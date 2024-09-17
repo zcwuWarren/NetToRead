@@ -36,4 +36,7 @@ public class BookInfo {
 
     @Column(name = "collect")
     private Integer collect;
+
+    @Column(name = "content")
+    private String content;
 }
