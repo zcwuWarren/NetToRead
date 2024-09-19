@@ -14,21 +14,42 @@ import java.util.List;
 @AllArgsConstructor
 public class BookCommentSql {
 
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    private Long id;
+//
+//    @Column(name = "book_id", nullable = false)
+//    private String bookId;
+//
+//    @Column(name = "user_id", nullable = false)
+//    private String userId;
+//
+//    @ElementCollection
+//    @Column(name = "comment")
+//    private List<String> comment;
+//
+//    @ElementCollection
+//    @CollectionTable(name = "book_highlights", joinColumns = @JoinColumn(name = "book_comment_id"))
+//    @Column(name = "highlight")
+//    private List<String> highlights;
+//}
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "book_id", nullable = false)
-    private String bookId;
+    // Many-to-One relation with User
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
-    @Column(name = "user_id", nullable = false)
-    private String userId;
+    // Many-to-One relation with BookInfo
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "book_id", nullable = false)
+    private BookInfo book;
 
-    @Column(name = "comment")
+    @Column(name = "comment", nullable = true)
     private String comment;
 
-    @ElementCollection
-    @CollectionTable(name = "book_highlights", joinColumns = @JoinColumn(name = "book_comment_id"))
-    @Column(name = "highlight")
-    private List<String> highlights;
+    @Column(name = "quote", nullable = true)
+    private String quote;
 }

@@ -15,30 +15,50 @@ import java.util.List;
 @AllArgsConstructor
 public class UserBookshelfSql {
 
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    private Long id;
+//
+//    @Column(name = "user_id", nullable = false)
+//    private String userId;
+//
+//    @ElementCollection
+//    @CollectionTable(name = "user_likes", joinColumns = @JoinColumn(name = "user_bookshelf_id"))
+//    @Column(name = "book_id")
+//    private List<String> likedBooks;
+//
+//    @ElementCollection
+//    @CollectionTable(name = "user_collects", joinColumns = @JoinColumn(name = "user_bookshelf_id"))
+//    @Column(name = "book_id")
+//    private List<String> collectedBooks;
+//
+//    @ElementCollection
+//    @CollectionTable(name = "user_comments", joinColumns = @JoinColumn(name = "user_bookshelf_id"))
+//    @Column(name = "book_id")
+//    private List<String> commentedBooks;
+//
+//    @ElementCollection
+//    @CollectionTable(name = "user_highlights", joinColumns = @JoinColumn(name = "user_bookshelf_id"))
+//    @Column(name = "book_id")
+//    private List<String> highlightedBooks;
+//}
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_id", nullable = false)
-    private String userId;
+    // Many-to-One relation with User
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
-    @ElementCollection
-    @CollectionTable(name = "user_likes", joinColumns = @JoinColumn(name = "user_bookshelf_id"))
-    @Column(name = "book_id")
-    private List<String> likedBooks;
+    // Many-to-One relation with BookInfo
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "book_id", nullable = false)
+    private BookInfo book;
 
-    @ElementCollection
-    @CollectionTable(name = "user_collects", joinColumns = @JoinColumn(name = "user_bookshelf_id"))
-    @Column(name = "book_id")
-    private List<String> collectedBooks;
+    @Column(name = "likes", nullable = false)
+    private Boolean likes;
 
-    @ElementCollection
-    @CollectionTable(name = "user_comments", joinColumns = @JoinColumn(name = "user_bookshelf_id"))
-    @Column(name = "book_id")
-    private List<String> commentedBooks;
-
-    @ElementCollection
-    @CollectionTable(name = "user_highlights", joinColumns = @JoinColumn(name = "user_bookshelf_id"))
-    @Column(name = "book_id")
-    private List<String> highlightedBooks;
+    @Column(name = "collect", nullable = false)
+    private Boolean collect;
 }

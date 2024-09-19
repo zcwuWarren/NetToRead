@@ -31,8 +31,8 @@ public class BookInfo {
     @Column(name = "publisher", nullable = false)
     private String publisher;
 
-    @Column(name = "like")
-    private Integer like;
+    @Column(name = "likes")
+    private Integer likes;
 
     @Column(name = "collect")
     private Integer collect;

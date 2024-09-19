@@ -1,7 +1,7 @@
 package com.personal_project.Next_to_read.controller;
 
-import com.personal_project.Next_to_read.data.dto.CommentDTO;
-import com.personal_project.Next_to_read.data.dto.HighlightDTO;
+import com.personal_project.Next_to_read.data.dto.CommentDto;
+import com.personal_project.Next_to_read.data.dto.HighlightDto;
 import com.personal_project.Next_to_read.service.BookCommentSqlService;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,13 +16,13 @@ public class BookCommentSqlController {
     }
 
     @PostMapping("/comment")
-    public void addOrUpdateComment(@PathVariable String category, @RequestParam String bookId, @RequestBody CommentDTO commentDTO) {
+    public void addOrUpdateComment(@PathVariable String category, @RequestParam String bookId, @RequestBody CommentDto commentDTO) {
         commentDTO.setBookId(bookId);
         bookCommentSqlService.addOrUpdateComment(commentDTO);
     }
 
     @PostMapping("/highlight")
-    public void addHighlight(@PathVariable String category, @RequestParam String bookId, @RequestBody HighlightDTO highlightDTO) {
+    public void addHighlight(@PathVariable String category, @RequestParam String bookId, @RequestBody HighlightDto highlightDTO) {
         highlightDTO.setBookId(bookId);
         bookCommentSqlService.addHighlight(highlightDTO);
     }

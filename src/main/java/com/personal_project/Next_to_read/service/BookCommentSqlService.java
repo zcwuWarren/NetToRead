@@ -1,7 +1,7 @@
 package com.personal_project.Next_to_read.service;
 
-import com.personal_project.Next_to_read.data.dto.CommentDTO;
-import com.personal_project.Next_to_read.data.dto.HighlightDTO;
+import com.personal_project.Next_to_read.data.dto.CommentDto;
+import com.personal_project.Next_to_read.data.dto.HighlightDto;
 import com.personal_project.Next_to_read.model.BookCommentSql;
 import com.personal_project.Next_to_read.repository.BookCommentSqlRepository;
 import org.springframework.stereotype.Service;
@@ -19,9 +19,9 @@ public class BookCommentSqlService {
     }
 
     @Transactional
-    public void addOrUpdateComment(CommentDTO commentDTO) {
+    public void addOrUpdateComment(CommentDto commentDTO) {
         // 查找或新建 BookCommentSql
-        BookCommentSql bookCommentSql = bookCommentSqlRepository.findById(Long.parseLong(commentDTO.getBookId()))
+        BookCommentSql bookCommentSql = bookCommentSqlRepository.findById()
                 .orElse(new BookCommentSql());
         bookCommentSql.setBookId(commentDTO.getBookId());
         bookCommentSql.setUserId(commentDTO.getUserId());
@@ -33,7 +33,7 @@ public class BookCommentSqlService {
     }
 
     @Transactional
-    public void addHighlight(HighlightDTO highlightDTO) {
+    public void addHighlight(HighlightDto highlightDTO) {
         BookCommentSql bookCommentSql = bookCommentSqlRepository.findById(Long.parseLong(highlightDTO.getBookId()))
                 .orElse(new BookCommentSql());
         bookCommentSql.setBookId(highlightDTO.getBookId());

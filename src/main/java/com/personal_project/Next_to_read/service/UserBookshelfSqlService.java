@@ -1,6 +1,8 @@
 package com.personal_project.Next_to_read.service;
 
+import com.personal_project.Next_to_read.model.BookCommentSql;
 import com.personal_project.Next_to_read.model.UserBookshelfSql;
+import com.personal_project.Next_to_read.repository.BookCommentSqlRepository;
 import com.personal_project.Next_to_read.repository.UserBookshelfSqlRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,16 +11,19 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserBookshelfSqlService {
 
     private final UserBookshelfSqlRepository userBookshelfSqlRepository;
+    private final BookCommentSqlRepository bookCommentSqlRepository;
 
-    public UserBookshelfSqlService(UserBookshelfSqlRepository userBookshelfSqlRepository) {
+    // constructor injection
+    public UserBookshelfSqlService(UserBookshelfSqlRepository userBookshelfSqlRepository, BookCommentSqlRepository bookCommentSqlRepository) {
         this.userBookshelfSqlRepository = userBookshelfSqlRepository;
+        this.bookCommentSqlRepository = bookCommentSqlRepository;
     }
 
     @Transactional
     public void addCommentedBook(String userId, String bookId) {
-        UserBookshelfSql userBookshelfSql = userBookshelfSqlRepository.findByUserId(userId)
+        BookCommentSql bookCommentSql = bookCommentSqlRepository.findByUserId(userId)
                 .orElse(new UserBookshelfSql());
-        userBookshelfSql.setUserId(userId); // 確保 userId 設置正確
+        bookCommentSql.setUser(userId); // 確保 userId 設置正確
         userBookshelfSql.getCommentedBooks().add(bookId);
         userBookshelfSqlRepository.save(userBookshelfSql);
     }
