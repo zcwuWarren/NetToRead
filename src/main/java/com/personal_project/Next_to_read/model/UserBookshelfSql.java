@@ -30,9 +30,9 @@ public class UserBookshelfSql {
     @JoinColumn(name = "book_id", nullable = false)
     private BookInfo bookId;
 
-    @Column(name = "likes", nullable = false)
-    private Boolean likes;
+    @Column(name = "likes")
+    private Boolean likes = false;
 
-    @Column(name = "collect", nullable = false)
-    private Boolean collect;
+    @Column(name = "collect")
+    private Boolean collect = false;
 }
