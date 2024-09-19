@@ -1,6 +1,6 @@
 package com.personal_project.Next_to_read.service;
 
-import com.personal_project.Next_to_read.data.form.RegistrationForm;
+import com.personal_project.Next_to_read.data.form.RegisterForm;
 import com.personal_project.Next_to_read.model.User;
 import com.personal_project.Next_to_read.repository.UserRepository;
 import org.slf4j.Logger;
@@ -8,8 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.sql.Timestamp;
 
 @Service
 public class UserService {
@@ -24,13 +22,14 @@ public class UserService {
     }
 
     @Transactional
-    public User registerUser(RegistrationForm form) {
+    public User registerUser(RegisterForm form) {
 
         if (userRepository.existsByEmail(form.getEmail())) {
             throw new RuntimeException("Email already exists");
         }
 
         User user = new User();
+        user.setUserName(form.getUserName());
         user.setEmail(form.getEmail());
         user.setPassword(passwordEncoder.encode(form.getPassword()));
 

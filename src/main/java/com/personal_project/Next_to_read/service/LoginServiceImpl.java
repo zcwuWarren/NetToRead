@@ -47,10 +47,12 @@ public class LoginServiceImpl implements LoginService {
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new UserPasswordMismatchException("帳號或密碼錯誤");
         }
+
+        // generate JWT token
         String jwtToken = jwtTokenUtil.generateToken(user);
         Long accessExpired = jwtTokenUtil.getExpirationDateFromToken(jwtToken).getTime();
 
-        LoginDto loginDto = new LoginDto(jwtToken, accessExpired, user);
+        LoginDto loginDto = new LoginDto(jwtToken, accessExpired);
         log.info("logged in:{}", loginDto);
         return loginDto;
     }

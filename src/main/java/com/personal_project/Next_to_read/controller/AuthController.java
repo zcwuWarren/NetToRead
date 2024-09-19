@@ -2,7 +2,7 @@ package com.personal_project.Next_to_read.controller;
 
 import com.personal_project.Next_to_read.data.dto.LoginDto;
 import com.personal_project.Next_to_read.data.form.LoginForm;
-import com.personal_project.Next_to_read.data.form.RegistrationForm;
+import com.personal_project.Next_to_read.data.form.RegisterForm;
 import com.personal_project.Next_to_read.model.User;
 import com.personal_project.Next_to_read.service.LoginService;
 import com.personal_project.Next_to_read.service.UserService;
@@ -29,7 +29,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody RegistrationForm registerForm) {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterForm registerForm) {
         @SuppressWarnings("unused")
         User registeredUser = userService.registerUser(registerForm);
         return ResponseEntity.ok(Map.of("message", "User registered successfully"));
