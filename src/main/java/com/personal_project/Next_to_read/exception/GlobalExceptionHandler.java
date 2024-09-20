@@ -1,6 +1,5 @@
 package com.personal_project.Next_to_read.exception;
 
-import com.personal_project.Next_to_read.exception.auth.UserNotExistException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
