@@ -41,6 +41,4 @@ public class UserBookshelfSql {
 
     @Column(name = "timestamp_like")
     private Timestamp timestampLike;
-
-
 }
