@@ -1,5 +1,6 @@
 package com.personal_project.Next_to_read.service;
 
+import com.personal_project.Next_to_read.data.dto.BookCommentDto;
 import com.personal_project.Next_to_read.data.form.CommentForm;
 import com.personal_project.Next_to_read.data.form.QuoteForm;
 import com.personal_project.Next_to_read.exception.ResourceNotFoundException;
@@ -12,22 +13,22 @@ import com.personal_project.Next_to_read.repository.UserBookshelfSqlRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class BookCommentSqlService {
 
     private final BookCommentSqlRepository bookCommentSqlRepository;
     private final UserBookshelfSqlRepository userBookshelfSqlRepository;
-    private final UserBookshelfSqlService userBookshelfSqlService;
     private final JwtTokenUtil jwtTokenUtil;
     private final BookInfoRepository bookinfoRepository;
     private final QuoteRepository quoteRepository;
 
-    public BookCommentSqlService(BookCommentSqlRepository bookCommentSqlRepository, UserBookshelfSqlService userBookshelfSqlService, JwtTokenUtil jwtTokenUtil, BookInfoRepository bookInfoRepository, QuoteRepository quoteRepository, UserBookshelfSqlRepository userBookshelfSqlRepository) {
+    public BookCommentSqlService(BookCommentSqlRepository bookCommentSqlRepository, JwtTokenUtil jwtTokenUtil, BookInfoRepository bookInfoRepository, QuoteRepository quoteRepository, UserBookshelfSqlRepository userBookshelfSqlRepository) {
         this.bookCommentSqlRepository = bookCommentSqlRepository;
         this.userBookshelfSqlRepository = userBookshelfSqlRepository;
-        this.userBookshelfSqlService = userBookshelfSqlService;
         this.jwtTokenUtil = jwtTokenUtil;
         this.bookinfoRepository = bookInfoRepository;
         this.quoteRepository = quoteRepository;
@@ -218,6 +219,12 @@ public class BookCommentSqlService {
 
             return true; // return true to indicate collect was added
         }
+    }
+
+    public List<BookCommentDto> getCommentsByBookId(Long bookId) {
+
+        List<BookCommentSql> comments = bookCommentSqlRepository.findByBookId_BookId(bookId);
+        return comments.stream().map(comment -> new BookCommentDto(comment)).collect(Collectors.toList());
     }
 }
 

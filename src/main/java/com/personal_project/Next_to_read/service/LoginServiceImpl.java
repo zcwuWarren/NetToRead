@@ -1,6 +1,5 @@
 package com.personal_project.Next_to_read.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.personal_project.Next_to_read.data.dto.LoginDto;
 import com.personal_project.Next_to_read.exception.auth.UserNotExistException;
