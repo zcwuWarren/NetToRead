@@ -76,9 +76,9 @@ public class BookCommentSqlService {
 
         // set quote
         Quote quote = new Quote();
-        quote.setBook(bookInfo);
-        quote.setUser(user);
-        quote.setQuoteText(quoteForm.getQuote());
+        quote.setBookId(bookInfo);
+        quote.setUserId(user);
+        quote.setQuote(quoteForm.getQuote());
 
         // save quote
         quoteRepository.save(quote);
@@ -224,6 +224,15 @@ public class BookCommentSqlService {
     public List<BookCommentDto> getCommentsByBookId(Long bookId) {
 
         List<BookCommentSql> comments = bookCommentSqlRepository.findByBookId_BookId(bookId);
+        return comments.stream().map(comment -> new BookCommentDto(comment)).collect(Collectors.toList());
+    }
+
+    public List<BookCommentDto> getCommentsByUserId(String token) {
+
+        User user = jwtTokenUtil.getUserFromToken(token);
+        Long userId = user.getUserId();
+
+        List<BookCommentSql> comments = bookCommentSqlRepository.findByUserId_UserId(userId);
         return comments.stream().map(comment -> new BookCommentDto(comment)).collect(Collectors.toList());
     }
 }

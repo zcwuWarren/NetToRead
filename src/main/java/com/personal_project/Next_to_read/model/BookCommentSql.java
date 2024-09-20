@@ -29,4 +29,7 @@ public class BookCommentSql {
 
     @Column(name = "comment")
     private String comment;
+
+//    @Column(name = "quote")
+//    private String quote;
 }
