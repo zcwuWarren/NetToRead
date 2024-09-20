@@ -12,11 +12,13 @@ import lombok.NoArgsConstructor;
 public class BookCommentDto {
     private Long userId;
     private String comment;
+    private String bookName;
     private String date;
 
     public BookCommentDto(BookCommentSql comment) {
         this.userId = comment.getUserId().getUserId();
         this.comment = comment.getComment();
+        this.bookName = comment.getBookId().getBookName();
         this.date = DateUtil.formatDate(comment.getTimestamp());
     }
 }

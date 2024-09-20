@@ -15,6 +15,6 @@ public interface UserBookshelfSqlRepository extends JpaRepository<UserBookshelfS
 
     List<UserBookshelfSql> findByUserId_UserIdAndCollectTrueOrderByTimestampCollectDesc(Long userId);
 
-    List<UserBookshelfSql> findByUserId_UserIdAndLikesTrueOrderByTimestampCollectDesc(Long userId);
+    List<UserBookshelfSql> findByUserId_UserIdAndLikesTrueOrderByTimestampLikeDesc(Long userId);
 }
 

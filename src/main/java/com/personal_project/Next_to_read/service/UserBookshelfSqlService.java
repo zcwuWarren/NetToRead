@@ -37,7 +37,7 @@ public class UserBookshelfSqlService {
         User user = jwtTokenUtil.getUserFromToken(token);
         Long userId = user.getUserId();
 
-        List<UserBookshelfSql> likes = userBookshelfSqlRepository.findByUserId_UserIdAndLikesTrueOrderByTimestampCollectDesc(userId);
+        List<UserBookshelfSql> likes = userBookshelfSqlRepository.findByUserId_UserIdAndLikesTrueOrderByTimestampLikeDesc(userId);
 
         // turn result to BookCollectDto
         return likes.stream().map(like -> new UserBookshelfDto(like)).collect(Collectors.toList());
