@@ -23,7 +23,7 @@ public class QuoteService {
 
     public List<QuoteDto> getQuotesByBookId(Long bookId) {
 
-        List<Quote> quotes = quoteRepository.findByBookId_BookId(bookId);
+        List<Quote> quotes = quoteRepository.findByBookId_BookIdOrderByTimestampDesc(bookId);
         return quotes.stream().map(quote -> new QuoteDto(quote)).collect(Collectors.toList());
     }
 
@@ -32,7 +32,7 @@ public class QuoteService {
         User user = jwtTokenUtil.getUserFromToken(token);
         Long userId = user.getUserId();
 
-        List<Quote> quotes = quoteRepository.findByUserId_UserId(userId);
+        List<Quote> quotes = quoteRepository.findByUserId_UserIdOrderByTimestampDesc(userId);
         return quotes.stream().map(quote -> new QuoteDto(quote)).collect(Collectors.toList());
     }
 }

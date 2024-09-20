@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.sql.Timestamp;
+
 @Entity
 @Table(name = "book_comment")
 @Data
@@ -30,6 +32,6 @@ public class BookCommentSql {
     @Column(name = "comment")
     private String comment;
 
-//    @Column(name = "quote")
-//    private String quote;
+    @Column(name = "timestamp", nullable = false)
+    private Timestamp timestamp;
 }

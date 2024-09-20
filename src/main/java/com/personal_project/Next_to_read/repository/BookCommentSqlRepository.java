@@ -12,7 +12,7 @@ public interface BookCommentSqlRepository extends JpaRepository<BookCommentSql, 
 
     Optional<BookCommentSql> findByUserId_UserIdAndBookId_BookId(Long userId, Long bookId);
 
-    List<BookCommentSql> findByBookId_BookId(Long bookId);
+    List<BookCommentSql> findByBookId_BookIdOrderByTimestampDesc(Long bookId);
 
-    List<BookCommentSql> findByUserId_UserId(Long userId);
+    List<BookCommentSql> findByUserId_UserIdOrderByTimestampDesc(Long userId);
 }

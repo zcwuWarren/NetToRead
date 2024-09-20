@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.sql.Timestamp;
+
 @Entity
 @Table(name = "quote")
 @Data
@@ -30,4 +32,7 @@ public class Quote {
 
     @Column(name = "quote", nullable = false)
     private String quote;
+
+    @Column(name = "timestamp", nullable = false)
+    private Timestamp timestamp;
 }
