@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Index</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/bookDisplay.css"> <!-- 引入新的CSS -->
+</head>
+<body>
+<header>
+    <div class="nav-left">
+        <a href="index.html">Home</a>
+        <div class="dropdown">
+            <a href="#" id="categoryBtn">Category</a>
+            <div class="dropdown-content" id="categoryDropdown">
+                <div class="category-box" id="mainCategoryContainer">
+                    <!-- 主分類會在這裡動態載入 -->
+                </div>
+                <div class="category-sub" id="categorySub">
+                    <!-- 次分類會在這裡動態載入 -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="nav-right">
+        <div class="dropdown">
+            <a href="#" id="profileBtn">Profile</a>
+            <div class="dropdown-content" id="profileDropdown">
+                <div class="profile-box">
+                    <div class="profile-item">User Profile</div>
+                    <div class="profile-item">Login</div>
+                    <div class="profile-item">Register</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main>
+    <div class="latest-likes-container" id="latestLikesContainer">
+        <!-- 6本書的資料將會動態載入 -->
+    </div>
+</main>
+
+<script src="js/script.js"></script>
+<script src="js/category.js"></script>
+<script src="js/latestLikes.js"></script>
+</body>
+</html>

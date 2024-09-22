@@ -1,0 +1,101 @@
+/* Reset default browser styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    background-color: #f1f1f1;
+}
+
+.nav-left, .nav-right {
+    display: flex;
+    gap: 20px;
+    justify-content: flex-start;
+}
+
+.nav-left a, .nav-right a {
+    padding: 10px 15px;
+    text-decoration: none;
+    background-color: #ccc;
+    color: black;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.nav-left a:hover, .nav-right a:hover {
+    background-color: #aaa;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: flex;
+    position: absolute;
+    background-color: #f9f9f9;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    gap: 1px; /* 添加小間隙，視覺上分離主分類和次分類 */
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+#mainCategoryContainer {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    border-right: 1px solid #ccc; /* 添加分隔線 */
+}
+
+.category-item {
+    padding: 10px;
+    cursor: pointer;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    margin: 2px; /* 減少外邊距 */
+    white-space: nowrap;
+}
+
+.category-item:hover {
+    background-color: #ddd;
+}
+
+/* 次分類的容器 */
+#categorySub {
+    display: none;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    padding: 5px;
+    position: absolute;
+    left: 100%; /* 改為 100% 確保它緊貼主分類右側 */
+    /*top: 0;*/
+    z-index: 10; /* 確保次分類出現在最上層 */
+    margin-left: -1px; /* 稍微向左移動以覆蓋邊界 */
+}
+
+.sub-category-item {
+    padding: 10px;
+    background-color: #e0e0e0;
+    margin: 2px;
+    white-space: nowrap;
+}
+
+.sub-category-item:hover {
+    background-color: #ddd;
+}

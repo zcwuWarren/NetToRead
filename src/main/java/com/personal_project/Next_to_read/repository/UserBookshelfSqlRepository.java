@@ -1,6 +1,7 @@
 package com.personal_project.Next_to_read.repository;
 
 import com.personal_project.Next_to_read.model.BookCommentSql;
+import com.personal_project.Next_to_read.model.BookInfo;
 import com.personal_project.Next_to_read.model.UserBookshelfSql;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -16,5 +17,7 @@ public interface UserBookshelfSqlRepository extends JpaRepository<UserBookshelfS
     List<UserBookshelfSql> findByUserId_UserIdAndCollectTrueOrderByTimestampCollectDesc(Long userId);
 
     List<UserBookshelfSql> findByUserId_UserIdAndLikesTrueOrderByTimestampLikeDesc(Long userId);
+
+    List<UserBookshelfSql> findTop4BySubCategoryAndLikesTrueOrderByTimestampLikeDesc(String subCategory);
 }
 

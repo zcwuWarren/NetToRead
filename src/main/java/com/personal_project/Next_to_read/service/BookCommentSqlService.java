@@ -60,6 +60,8 @@ public class BookCommentSqlService {
         bookCommentSql.setUserId(user);
         bookCommentSql.setComment(commentForm.getComment());
         bookCommentSql.setTimestamp(new Timestamp(new Date().getTime()));
+        bookCommentSql.setMainCategory(bookInfo.getMainCategory());
+        bookCommentSql.setSubCategory(bookInfo.getSubCategory());
 
         // save comment
         bookCommentSqlRepository.save(bookCommentSql);
@@ -83,6 +85,8 @@ public class BookCommentSqlService {
         quote.setUserId(user);
         quote.setQuote(quoteForm.getQuote());
         quote.setTimestamp(new Timestamp(new Date().getTime()));
+        quote.setMainCategory(bookInfo.getMainCategory());
+        quote.setSubCategory(bookInfo.getSubCategory());
 
         // save quote
         quoteRepository.save(quote);
@@ -141,6 +145,8 @@ public class BookCommentSqlService {
             userBookshelfSql.setLikes(true);
             userBookshelfSql.setCollect(false);
             userBookshelfSql.setTimestampLike(new Timestamp(new Date().getTime()));// set default collect status
+            userBookshelfSql.setMainCategory(bookInfo.getMainCategory());
+            userBookshelfSql.setSubCategory(bookInfo.getSubCategory());
 
             // Save like
             userBookshelfSqlRepository.save(userBookshelfSql);
@@ -215,6 +221,8 @@ public class BookCommentSqlService {
             userBookshelfSql.setCollect(true);
             userBookshelfSql.setLikes(false); // set default likes status
             userBookshelfSql.setTimestampCollect(new Timestamp(new Date().getTime()));
+            userBookshelfSql.setMainCategory(bookInfo.getMainCategory());
+            userBookshelfSql.setSubCategory(bookInfo.getSubCategory());
 
             // Save collect
             userBookshelfSqlRepository.save(userBookshelfSql);

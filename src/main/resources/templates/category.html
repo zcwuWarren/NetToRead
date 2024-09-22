@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Category Page</title>
+  <link rel="stylesheet" href="../static/css/style.css"> <!-- 引入與 index.html 相同的 CSS -->
+  <link rel="stylesheet" href="../static/css/bookDisplay.css"> <!-- 引入新的 bookDisplay.css -->
+</head>
+<body data-mainCategory="[[${mainCategory}]]" data-subCategory="[[${subCategory}]]">
+<header>
+  <div class="nav-left">
+    <a href="../static/index.html">Home</a>
+    <div class="dropdown">
+      <a href="#" id="categoryBtn">Category</a>
+      <div class="dropdown-content" id="categoryDropdown">
+        <div class="category-box" id="mainCategoryContainer">
+          <!-- 主分類會在這裡動態載入 -->
+        </div>
+        <div class="category-sub" id="categorySub">
+          <!-- 次分類會在這裡動態載入 -->
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="nav-right">
+    <a href="profile.html">Profile</a>
+  </div>
+</header>
+
+<main>
+  <!-- 第一個大容器，用於顯示書籍封面及名稱 -->
+  <div class="latest-likes-container" id="latestLikesContainer">
+    <!-- 6 本書籍的資料將在此動態載入 -->
+  </div>
+
+  <!-- 第二個大容器，用於顯示最新評論 -->
+  <div class="latest-comments-container" id="latestCommentsContainer">
+    <!-- 最新評論將在此動態載入 -->
+  </div>
+</main>
+
+<script src="js/script.js"></script> <!-- 引入原本的 JS -->
+<script src="../static/js/category.js"></script> <!-- 引入與分類有關的 JS -->
+<script src="../static/js/latestLikesByCategory.js"></script> <!-- 動態載入最新按讚書籍 -->
+<script src="../static/js/latestCommentsByCategory.js"></script> <!-- 動態載入最新評論 -->
+<script>
+  const mainCategory = '[[${mainCategory}]]';
+  const subCategory = '[[${subCategory}]]';
+</script>
+</body>
+</html>

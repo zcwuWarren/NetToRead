@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/account.css"> <!-- 引入新的CSS -->
+</head>
+<body>
+<header>
+    <div class="nav-left">
+        <a href="index.html">Home</a>
+    </div>
+</header>
+
+<main>
+    <!-- 大的 a 容器 -->
+    <div class="container-a" id="containerA">
+        <!-- 左上切換 login 和 register -->
+        <div class="switch-buttons">
+            <button id="switch-login">Login</button>
+            <button id="switch-register">Register</button>
+        </div>
+
+        <!-- a-login 容器，預設顯示 -->
+        <div id="a-login">
+            <div class="container-a-login-1">
+                <input type="email" id="login-email" placeholder="Enter your email">
+            </div>
+            <div class="container-a-login-2">
+                <input type="password" id="login-password" placeholder="Enter your password">
+            </div>
+            <div class="container-a-login-3">
+                <button id="submit-login">Login</button>
+            </div>
+        </div>
+
+        <!-- a-register 容器，切換顯示 -->
+        <div id="a-register" style="display:none;">
+            <div class="container-a-register-1">
+                <input type="text" id="register-username" placeholder="Enter your user name">
+            </div>
+            <div class="container-a-register-2">
+                <input type="email" id="register-email" placeholder="Enter your email">
+            </div>
+            <div class="container-a-register-3">
+                <input type="password" id="register-password" placeholder="Enter your password">
+            </div>
+            <div class="container-a-register-4">
+                <button id="submit-register">Register</button>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="js/account.js"></script> <!-- 引入 JS -->
+<script src="js/category.js"></script>
+</body>
+</html>

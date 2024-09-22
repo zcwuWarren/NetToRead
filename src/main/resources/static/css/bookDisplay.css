@@ -1,0 +1,53 @@
+/* 最新按讚書籍的容器 */
+.latest-likes-container {
+    display: flex;
+    justify-content: space-between;
+    width: 60%;
+    margin: 0 auto;
+    padding-top: 20px;
+}
+
+.book-container {
+    text-align: center;
+    margin: 10px;
+}
+
+.book-cover {
+    width: 150px;
+    height: 220px;
+    object-fit: cover;
+}
+
+.book-name {
+    margin-top: 10px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/* 最新評論的容器 */
+.latest-comments-container {
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+    margin: 20px auto;
+}
+
+.comment-container {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    margin: 10px 0;
+    border-bottom: 1px solid #ccc;
+}
+
+.comment-text {
+    flex: 1;
+    padding-right: 10px;
+}
+
+.comment-book-name {
+    flex-basis: 150px;
+    text-align: right;
+    font-size: 14px;
+    font-weight: bold;
+}

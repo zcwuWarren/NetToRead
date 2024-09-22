@@ -41,4 +41,10 @@ public class UserBookshelfSql {
 
     @Column(name = "timestamp_like")
     private Timestamp timestampLike;
+
+    @Column(name = "main_category", nullable = false)
+    private String mainCategory;
+
+    @Column(name = "sub_category", nullable = false)
+    private String subCategory;
 }

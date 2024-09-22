@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Detail</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/bookDisplay.css">
+    <link rel="stylesheet" href="css/bookDetail.css">
+
+</head>
+<body>
+<header>
+    <div class="nav-left">
+        <a href="index.html">Home</a>
+        <div class="dropdown">
+            <a href="#" id="categoryBtn">Category</a>
+            <div class="dropdown-content" id="categoryDropdown">
+                <div class="category-box" id="mainCategoryContainer">
+                    <!-- 主分類會在這裡動態載入 -->
+                </div>
+                <div class="category-sub" id="categorySub">
+                    <!-- 次分類會在這裡動態載入 -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="nav-right">
+        <a href="profile.html">Profile</a>
+    </div>
+</header>
+
+<main>
+    <!-- 第一個大容器 a -->
+    <div class="container-a" id="containerA">
+        <div class="container-a-top">
+            <div class="container-a-1" id="containerA1">
+                <!-- 書籍封面將顯示在這裡 -->
+            </div>
+            <div class="container-a-2" id="containerA2">
+                <!-- 書籍資訊將顯示在這裡 -->
+<!--                <div id="A-2-like" class="like-button">Like</div>-->
+<!--                <div id="A-2-collect" class="collect-button">Collect</div>-->
+            </div>
+        </div>
+        <div class="container-a-3" id="containerA3">
+            <!-- 書籍描述將顯示在這裡 -->
+        </div>
+    <div class="like-collect-container">
+        <div id="A-2-like" class="like-button">Like</div>
+        <div id="A-2-collect" class="collect-button">Collect</div>
+    </div>
+    <div id="containerB-controls">
+        <button id="b-left">Comments</button>
+        <button id="b-right">Quotes</button>
+    </div>
+    </div>
+    <!-- b 大容器 -->
+    <div class="container-b" id="containerB">
+        <!-- 這裡會動態生成評論小容器 -->
+    </div>
+    <!-- 分頁按鈕 -->
+    <div class="pagination" id="pagination">
+        <!-- 分頁按鈕將在這裡動態生成 -->
+    </div>
+    <!-- c 大容器 -->
+    <div id="containerC" class="container">
+        <!-- 左上切換按鈕 -->
+        <div class="switch-buttons">
+            <button id="switch-comment">Comment</button>
+            <button id="switch-quote">Quote</button>
+        </div>
+
+        <!-- 輸入框 -->
+        <h2>Add a Comment or Quotes</h2>
+        <textarea id="input-box" placeholder="Enter your comment or quotes..."></textarea>
+
+        <!-- 送出按鈕 -->
+        <button id="submit-button">Submit</button>
+    </div>
+</main>
+
+<script src="js/bookDetail.js"></script>
+</body>
+</html>
