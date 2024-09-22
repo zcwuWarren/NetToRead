@@ -16,14 +16,20 @@ public class BookInfo {
     @Column(name = "ISBN", nullable = false)
     private Long isbn;
 
-    @Column(name = "category", nullable = false)
-    private String category;
+    @Column(name = "main_category", nullable = false)
+    private String mainCategory;
+
+    @Column(name = "sub_category", nullable = false)
+    private String subCategory;
 
     @Column(name = "book_name", nullable = false)
     private String bookName;
 
     @Column(name = "book_cover", nullable = false)
     private String bookCover;
+
+    @Column(name = "author", nullable = false)
+    private String author;
 
     @Column(name = "publish_date", nullable = false)
     private String publishDate;
@@ -37,6 +43,9 @@ public class BookInfo {
     @Column(name = "collect")
     private Integer collect;
 
-    @Column(name = "content")
+    @Column(name = "content", nullable = false)
     private String content;
+
+    @Column(name = "description", nullable = false)
+    private String description;
 }

@@ -10,12 +10,15 @@ import lombok.AllArgsConstructor;
 public class BookInfoDto {
     private Long bookId;
     private Long isbn;
-    private String category;
+    private String mainCategory;
+    private String subCategory;
     private String bookName;
     private String bookCover;
     private String publishDate;
     private String publisher;
+    private String author;
     private Integer like;
     private Integer collect;
     private String content;
+    private String description;
 }
