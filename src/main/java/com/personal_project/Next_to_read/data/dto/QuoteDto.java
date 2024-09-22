@@ -1,16 +1,25 @@
 package com.personal_project.Next_to_read.data.dto;
 
 import com.personal_project.Next_to_read.model.Quote;
+import com.personal_project.Next_to_read.util.DateUtil;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class QuoteDto {
     private Long userId;
-    private String quoteText;
+    private String quote;
+    private String bookName;
+    private String date;
 
     public QuoteDto(Quote quote) {
-        this.userId = quote.getUser().getUserId();
-        this.quoteText = quote.getQuoteText();
+        this.userId = quote.getUserId().getUserId();
+        this.quote = quote.getQuote();
+        this.bookName = quote.getBookId().getBookName();
+        this.date = DateUtil.formatDate(quote.getTimestamp());
     }
 }
 

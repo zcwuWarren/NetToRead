@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.sql.Timestamp;
 
 
 @Entity
@@ -34,4 +35,10 @@ public class UserBookshelfSql {
 
     @Column(name = "collect")
     private Boolean collect = false;
+
+    @Column(name = "timestamp_collect")
+    private Timestamp timestampCollect;
+
+    @Column(name = "timestamp_like")
+    private Timestamp timestampLike;
 }

@@ -7,7 +7,7 @@ import lombok.Data;
 public class CommentForm {
 
     @NotEmpty
-    private String Comment;
+    private String comment;
 
     private String token;
 }

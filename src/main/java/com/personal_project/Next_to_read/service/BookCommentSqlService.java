@@ -13,6 +13,8 @@ import com.personal_project.Next_to_read.repository.UserBookshelfSqlRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -57,6 +59,7 @@ public class BookCommentSqlService {
         bookCommentSql.setBookId(bookInfo);
         bookCommentSql.setUserId(user);
         bookCommentSql.setComment(commentForm.getComment());
+        bookCommentSql.setTimestamp(new Timestamp(new Date().getTime()));
 
         // save comment
         bookCommentSqlRepository.save(bookCommentSql);
@@ -76,9 +79,10 @@ public class BookCommentSqlService {
 
         // set quote
         Quote quote = new Quote();
-        quote.setBook(bookInfo);
-        quote.setUser(user);
-        quote.setQuoteText(quoteForm.getQuote());
+        quote.setBookId(bookInfo);
+        quote.setUserId(user);
+        quote.setQuote(quoteForm.getQuote());
+        quote.setTimestamp(new Timestamp(new Date().getTime()));
 
         // save quote
         quoteRepository.save(quote);
@@ -104,6 +108,8 @@ public class BookCommentSqlService {
             if (Boolean.TRUE.equals(userBookshelfSql.getLikes())) {
                 // If currently liked, cancel the like
                 userBookshelfSql.setLikes(false);
+                // Set timestamp_like to null when canceling the like
+                userBookshelfSql.setTimestampLike(null);
 
                 // Decrease book's likes count
                 if (bookInfo.getLikes() != null && bookInfo.getLikes() > 0) {
@@ -112,6 +118,7 @@ public class BookCommentSqlService {
             } else {
                 // If not liked (or previously canceled), add a like
                 userBookshelfSql.setLikes(true);
+                userBookshelfSql.setTimestampLike(new Timestamp(new Date().getTime()));
 
                 // Increase book's likes count
                 if (bookInfo.getLikes() == null) {
@@ -132,7 +139,8 @@ public class BookCommentSqlService {
             userBookshelfSql.setBookId(bookInfo);
             userBookshelfSql.setUserId(user);
             userBookshelfSql.setLikes(true);
-            userBookshelfSql.setCollect(false); // set default collect status
+            userBookshelfSql.setCollect(false);
+            userBookshelfSql.setTimestampLike(new Timestamp(new Date().getTime()));// set default collect status
 
             // Save like
             userBookshelfSqlRepository.save(userBookshelfSql);
@@ -174,6 +182,8 @@ public class BookCommentSqlService {
             if (Boolean.TRUE.equals(userBookshelfSql.getCollect())) {
                 // If currently collected, cancel the collect
                 userBookshelfSql.setCollect(false);
+                // Set timestamp_collect to null when canceling the collect
+                userBookshelfSql.setTimestampCollect(null);
 
                 // Decrease book's collect count
                 if (bookInfo.getCollect() != null && bookInfo.getCollect() > 0) {
@@ -182,6 +192,7 @@ public class BookCommentSqlService {
             } else {
                 // If not collected (or previously canceled), add a collect
                 userBookshelfSql.setCollect(true);
+                userBookshelfSql.setTimestampCollect(new Timestamp(new Date().getTime()));
 
                 // Increase book's collect count
                 if (bookInfo.getCollect() == null) {
@@ -203,6 +214,7 @@ public class BookCommentSqlService {
             userBookshelfSql.setUserId(user);
             userBookshelfSql.setCollect(true);
             userBookshelfSql.setLikes(false); // set default likes status
+            userBookshelfSql.setTimestampCollect(new Timestamp(new Date().getTime()));
 
             // Save collect
             userBookshelfSqlRepository.save(userBookshelfSql);
@@ -223,7 +235,16 @@ public class BookCommentSqlService {
 
     public List<BookCommentDto> getCommentsByBookId(Long bookId) {
 
-        List<BookCommentSql> comments = bookCommentSqlRepository.findByBookId_BookId(bookId);
+        List<BookCommentSql> comments = bookCommentSqlRepository.findByBookId_BookIdOrderByTimestampDesc(bookId);
+        return comments.stream().map(comment -> new BookCommentDto(comment)).collect(Collectors.toList());
+    }
+
+    public List<BookCommentDto> getCommentsByUserId(String token) {
+
+        User user = jwtTokenUtil.getUserFromToken(token);
+        Long userId = user.getUserId();
+
+        List<BookCommentSql> comments = bookCommentSqlRepository.findByUserId_UserIdOrderByTimestampDesc(userId);
         return comments.stream().map(comment -> new BookCommentDto(comment)).collect(Collectors.toList());
     }
 }

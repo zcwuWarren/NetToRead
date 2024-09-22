@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.sql.Timestamp;
+
 @Entity
 @Table(name = "quote")
 @Data
@@ -21,13 +23,16 @@ public class Quote {
     // Many-to-One relation with User
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private User userId;
 
     // Many-to-One relation with BookInfo
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id", nullable = false)
-    private BookInfo book;
+    private BookInfo bookId;
 
     @Column(name = "quote", nullable = false)
-    private String quoteText;
+    private String quote;
+
+    @Column(name = "timestamp", nullable = false)
+    private Timestamp timestamp;
 }

@@ -11,5 +11,7 @@ import java.util.Optional;
 @Repository
 public interface QuoteRepository extends JpaRepository<Quote, Long> {
 
-    List<Quote> findByBook_BookId(Long bookId);
+    List<Quote> findByBookId_BookIdOrderByTimestampDesc(Long bookId);
+
+    List<Quote> findByUserId_UserIdOrderByTimestampDesc(Long UserId);
 }
