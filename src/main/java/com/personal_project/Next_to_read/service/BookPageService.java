@@ -7,23 +7,27 @@ import com.personal_project.Next_to_read.model.BookCommentSql;
 import com.personal_project.Next_to_read.model.BookInfo;
 import com.personal_project.Next_to_read.repository.BookCommentSqlRepository;
 import com.personal_project.Next_to_read.repository.BookInfoRepository;
-import com.personal_project.Next_to_read.util.DateUtil;
+import com.personal_project.Next_to_read.repository.UserBookshelfSqlRepository;
+import com.personal_project.Next_to_read.util.EntityToDtoConverter.BookCommentDtoConverter;
+import com.personal_project.Next_to_read.util.EntityToDtoConverter.BookInfoDtoConverter;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class BookPageService {
 
     private final BookInfoRepository bookInfoRepository;
     private final BookCommentSqlRepository bookCommentSqlRepository;
+    private final UserBookshelfSqlRepository userBookshelfSqlRepository;
 
 
-    public BookPageService(BookInfoRepository bookInfoRepository, BookCommentSqlRepository bookCommentSqlRepository) {
+
+    public BookPageService(BookInfoRepository bookInfoRepository, BookCommentSqlRepository bookCommentSqlRepository, UserBookshelfSqlRepository userBookshelfSqlRepository) {
         this.bookInfoRepository = bookInfoRepository;
         this.bookCommentSqlRepository = bookCommentSqlRepository;
+        this.userBookshelfSqlRepository = userBookshelfSqlRepository;
     }
 
     public List<Map<String, Object>> getCategories() {
@@ -32,60 +36,52 @@ public class BookPageService {
 
     public List<BookInfoDto> getTop6BooksByLikesByCategory(String subCategory) {
         List<BookInfo> books = bookInfoRepository.findTop6BySubCategoryOrderByLikesDesc(subCategory);
-
         // turn to BookInfoDto
-        return books.stream()
-                .map(book -> BookInfoDto.builder()
-                        .bookId(book.getBookId())
-                        .bookName(book.getBookName())
-                        .bookCover(book.getBookCover())
-                        .build())
-                .collect(Collectors.toList());
-    }
-
-    public List<BookInfoDto> getTop6BooksByLikes() {
-        List<BookInfo> books = bookInfoRepository.findTop6ByOrderByLikesDesc();
-
-        // turn to BookInfoDto
-        return books.stream()
-                .map(book -> BookInfoDto.builder()
-                        .bookId(book.getBookId())
-                        .bookName(book.getBookName())
-                        .bookCover(book.getBookCover())
-                        .build())
-                .collect(Collectors.toList());
-
+        return BookInfoDtoConverter.convertToDtoList(books);
     }
 
     public List<BookCommentDto> getLatestCommentsBySubCategory(String subCategory) {
 
         List<BookCommentSql> comments = bookCommentSqlRepository.findBySubCategoryOrderByTimestampDesc(subCategory);
-        return comments.stream()
-                .map(comment -> BookCommentDto.builder()
-                        .userId(comment.getUserId().getUserId())
-                        .comment(comment.getComment())
-                        .bookName(comment.getBookId().getBookName())
-                        .date(DateUtil.formatDate(comment.getTimestamp()))
-                        .build())
-                .collect(Collectors.toList());
+        return BookCommentDtoConverter.convertToDtoList(comments);
     }
 
     public BookInfoDto getBookInfoById(Long bookId) {
         BookInfo book = bookInfoRepository.findByBookId(bookId)
                 .orElseThrow(() -> new ResourceNotFoundException("Book not found with id: " + bookId));
 
-        return BookInfoDto.builder()
-                .bookId(book.getBookId())
-                .isbn(book.getIsbn())
-                .publisher(book.getPublisher())
-                .publishDate(book.getPublishDate())
-                .author(book.getAuthor())
-                .like(book.getLikes())
-                .collect(book.getCollect())
-                .content(book.getContent())
-                .description(book.getDescription())
-                .bookName(book.getBookName())
-                .bookCover(book.getBookCover())
-                .build();
+        return BookInfoDtoConverter.convertToDto(book);
+    }
+
+    public List<BookCommentDto> getLatestComments() {
+        List<BookCommentSql> comments = bookCommentSqlRepository.findTop6ByOrderByTimestampDesc();
+        return BookCommentDtoConverter.convertToDtoList(comments);
+    }
+
+    public List<BookInfoDto> getTop6BooksByCategory(String subCategory) {
+        List<BookInfo> books = bookInfoRepository.findTop6BySubCategoryOrderByCollectDesc(subCategory);
+        return BookInfoDtoConverter.convertToDtoList(books);
+    }
+
+    public List<BookInfoDto> getLatestLikedBooksByCategory(String subCategory) {
+
+        // get bookId from user_bookshelf by subCategory and timestampLike
+        List<Long> bookIds = userBookshelfSqlRepository.findTop6BookIdsBySubCategoryOrderByTimestampLikeDesc(subCategory);
+
+        // get book data from bookinfo by bookIds
+        List<BookInfo> books = bookInfoRepository.findTop6ByBookIdIn(bookIds);
+
+        // turn to BookInfoDto
+        return BookInfoDtoConverter.convertToDtoList(books);
+    }
+
+    public List<BookInfoDto> getLatestLikedBooks() {
+
+        // get bookId from user_bookshelf by subCategory and timestampLike
+        List<Long> bookIds = userBookshelfSqlRepository.findTop6BookIdsOrderByTimestampLikeDesc();
+        System.out.println(bookIds);
+        List<BookInfo> books = bookInfoRepository.findTop6ByBookIdIn(bookIds);
+        // turn to BookInfoDto
+        return BookInfoDtoConverter.convertToDtoList(books);
     }
 }

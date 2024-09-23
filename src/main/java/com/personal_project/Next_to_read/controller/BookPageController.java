@@ -36,16 +36,15 @@ public class BookPageController {
         this.bookPageService = bookPageService;
     }
 
-    @GetMapping("/switchToComment")
-    public ResponseEntity<List<BookCommentDto>> getCommentsByBookId(@RequestParam Long bookId) {
-        List<BookCommentDto> comments = bookCommentSqlService.getCommentsByBookId(bookId);
-        return ResponseEntity.ok(comments);
-    }
 
-    @GetMapping("/switchToQuote")
-    public ResponseEntity<List<QuoteDto>> getQuotesByBookId(@RequestParam Long bookId) {
-        List<QuoteDto> quotes = quoteService.getQuotesByBookId(bookId);
-        return ResponseEntity.ok(quotes);
+
+    // categories
+    @GetMapping("/{mainCategory}/{subCategory}")
+    public String showCategoryPage(@PathVariable String mainCategory, @PathVariable String subCategory, Model model) {
+        // send mainCategory, subCategory to category model
+        model.addAttribute("mainCategory", mainCategory);
+        model.addAttribute("subCategory", subCategory);
+        return "category";
     }
 
     @GetMapping("/categories")
@@ -54,36 +53,89 @@ public class BookPageController {
         return ResponseEntity.ok(categories);
     }
 
-    @GetMapping("{mainCategory}/{subCategory}/latest-likes-by-category")
+    // likes
+    // likes by subCategory
+    @GetMapping("/{mainCategory}/{subCategory}/latest-likes-by-category")
     public ResponseEntity<List<BookInfoDto>> getLatestLikedBooksByCategory(@PathVariable String subCategory) {
-        List<BookInfoDto> latestLikedBooksByCategory = bookPageService.getTop6BooksByLikesByCategory(subCategory);
-        return ResponseEntity.ok(latestLikedBooksByCategory);
-    }
-
-    @GetMapping("/{mainCategory}/{subCategory}/latest-comments")
-    public ResponseEntity<List<BookCommentDto>> getLatestComments(
-            @PathVariable String subCategory) {
-        List<BookCommentDto> latestComments = bookPageService.getLatestCommentsBySubCategory(subCategory);
-        return ResponseEntity.ok(latestComments);
-    }
-
-    @GetMapping("/latest-likes")
-    public ResponseEntity<List<BookInfoDto>> getLatestLikedBooks() {
-        List<BookInfoDto> latestLikedBooks = bookPageService.getTop6BooksByLikes();
+        List<BookInfoDto> latestLikedBooks = bookPageService.getLatestLikedBooksByCategory(subCategory);
         return ResponseEntity.ok(latestLikedBooks);
     }
 
+    // likes without condition
+    @GetMapping("/latest-likes")
+    public ResponseEntity<List<BookInfoDto>> getLatestLikedBooks() {
+        List<BookInfoDto> latestLikedBooks = bookPageService.getLatestLikedBooks();
+        return ResponseEntity.ok(latestLikedBooks);
+    }
+
+
+    // collects
+    // collect by subCategory
+    @GetMapping("/{mainCategory}/{subCategory}/latest-collect-by-category")
+    public ResponseEntity<List<BookInfoDto>> getLatestCollectBooksByCategory(@PathVariable String subCategory) {
+        List<BookInfoDto> latestCollectBooksByCategory = bookPageService.getTop6BooksByCategory(subCategory);
+        return ResponseEntity.ok(latestCollectBooksByCategory);
+    }
+
+    // collect without condition
+
+
+
+
+
+
+
+
+    // comments
+    // comment by bookId
+    @GetMapping("/switchToComment")
+    public ResponseEntity<List<BookCommentDto>> getCommentsByBookId(@RequestParam Long bookId) {
+        List<BookCommentDto> comments = bookCommentSqlService.getCommentsByBookId(bookId);
+        return ResponseEntity.ok(comments);
+    }
+
+    // comment by subCategory
+    @GetMapping("/{mainCategory}/{subCategory}/latest-comments")
+    public ResponseEntity<List<BookCommentDto>> getLatestCommentsBySubCategory(@PathVariable String subCategory) {
+        List<BookCommentDto> comments = bookPageService.getLatestCommentsBySubCategory(subCategory);
+        return ResponseEntity.ok(comments);
+    }
+
+    // comment without condition
+    @GetMapping("/latest-comments")
+    public ResponseEntity<List<BookCommentDto>> getLatestComments() {
+        List<BookCommentDto> comments = bookPageService.getLatestComments();
+        return ResponseEntity.ok(comments);
+    }
+
+
+
+    // quotes
+    // quotes by bookId
+    @GetMapping("/switchToQuote")
+    public ResponseEntity<List<QuoteDto>> getQuotesByBookId(@RequestParam Long bookId) {
+        List<QuoteDto> quotes = quoteService.getQuotesByBookId(bookId);
+        return ResponseEntity.ok(quotes);
+    }
+
+    // quotes by sub-category
+    @GetMapping("{mainCategory}/{subCategory}/latest-quotes")
+    public ResponseEntity<List<QuoteDto>> getLatestQuotesBySubCategory(@PathVariable String subCategory) {
+        List<QuoteDto> quotes = quoteService.getQuotesBySubCategory(subCategory);
+        return ResponseEntity.ok(quotes);
+    }
+
+    // quotes without condition
+    @GetMapping("/latest-quotes")
+    public ResponseEntity<List<QuoteDto>> getLatestQuotes() {
+        List<QuoteDto> quotes = quoteService.getQuotesWithoutCondition();
+        return ResponseEntity.ok(quotes);
+    }
+
+    // detail of books by bookId
     @GetMapping("/getBookInfo")
     public ResponseEntity<BookInfoDto> getBookInfoById(@RequestParam Long bookId) {
         BookInfoDto bookInfoDto = bookPageService.getBookInfoById(bookId);
         return ResponseEntity.ok(bookInfoDto);
-    }
-
-    @GetMapping("/{mainCategory}/{subCategory}")
-    public String showCategoryPage(@PathVariable String mainCategory, @PathVariable String subCategory, Model model) {
-        // send mainCategory, subCategory to category model
-        model.addAttribute("mainCategory", mainCategory);
-        model.addAttribute("subCategory", subCategory);
-        return "category";
     }
 }

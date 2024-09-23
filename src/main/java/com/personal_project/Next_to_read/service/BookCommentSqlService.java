@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -59,7 +60,7 @@ public class BookCommentSqlService {
         bookCommentSql.setBookId(bookInfo);
         bookCommentSql.setUserId(user);
         bookCommentSql.setComment(commentForm.getComment());
-        bookCommentSql.setTimestamp(new Timestamp(new Date().getTime()));
+        bookCommentSql.setTimestamp(Timestamp.from(Instant.now()));
         bookCommentSql.setMainCategory(bookInfo.getMainCategory());
         bookCommentSql.setSubCategory(bookInfo.getSubCategory());
 
@@ -84,7 +85,7 @@ public class BookCommentSqlService {
         quote.setBookId(bookInfo);
         quote.setUserId(user);
         quote.setQuote(quoteForm.getQuote());
-        quote.setTimestamp(new Timestamp(new Date().getTime()));
+        quote.setTimestamp(Timestamp.from(Instant.now()));
         quote.setMainCategory(bookInfo.getMainCategory());
         quote.setSubCategory(bookInfo.getSubCategory());
 
@@ -122,7 +123,7 @@ public class BookCommentSqlService {
             } else {
                 // If not liked (or previously canceled), add a like
                 userBookshelfSql.setLikes(true);
-                userBookshelfSql.setTimestampLike(new Timestamp(new Date().getTime()));
+                userBookshelfSql.setTimestampLike(Timestamp.from(Instant.now()));
 
                 // Increase book's likes count
                 if (bookInfo.getLikes() == null) {
@@ -144,7 +145,7 @@ public class BookCommentSqlService {
             userBookshelfSql.setUserId(user);
             userBookshelfSql.setLikes(true);
             userBookshelfSql.setCollect(false);
-            userBookshelfSql.setTimestampLike(new Timestamp(new Date().getTime()));// set default collect status
+            userBookshelfSql.setTimestampLike(Timestamp.from(Instant.now()));// set default collect status
             userBookshelfSql.setMainCategory(bookInfo.getMainCategory());
             userBookshelfSql.setSubCategory(bookInfo.getSubCategory());
 
@@ -198,7 +199,7 @@ public class BookCommentSqlService {
             } else {
                 // If not collected (or previously canceled), add a collect
                 userBookshelfSql.setCollect(true);
-                userBookshelfSql.setTimestampCollect(new Timestamp(new Date().getTime()));
+                userBookshelfSql.setTimestampCollect(Timestamp.from(Instant.now()));
 
                 // Increase book's collect count
                 if (bookInfo.getCollect() == null) {
@@ -220,7 +221,7 @@ public class BookCommentSqlService {
             userBookshelfSql.setUserId(user);
             userBookshelfSql.setCollect(true);
             userBookshelfSql.setLikes(false); // set default likes status
-            userBookshelfSql.setTimestampCollect(new Timestamp(new Date().getTime()));
+            userBookshelfSql.setTimestampCollect(Timestamp.from(Instant.now()));
             userBookshelfSql.setMainCategory(bookInfo.getMainCategory());
             userBookshelfSql.setSubCategory(bookInfo.getSubCategory());
 

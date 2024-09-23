@@ -51,3 +51,12 @@
     font-size: 14px;
     font-weight: bold;
 }
+
+/*最新按讚的書籍 by category*/
+.container-category {
+    display: flex;
+    justify-content: space-between;
+    width: 60%;
+    margin: 0 auto;
+    padding-top: 20px;
+}

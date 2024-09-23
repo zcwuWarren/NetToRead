@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Category</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/bookDisplay.css">
+</head>
+<body>
+<header class="container-header">
+  <div class="middle-container">
+    <div id="header-1" class="header-item">
+      <a href="index.html">Home</a>
+    </div>
+    <div id="header-2" class="header-item">
+      <span>Category</span>
+      <div class="dropdown-content" id="mainCategoryContainer">
+        <!-- 主分類和次分類將動態加載 -->
+      </div>
+    </div>
+    <div id="header-3" class="header-item">
+      <span>Profile</span>
+      <div class="dropdown-content" id="profileDropdown">
+        <div class="profile-box">
+          <div class="profile-item"><a href="account.html">Login</a></div>
+          <div class="profile-item"><a href="profile.html">Profile</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+
+<main>
+  <div class="container-category" id="container-category">
+    <!-- 按讚書籍的資料將會動態載入 -->
+  </div>
+  <!-- 新增的評論/引言切換容器 -->
+  <div class="comments-quotes-container">
+    <div class="switch-buttons">
+      <button id="switch-comment">Comments</button>
+      <button id="switch-quote">Quotes</button>
+    </div>
+
+    <!-- 動態生成評論或引言的小容器 -->
+    <div id="dynamic-container"></div>
+
+    <!-- 分頁按鈕 -->
+    <div class="pagination" id="pagination"></div>
+  </div>
+</main>
+
+<script src="js/categoryPage.js"></script>
+<script src="js/style.js"></script>
+<script src="js/category.js"></script>
+</body>
+</html>

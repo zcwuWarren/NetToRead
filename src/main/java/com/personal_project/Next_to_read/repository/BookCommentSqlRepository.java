@@ -17,4 +17,6 @@ public interface BookCommentSqlRepository extends JpaRepository<BookCommentSql, 
     List<BookCommentSql> findByUserId_UserIdOrderByTimestampDesc(Long userId);
 
     List<BookCommentSql> findBySubCategoryOrderByTimestampDesc(String subCategory);
+
+    List<BookCommentSql> findTop6ByOrderByTimestampDesc();
 }

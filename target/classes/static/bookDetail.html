@@ -10,11 +10,13 @@
 
 </head>
 <body>
-<header>
-    <div class="nav-left">
-        <a href="index.html">Home</a>
-        <div class="dropdown">
-            <a href="#" id="categoryBtn">Category</a>
+<header class="container-header">
+    <div class="middle-container">
+        <div id="header-1" class="header-item">
+            <a href="index.html">Home</a>
+        </div>
+        <div id="header-2" class="header-item">
+            <span>Category</span>
             <div class="dropdown-content" id="categoryDropdown">
                 <div class="category-box" id="mainCategoryContainer">
                     <!-- 主分類會在這裡動態載入 -->
@@ -24,11 +26,18 @@
                 </div>
             </div>
         </div>
-    </div>
-    <div class="nav-right">
-        <a href="profile.html">Profile</a>
+        <div id="header-3" class="header-item">
+            <span>Profile</span>
+            <div class="dropdown-content" id="profileDropdown">
+                <div class="profile-box">
+                    <div class="profile-item"><a href="account.html">Login</a></div>
+                    <div class="profile-item"><a href="profile.html">Profile</a></div>
+                </div>
+            </div>
+        </div>
     </div>
 </header>
+
 
 <main>
     <!-- 第一個大容器 a -->
@@ -81,5 +90,6 @@
 </main>
 
 <script src="js/bookDetail.js"></script>
+<script src="js/category.js"></script>
 </body>
 </html>

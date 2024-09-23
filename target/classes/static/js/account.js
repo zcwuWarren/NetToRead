@@ -7,6 +7,9 @@ document.addEventListener("DOMContentLoaded", function() {
     const loginSubmitButton = document.getElementById('submit-login');
     const registerSubmitButton = document.getElementById('submit-register');
 
+    // 取得上一頁的 URL，如果沒有上一頁，則預設為 'index.html'
+    const previousPage = document.referrer || 'index.html';
+
     // 切換至 Login
     switchLoginButton.addEventListener('click', () => {
         loginContainer.style.display = 'block';
@@ -45,7 +48,7 @@ document.addEventListener("DOMContentLoaded", function() {
             if (response.ok) {
                 localStorage.setItem('jwtToken', result.data.token); // 儲存 JWT token
                 alert("Login successful!");
-                window.location.href = 'index.html'; // 成功後跳轉至首頁
+                window.location.href = previousPage; // 成功後跳轉至上一頁
             } else {
                 alert(result.message);
             }
