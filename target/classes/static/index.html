@@ -6,7 +6,7 @@
     <title>Index</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/bookDisplay.css"> <!-- 引入新的CSS -->
-    <link rel="stylesheet" href="css/commentsAndQuotes.css"> <!-- 新的樣式文件 -->
+    <link rel="stylesheet" href="css/bookDetail.css">  <!-- bookDetail相關的樣式 -->
 </head>
 <body>
 <header class="container-header">
@@ -36,24 +36,27 @@
     <div class="latest-likes-container" id="latestLikesContainer">
         <!-- 6本書的資料將會動態載入 -->
     </div>
-    <!-- 新增的評論/引言切換容器 -->
-    <div class="comments-quotes-container">
-        <div class="switch-buttons">
-            <button id="switch-comment">Comments</button>
-            <button id="switch-quote">Quotes</button>
-        </div>
 
-        <!-- 動態生成評論或引言的小容器 -->
-        <div id="dynamic-container"></div>
-
-        <!-- 分頁按鈕 -->
-        <div class="pagination" id="pagination"></div>
+    <div id="containerB-controls-index-category">
+        <!-- 切換評論和引言的按鈕 -->
+        <button id="b-left">Comments</button>
+        <button id="b-right">Quotes</button>
+    </div>
+    <!-- 使用 b 大容器結構 -->
+   <div class="container-b" id="containerB">
+       <!-- 這裡會動態生成評論小容器 -->
+    </div>
+    <!-- 分頁按鈕 -->
+    <div class="pagination" id="pagination">
+        <!-- 分頁按鈕將在這裡動態生成 -->
     </div>
 </main>
 
 <script src="js/style.js"></script>
-<script src="js/category.js"></script>
-<script src="js/latestLikes.js"></script>
-<script src="js/commentsAndQuotes.js"></script> <!-- 新的 JS 文件 -->
+<script src="js/categoryNavBar.js"></script>
+<script src="js/bookShelfAll.js"></script>
+<script src="js/reviewsAll.js"></script> <!-- 新的 JS 文件 -->
+<script src="js/bookDetailPage.js"></script>
+
 </body>
 </html>

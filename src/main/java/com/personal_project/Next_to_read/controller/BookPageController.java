@@ -55,6 +55,7 @@ public class BookPageController {
 
     // likes
     // likes by subCategory
+    // todo have to modify pathVariable to requestParameter, but keep first,
     @GetMapping("/{mainCategory}/{subCategory}/latest-likes-by-category")
     public ResponseEntity<List<BookInfoDto>> getLatestLikedBooksByCategory(@PathVariable String subCategory) {
         List<BookInfoDto> latestLikedBooks = bookPageService.getLatestLikedBooksByCategory(subCategory);
@@ -71,6 +72,7 @@ public class BookPageController {
 
     // collects
     // collect by subCategory
+    // todo have to modify pathVariable to requestParameter, but keep first,
     @GetMapping("/{mainCategory}/{subCategory}/latest-collect-by-category")
     public ResponseEntity<List<BookInfoDto>> getLatestCollectBooksByCategory(@PathVariable String subCategory) {
         List<BookInfoDto> latestCollectBooksByCategory = bookPageService.getTop6BooksByCategory(subCategory);
@@ -95,8 +97,9 @@ public class BookPageController {
     }
 
     // comment by subCategory
-    @GetMapping("/{mainCategory}/{subCategory}/latest-comments")
-    public ResponseEntity<List<BookCommentDto>> getLatestCommentsBySubCategory(@PathVariable String subCategory) {
+    // modify from pathVariable to requestParameter
+    @GetMapping("/latest-comments-by-subCategory")
+    public ResponseEntity<List<BookCommentDto>> getLatestCommentsBySubCategory(@RequestParam String subCategory) {
         List<BookCommentDto> comments = bookPageService.getLatestCommentsBySubCategory(subCategory);
         return ResponseEntity.ok(comments);
     }
@@ -119,8 +122,9 @@ public class BookPageController {
     }
 
     // quotes by sub-category
-    @GetMapping("{mainCategory}/{subCategory}/latest-quotes")
-    public ResponseEntity<List<QuoteDto>> getLatestQuotesBySubCategory(@PathVariable String subCategory) {
+    // modify from pathVariable to requestParameter
+    @GetMapping("/latest-quotes-by-subCategory")
+    public ResponseEntity<List<QuoteDto>> getLatestQuotesBySubCategory(@RequestParam String subCategory) {
         List<QuoteDto> quotes = quoteService.getQuotesBySubCategory(subCategory);
         return ResponseEntity.ok(quotes);
     }

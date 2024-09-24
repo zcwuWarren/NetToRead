@@ -19,7 +19,9 @@ com/personal_project/Next_to_read/controller/UserPageController.class
 com/personal_project/Next_to_read/data/dto/UserBookshelfDto.class
 com/personal_project/Next_to_read/data/dto/LoginDto.class
 com/personal_project/Next_to_read/exception/GlobalExceptionHandler.class
+com/personal_project/Next_to_read/util/EntityToDtoConverter/BookInfoDtoConverter.class
 com/personal_project/Next_to_read/data/dto/LoginDto$LoginDtoBuilder.class
+com/personal_project/Next_to_read/util/EntityToDtoConverter/BookCommentDtoConverter.class
 com/personal_project/Next_to_read/repository/BookCommentSqlRepository.class
 com/personal_project/Next_to_read/service/UserService.class
 com/personal_project/Next_to_read/data/dto/BookCommentDto.class

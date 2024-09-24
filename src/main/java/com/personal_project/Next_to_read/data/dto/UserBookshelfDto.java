@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserBookshelfDto {
-
+    // todo add bookId
     private Long userId;
     private String bookName;
     private String bookCover;

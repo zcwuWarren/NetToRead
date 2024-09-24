@@ -39,5 +39,7 @@
 /Users/user/repo/NetToRead/src/main/java/com/personal_project/Next_to_read/service/UserBookshelfSqlService.java
 /Users/user/repo/NetToRead/src/main/java/com/personal_project/Next_to_read/service/UserService.java
 /Users/user/repo/NetToRead/src/main/java/com/personal_project/Next_to_read/util/DateUtil.java
+/Users/user/repo/NetToRead/src/main/java/com/personal_project/Next_to_read/util/EntityToDtoConverter/BookCommentDtoConverter.java
+/Users/user/repo/NetToRead/src/main/java/com/personal_project/Next_to_read/util/EntityToDtoConverter/BookInfoDtoConverter.java
 /Users/user/repo/NetToRead/src/main/java/com/personal_project/Next_to_read/validation/PasswordValidator.java
 /Users/user/repo/NetToRead/src/main/java/com/personal_project/Next_to_read/validation/ValidPassword.java

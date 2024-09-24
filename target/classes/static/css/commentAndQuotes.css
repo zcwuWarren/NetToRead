@@ -1,75 +1,75 @@
-/* 大容器樣式 */
-.comments-quotes-container {
-/*    width: 60%;*/
-/*    margin: 20px auto;*/
-/*    padding: 20px;*/
-/*    background-color: #f9f9f9;*/
-/*    justify-content: space-between;*/
-/*}*/
-    display: flex;
-    flex-direction: column;
-    width: 80%;
-    margin: 20px auto;
-}
-
-/* 左上切換按鈕 */
-.switch-buttons {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
-}
-
-#switch-comment, #switch-quote {
-    padding: 10px 20px;
-    cursor: pointer;
-    border: 1px solid #ccc;
-    background-color: #f0f0f0;
-}
-
-#switch-comment:hover, #switch-quote:hover {
-    background-color: #ddd;
-}
-
-/* 小容器樣式 */
-.comment-container, .quote-container {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
-    border-bottom: 1px solid #ddd;
-    padding: 10px;
-}
-
-.comment-text, .quote-text {
+/*!* 大容器樣式 *!*/
+/*.comments-quotes-container {*/
+/*!*    width: 60%;*!*/
+/*!*    margin: 20px auto;*!*/
+/*!*    padding: 20px;*!*/
+/*!*    background-color: #f9f9f9;*!*/
+/*!*    justify-content: space-between;*!*/
+/*!*}*!*/
+/*    display: flex;*/
+/*    flex-direction: column;*/
 /*    width: 80%;*/
-/*    word-wrap: break-word;*/
-/*    font-size: 14px;*/
+/*    margin: 20px auto;*/
 /*}*/
-    flex: 1;
-    padding-right: 10px;
-}
 
-.comment-user-id, .quote-user-id {
-    width: 20%;
-    text-align: right;
-    font-size: 12px;
-    color: #666;
-}
+/*!* 左上切換按鈕 *!*/
+/*.switch-buttons {*/
+/*    display: flex;*/
+/*    gap: 10px;*/
+/*    margin-bottom: 10px;*/
+/*}*/
 
-/* 分頁按鈕樣式 */
-.pagination {
-    display: flex;
-    justify-content: center;
-    margin-top: 10px;
-}
+/*#switch-comment, #switch-quote {*/
+/*    padding: 10px 20px;*/
+/*    cursor: pointer;*/
+/*    border: 1px solid #ccc;*/
+/*    background-color: #f0f0f0;*/
+/*}*/
 
-.pagination button {
-    margin: 0 5px;
-    padding: 5px 10px;
-    border: 1px solid #ccc;
-    background-color: #f0f0f0;
-    cursor: pointer;
-}
+/*#switch-comment:hover, #switch-quote:hover {*/
+/*    background-color: #ddd;*/
+/*}*/
 
-.pagination button:hover {
-    background-color: #ddd;
-}
+/*!* 小容器樣式 *!*/
+/*.comment-container, .quote-container {*/
+/*    display: flex;*/
+/*    justify-content: space-between;*/
+/*    margin-bottom: 10px;*/
+/*    border-bottom: 1px solid #ddd;*/
+/*    padding: 10px;*/
+/*}*/
+
+/*.comment-text, .quote-text {*/
+/*!*    width: 80%;*!*/
+/*!*    word-wrap: break-word;*!*/
+/*!*    font-size: 14px;*!*/
+/*!*}*!*/
+/*    flex: 1;*/
+/*    padding-right: 10px;*/
+/*}*/
+
+/*.comment-user-id, .quote-user-id {*/
+/*    width: 20%;*/
+/*    text-align: right;*/
+/*    font-size: 12px;*/
+/*    color: #666;*/
+/*}*/
+
+/*!* 分頁按鈕樣式 *!*/
+/*.pagination {*/
+/*    display: flex;*/
+/*    justify-content: center;*/
+/*    margin-top: 10px;*/
+/*}*/
+
+/*.pagination button {*/
+/*    margin: 0 5px;*/
+/*    padding: 5px 10px;*/
+/*    border: 1px solid #ccc;*/
+/*    background-color: #f0f0f0;*/
+/*    cursor: pointer;*/
+/*}*/
+
+/*.pagination button:hover {*/
+/*    background-color: #ddd;*/
+/*}*/

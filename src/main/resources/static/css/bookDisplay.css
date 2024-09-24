@@ -1,3 +1,4 @@
+/*bookDisplay.css*/
 /* 最新按讚書籍的容器 */
 .latest-likes-container {
     display: flex;
@@ -50,6 +51,13 @@
     text-align: right;
     font-size: 14px;
     font-weight: bold;
+}
+
+#containerB-controls-index-category {
+    width: 60%; /* 確保和 container-b 一樣的寬度 */
+    margin: 20px auto; /* 垂直和水平方向置中 */
+    display: flex;
+    justify-content: flex-start;
 }
 
 /*最新按讚的書籍 by category*/
