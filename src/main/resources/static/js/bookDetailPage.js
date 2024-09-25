@@ -1,3 +1,4 @@
+// bookDetailPage.js
 // container a
 document.addEventListener("DOMContentLoaded", async function() {
     // 從 URL 中提取 bookId
@@ -179,7 +180,7 @@ document.addEventListener("DOMContentLoaded", async function() {
             userIdDiv.textContent = comment.userId;  // 顯示用戶 ID
 
             commentDiv.appendChild(commentText);
-            commentDiv.appendChild(userIdDiv);
+            // commentDiv.appendChild(userIdDiv);
             commentsContainer.appendChild(commentDiv);
         });
     }
@@ -201,7 +202,7 @@ document.addEventListener("DOMContentLoaded", async function() {
             userIdDiv.textContent = quote.userId;  // 顯示用戶 ID
 
             quoteDiv.appendChild(quoteText);
-            quoteDiv.appendChild(userIdDiv);
+            // quoteDiv.appendChild(userIdDiv);
             commentsContainer.appendChild(quoteDiv);
         });
     }
@@ -248,6 +249,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const switchQuoteButton = document.getElementById('switch-quote');
     const submitButton = document.getElementById('submit-button');
     const inputBox = document.getElementById('input-box');
+    const commentsContainer = document.getElementById('containerB'); // 這裡應該是評論/引用的容器
 
     let currentMode = 'comment'; // 預設為 Comment 模式
 
@@ -305,7 +307,13 @@ document.addEventListener("DOMContentLoaded", function() {
             const result = await response.json();
 
             if (response.ok) {
-                alert(result.message);
+                // 即時將新評論或引用渲染到頁面
+                if (currentMode === 'comment') {
+                    renderNewComment(commentOrQuote); // 渲染新評論
+                } else {
+                    renderNewQuote(commentOrQuote); // 渲染新引用
+                }
+
                 inputBox.value = ""; // 清空輸入框
             } else {
                 alert(result.message);
@@ -314,5 +322,43 @@ document.addEventListener("DOMContentLoaded", function() {
             console.error("Error submitting data: ", error);
             alert("Failed to submit.");
         }
+
+        //     if (response.ok) {
+        //         alert(result.message);
+        //         inputBox.value = ""; // 清空輸入框
+        //     } else {
+        //         alert(result.message);
+        //     }
+        // } catch (error) {
+        //     console.error("Error submitting data: ", error);
+        //     alert("Failed to submit.");
+        // }
     });
+
+    // 渲染新評論
+    function renderNewComment(comment) {
+        const commentDiv = document.createElement('div');
+        commentDiv.classList.add('comment-container');
+
+        const commentText = document.createElement('div');
+        commentText.classList.add('comment-text');
+        commentText.textContent = comment;  // 顯示新評論文字
+
+        commentDiv.appendChild(commentText);
+        commentsContainer.prepend(commentDiv); // 新評論顯示在頂部
+    }
+
+    // 渲染新引用
+    function renderNewQuote(quote) {
+        const quoteDiv = document.createElement('div');
+        quoteDiv.classList.add('quote-container');
+
+        const quoteText = document.createElement('div');
+        quoteText.classList.add('quote-text');
+        quoteText.textContent = quote;  // 顯示新引用文字
+
+        quoteDiv.appendChild(quoteText);
+        commentsContainer.prepend(quoteDiv); // 新引用顯示在頂部
+    }
+
 });

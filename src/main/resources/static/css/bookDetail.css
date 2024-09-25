@@ -90,7 +90,8 @@
 /* 小容器樣式 */
 .comment-container, .quote-container {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column; /* Stack items vertically */
+    /*justify-content: space-between;*/
     margin-bottom: 10px;
     border-bottom: 1px solid #ddd;
     padding: 10px;
@@ -98,16 +99,19 @@
 
 /* 左側 comment 部分 */
 .comment-text, .quote-text {
-    width: 80%;
+    /*width: 80%;*/
     word-wrap: break-word;
-    font-size: 14px;
+    font-size: 20px;
+    margin-bottom: 5px; /* Add some space between comment and book name */
+
 }
 
 /* 右側 userId 部分 */
-.comment-user-id, .quote-user-id {
-    width: 20%;
-    text-align: right;
-    font-size: 12px;
+.comment-user-id, .quote-user-id, .comment-book-name, .quote-book-name {
+    /*width: 20%;*/
+    /*text-align: right;*/
+    text-align: left; /* Align the book name to the left */
+    font-size: 16px;
     color: #666;
 }
 
@@ -137,7 +141,7 @@
     margin-bottom: 20px;
 }
 
-#b-left, #b-right {
+#b-left, #b-right, #switch-likes, #switch-collects {
     padding: 10px 15px;
     cursor: pointer;
     border: 1px solid #ccc;
@@ -145,7 +149,7 @@
     margin-right: 10px;
 }
 
-#b-left:hover, #b-right:hover {
+#b-left:hover, #b-right:hover, #switch-likes:hover, #switch-collects:hover {
     background-color: #ddd;
 }
 

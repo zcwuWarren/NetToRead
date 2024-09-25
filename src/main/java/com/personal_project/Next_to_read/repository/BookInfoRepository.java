@@ -3,6 +3,7 @@ package com.personal_project.Next_to_read.repository;
 import com.personal_project.Next_to_read.model.BookInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -24,4 +25,6 @@ public interface BookInfoRepository extends JpaRepository<BookInfo, Long> {
     List<BookInfo> findTop6BySubCategoryOrderByCollectDesc(String subCategory);
 
     List<BookInfo> findTop6ByBookIdIn(List<Long> bookIds);
+
+    List<BookInfo> findByBookIdIn(List<Long> bookIds);
 }

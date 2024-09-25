@@ -56,8 +56,14 @@ public class BookPageController {
     // likes
     // likes by subCategory
     // todo have to modify pathVariable to requestParameter, but keep first,
-    @GetMapping("/{mainCategory}/{subCategory}/latest-likes-by-category")
-    public ResponseEntity<List<BookInfoDto>> getLatestLikedBooksByCategory(@PathVariable String subCategory) {
+//    @GetMapping("/{mainCategory}/{subCategory}/latest-likes-by-category")
+//    public ResponseEntity<List<BookInfoDto>> getLatestLikedBooksByCategory(@PathVariable String subCategory) {
+//        List<BookInfoDto> latestLikedBooks = bookPageService.getLatestLikedBooksByCategory(subCategory);
+//        return ResponseEntity.ok(latestLikedBooks);
+//    }
+
+    @GetMapping("/latest-likes-by-subCategory")
+    public ResponseEntity<List<BookInfoDto>> getLatestLikedBooksByCategory(@RequestParam String subCategory) {
         List<BookInfoDto> latestLikedBooks = bookPageService.getLatestLikedBooksByCategory(subCategory);
         return ResponseEntity.ok(latestLikedBooks);
     }
@@ -69,24 +75,20 @@ public class BookPageController {
         return ResponseEntity.ok(latestLikedBooks);
     }
 
-
     // collects
     // collect by subCategory
-    // todo have to modify pathVariable to requestParameter, but keep first,
-    @GetMapping("/{mainCategory}/{subCategory}/latest-collect-by-category")
-    public ResponseEntity<List<BookInfoDto>> getLatestCollectBooksByCategory(@PathVariable String subCategory) {
-        List<BookInfoDto> latestCollectBooksByCategory = bookPageService.getTop6BooksByCategory(subCategory);
+    @GetMapping("/latest-collect-by-subCategory")
+    public ResponseEntity<List<BookInfoDto>> getLatestCollectBooksByCategory(@RequestParam String subCategory) {
+        List<BookInfoDto> latestCollectBooksByCategory = bookPageService.getLatestCollectBooksByCategory(subCategory);
         return ResponseEntity.ok(latestCollectBooksByCategory);
     }
 
     // collect without condition
-
-
-
-
-
-
-
+    @GetMapping("/latest-collect")
+    public ResponseEntity<List<BookInfoDto>> getLatestCollectBooks() {
+        List<BookInfoDto> latestCollectBooksByCategory = bookPageService.getLatestCollectBooks();
+        return ResponseEntity.ok(latestCollectBooksByCategory);
+    }
 
     // comments
     // comment by bookId

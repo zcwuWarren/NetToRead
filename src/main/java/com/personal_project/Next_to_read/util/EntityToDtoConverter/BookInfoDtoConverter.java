@@ -16,12 +16,13 @@ public class BookInfoDtoConverter {
                 .subCategory(bookInfo.getSubCategory())
                 .bookName(bookInfo.getBookName())
                 .bookCover(bookInfo.getBookCover())
-                .publisher(bookInfo.getPublishDate())
+                .publishDate(bookInfo.getPublishDate())
                 .publisher(bookInfo.getPublisher())
                 .like(bookInfo.getLikes())
                 .collect(bookInfo.getCollect())
                 .content(bookInfo.getContent())
                 .description(bookInfo.getDescription())
+                .author(bookInfo.getAuthor())
                 .build();
     }
 

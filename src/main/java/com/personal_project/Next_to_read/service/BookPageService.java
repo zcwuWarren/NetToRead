@@ -12,6 +12,7 @@ import com.personal_project.Next_to_read.util.EntityToDtoConverter.BookCommentDt
 import com.personal_project.Next_to_read.util.EntityToDtoConverter.BookInfoDtoConverter;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -58,8 +59,17 @@ public class BookPageService {
         return BookCommentDtoConverter.convertToDtoList(comments);
     }
 
-    public List<BookInfoDto> getTop6BooksByCategory(String subCategory) {
-        List<BookInfo> books = bookInfoRepository.findTop6BySubCategoryOrderByCollectDesc(subCategory);
+    public List<BookInfoDto> getLatestCollectBooksByCategory(String subCategory) {
+//        List<BookInfo> books = bookInfoRepository.findTop6BySubCategoryOrderByCollectDesc(subCategory);
+        List<Long> bookIds = userBookshelfSqlRepository.findTop6BookIdsBySubCategoryOrderByTimestampCollectDesc(subCategory);
+        System.out.println(bookIds.toString());
+        // get book data from bookinfo by bookIds
+        List<BookInfo> books = bookInfoRepository.findByBookIdIn(bookIds);
+        System.out.println(books);
+
+        // manually sort the list order
+        books.sort(Comparator.comparingInt(book -> bookIds.indexOf(book.getBookId())));
+
         return BookInfoDtoConverter.convertToDtoList(books);
     }
 
@@ -67,9 +77,12 @@ public class BookPageService {
 
         // get bookId from user_bookshelf by subCategory and timestampLike
         List<Long> bookIds = userBookshelfSqlRepository.findTop6BookIdsBySubCategoryOrderByTimestampLikeDesc(subCategory);
-
+        System.out.println(bookIds.toString());
         // get book data from bookinfo by bookIds
-        List<BookInfo> books = bookInfoRepository.findTop6ByBookIdIn(bookIds);
+        List<BookInfo> books = bookInfoRepository.findByBookIdIn(bookIds);
+
+        // manually sort the list order
+        books.sort(Comparator.comparingInt(book -> bookIds.indexOf(book.getBookId())));
 
         // turn to BookInfoDto
         return BookInfoDtoConverter.convertToDtoList(books);
@@ -77,10 +90,25 @@ public class BookPageService {
 
     public List<BookInfoDto> getLatestLikedBooks() {
 
+        // get bookId from user_bookshelf by timestampLike
+        List<Long> bookIds = userBookshelfSqlRepository.findTop6BookIdsByOrderByTimestampLikeDesc();
+        System.out.println(bookIds.toString());
+        List<BookInfo> books = bookInfoRepository.findByBookIdIn(bookIds);
+
+        // manually sort the list order
+        books.sort(Comparator.comparingInt(book -> bookIds.indexOf(book.getBookId())));
+        // turn to BookInfoDto
+        return BookInfoDtoConverter.convertToDtoList(books);
+    }
+
+    public List<BookInfoDto> getLatestCollectBooks() {
         // get bookId from user_bookshelf by subCategory and timestampLike
-        List<Long> bookIds = userBookshelfSqlRepository.findTop6BookIdsOrderByTimestampLikeDesc();
-        System.out.println(bookIds);
-        List<BookInfo> books = bookInfoRepository.findTop6ByBookIdIn(bookIds);
+        List<Long> bookIds = userBookshelfSqlRepository.findTop6BookIdsOrderByTimestampCollectDesc();
+        System.out.println(bookIds.toString());
+        List<BookInfo> books = bookInfoRepository.findByBookIdIn(bookIds);
+
+        // manually sort the list order
+        books.sort(Comparator.comparingInt(book -> bookIds.indexOf(book.getBookId())));
         // turn to BookInfoDto
         return BookInfoDtoConverter.convertToDtoList(books);
     }

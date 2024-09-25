@@ -1,7 +1,5 @@
 package com.personal_project.Next_to_read.repository;
 
-import com.personal_project.Next_to_read.model.BookCommentSql;
-import com.personal_project.Next_to_read.model.BookInfo;
 import com.personal_project.Next_to_read.model.UserBookshelfSql;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -22,17 +20,13 @@ public interface UserBookshelfSqlRepository extends JpaRepository<UserBookshelfS
     @Query("SELECT u.bookId.bookId FROM UserBookshelfSql u WHERE u.subCategory = :subCategory ORDER BY u.timestampLike DESC")
     List<Long> findTop6BookIdsBySubCategoryOrderByTimestampLikeDesc(String subCategory);
 
+    @Query("SELECT u.bookId.bookId FROM UserBookshelfSql u WHERE u.subCategory = :subCategory ORDER BY u.timestampCollect DESC")
+    List<Long> findTop6BookIdsBySubCategoryOrderByTimestampCollectDesc(String subCategory);
+
     @Query("SELECT u.bookId.bookId FROM UserBookshelfSql u ORDER BY u.timestampLike DESC")
-    List<Long> findTop6BookIdsOrderByTimestampLikeDesc();
+    List<Long> findTop6BookIdsByOrderByTimestampLikeDesc();
 
-    // find book without condition sort by like timestamp descending
-//    List<UserBookshelfSql> findTop6AndLikesTrueOrderByTimestampLikeDesc();
-
-    // find book by subcategory sort by collect timestamp descending
-//    List<UserBookshelfSql> findTop6BySubCategoryAndCollectTrueOrderByTimestampCollect(Long userId);
-
-    // find book without condition sort by collect timestamp descending
-//    List<UserBookshelfSql> findTop6AndCollectTrueOrderByTimestampCollect();
-
+    @Query("SELECT u.bookId.bookId FROM UserBookshelfSql u ORDER BY u.timestampCollect DESC")
+    List<Long> findTop6BookIdsOrderByTimestampCollectDesc();
 }
 

@@ -10,12 +10,17 @@
 
 .book-container {
     text-align: center;
-    margin: 10px;
+    flex: 1 1 calc(16.66% - 10px); /* 每個 .book-container 寬度占 16.66% 減去 margin */
+    margin: 5px;
 }
 
 .book-cover {
-    width: 150px;
-    height: 220px;
+    /*width: 170.5px;*/
+    width: 100%;
+    /*height: 220px;*/
+    aspect-ratio: 31 / 40;  /* 設定圖片的寬高比 3:4 */
+    /*width: 310px;*/
+    /*height: 400px;*/
     object-fit: cover;
 }
 
@@ -25,35 +30,36 @@
     font-weight: bold;
 }
 
-/* 最新評論的容器 */
-.latest-comments-container {
-    display: flex;
-    flex-direction: column;
-    width: 80%;
-    margin: 20px auto;
-}
+/* !*最新評論的容器 *!*/
+/*.latest-comments-container {*/
+/*    display: flex;*/
+/*    flex-direction: column;*/
+/*    width: 80%;*/
+/*    margin: 20px auto;*/
+/*}*/
 
-.comment-container {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px;
-    margin: 10px 0;
-    border-bottom: 1px solid #ccc;
-}
+/*.comment-container {*/
+/*    display: flex;*/
+/*    justify-content: space-between;*/
+/*    padding: 10px;*/
+/*    margin: 10px 0;*/
+/*    border-bottom: 1px solid #ccc;*/
+/*}*/
 
-.comment-text {
-    flex: 1;
-    padding-right: 10px;
-}
+/*.comment-text {*/
+/*    flex: 1;*/
+/*    padding-right: 10px;*/
+/*}*/
 
-.comment-book-name {
-    flex-basis: 150px;
-    text-align: right;
-    font-size: 14px;
-    font-weight: bold;
-}
 
 #containerB-controls-index-category {
+    width: 60%; /* 確保和 container-b 一樣的寬度 */
+    margin: 20px auto; /* 垂直和水平方向置中 */
+    display: flex;
+    justify-content: flex-start;
+}
+
+#containerB-switch-likes-collects {
     width: 60%; /* 確保和 container-b 一樣的寬度 */
     margin: 20px auto; /* 垂直和水平方向置中 */
     display: flex;

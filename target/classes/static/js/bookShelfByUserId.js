@@ -1,14 +1,39 @@
+
+
 document.addEventListener("DOMContentLoaded", function() {
     const booksPerPage = 6;  // 每頁顯示 6 本書
     let currentPage = 1;
     let totalBooks = [];
-
-    // 從 localStorage 中提取 jwtToken
+    const containerCategory = document.getElementById('container-category');
+    const paginationContainer = document.getElementById('pagination-bookshelf');
     const token = localStorage.getItem('jwtToken');
 
-    if (token) {
-        // 調用後端 API 獲取用戶按讚的書籍
-        fetch('/api/userPage/myLike', {
+    // 按鈕元素
+    const likesButton = document.getElementById('switch-likes');
+    const collectsButton = document.getElementById('switch-collects');
+
+    if (!token) {
+        console.error("No token found in localStorage.");
+        window.location.href = '/account.html';  // 跳轉到登入頁面
+        return;
+    }
+
+    // 預設載入 Likes 書籍
+    loadBookshelf('/api/userPage/myLike');
+
+    // 點擊 Likes 時載入
+    likesButton.addEventListener('click', () => {
+        loadBookshelf('/api/userPage/myLike');
+    });
+
+    // 點擊 Collects 時載入
+    collectsButton.addEventListener('click', () => {
+        loadBookshelf('/api/userPage/myCollect');
+    });
+
+    // 通用載入書籍的函數
+    function loadBookshelf(apiUrl) {
+        fetch(apiUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -21,16 +46,11 @@ document.addEventListener("DOMContentLoaded", function() {
                 renderBooks(currentPage);  // 初始加載當前頁面書籍
                 renderPagination();  // 渲染分頁按鈕
             })
-            .catch(error => console.error("Error fetching liked books:", error));
-    } else {
-        console.error("No token found in localStorage.");
-        // 如果沒有 token，可能需要引導用戶登錄
-        window.location.href = '/account.html';  // 跳轉到登入頁面
+            .catch(error => console.error(`Error fetching books from ${apiUrl}:`, error));
     }
 
     // 渲染當前頁面的書籍
     function renderBooks(page) {
-        const containerCategory = document.getElementById('container-category');
         containerCategory.innerHTML = '';  // 清空之前的內容
 
         const start = (page - 1) * booksPerPage;
@@ -39,7 +59,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // 如果沒有書籍，顯示提示
         if (booksToShow.length === 0) {
-            containerCategory.innerHTML = '<p>No liked books found.</p>';
+            containerCategory.innerHTML = '<p>No books found.</p>';
             return;
         }
 
@@ -63,7 +83,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // 渲染分頁按鈕
     function renderPagination() {
-        const paginationContainer = document.getElementById('pagination');
         paginationContainer.innerHTML = '';  // 清空現有分頁按鈕
 
         const totalPages = Math.ceil(totalBooks.length / booksPerPage);  // 計算總頁數
@@ -76,6 +95,7 @@ document.addEventListener("DOMContentLoaded", function() {
             button.addEventListener('click', function() {
                 currentPage = i;  // 更新當前頁數
                 renderBooks(currentPage);  // 重新渲染當前頁面的書籍
+                renderPagination(); // 重新渲染分頁按鈕
             });
 
             paginationContainer.appendChild(button);

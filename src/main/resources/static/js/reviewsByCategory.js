@@ -76,12 +76,12 @@ document.addEventListener("DOMContentLoaded", async function() {
             commentText.classList.add('comment-text');
             commentText.textContent = comment.comment;  // 顯示評論文字
 
-            const userIdDiv = document.createElement('div');
-            userIdDiv.classList.add('comment-user-id');
-            userIdDiv.textContent = comment.userId;  // 顯示用戶 ID
+            const bookName = document.createElement('div');
+            bookName.classList.add('comment-book-name');
+            bookName.textContent = comment.bookName;  // 顯示書名
 
             commentDiv.appendChild(commentText);
-            commentDiv.appendChild(userIdDiv);
+            commentDiv.appendChild(bookName);
             commentsContainer.appendChild(commentDiv);
         });
     }
@@ -98,12 +98,12 @@ document.addEventListener("DOMContentLoaded", async function() {
             quoteText.classList.add('quote-text');
             quoteText.textContent = quote.quote;  // 顯示引用文字
 
-            const userIdDiv = document.createElement('div');
-            userIdDiv.classList.add('quote-user-id');
-            userIdDiv.textContent = quote.userId;  // 顯示用戶 ID
+            const bookName = document.createElement('div');
+            bookName.classList.add('comment-book-name');
+            bookName.textContent = quote.bookName;  // 顯示書名
 
             quoteDiv.appendChild(quoteText);
-            quoteDiv.appendChild(userIdDiv);
+            quoteDiv.appendChild(bookName);
             commentsContainer.appendChild(quoteDiv);
         });
     }
