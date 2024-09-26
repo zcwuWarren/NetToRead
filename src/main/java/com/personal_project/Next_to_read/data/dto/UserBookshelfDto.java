@@ -16,6 +16,7 @@ public class UserBookshelfDto {
     private String bookCover;
     private String dateOfLike;
     private String dateOfCollect;
+    private Long bookId;
 
     public UserBookshelfDto(UserBookshelfSql userBookshelfSql) {
         this.userId = userBookshelfSql.getUserId().getUserId();
@@ -23,5 +24,6 @@ public class UserBookshelfDto {
         this.bookCover = userBookshelfSql.getBookId().getBookCover();
         this.dateOfLike = DateUtil.formatDate(userBookshelfSql.getTimestampLike());
         this.dateOfCollect = DateUtil.formatDate(userBookshelfSql.getTimestampCollect());
+        this.bookId = userBookshelfSql.getBookId().getBookId();
     }
 }

@@ -1,3 +1,4 @@
+// accountPage.js
 document.addEventListener("DOMContentLoaded", function() {
     const switchLoginButton = document.getElementById('switch-login');
     const switchRegisterButton = document.getElementById('switch-register');
@@ -9,6 +10,16 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // 取得上一頁的 URL，如果沒有上一頁，則預設為 'index.html'
     const previousPage = document.referrer || 'index.html';
+
+    const token = localStorage.getItem('jwtToken');
+
+    if (token) {
+        // 如果有 token，直接跳轉到 profile 頁面
+        window.location.href = '/profile.html';
+    } else {
+        // 沒有 token 的情況下，顯示頁面
+        document.body.style.display = "block";
+    }
 
     // 切換至 Login
     switchLoginButton.addEventListener('click', () => {

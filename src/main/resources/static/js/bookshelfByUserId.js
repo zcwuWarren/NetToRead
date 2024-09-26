@@ -1,4 +1,4 @@
-
+// bookshelfByUserId.js
 
 document.addEventListener("DOMContentLoaded", function() {
     const booksPerPage = 6;  // 每頁顯示 6 本書
@@ -14,10 +14,32 @@ document.addEventListener("DOMContentLoaded", function() {
 
     if (!token) {
         console.error("No token found in localStorage.");
+        window.location.href = '/account.html';}  // 跳轉到登入頁面
+        else {
+        document.body.style.display = "block";
+    }
+
+    // 檢查 JWT Token 是否過期
+    function isTokenExpired(token) {
+        const tokenParts = token.split('.');
+        if (tokenParts.length !== 3) {
+            return true;  // 無效的 token
+        }
+
+        const decodedPayload = JSON.parse(atob(tokenParts[1]));
+        const expirationDate = new Date(decodedPayload.exp * 1000);  // exp 是以秒計算的
+        const now = new Date();
+
+        return expirationDate < now;  // 如果當前時間大於過期時間，token 已過期
+    }
+
+    if (isTokenExpired(token)) {
+        console.error("JWT Token has expired.");
         window.location.href = '/account.html';  // 跳轉到登入頁面
         return;
     }
 
+    // 如果 Token 有效，繼續執行頁面渲染邏輯
     // 預設載入 Likes 書籍
     loadBookshelf('/api/userPage/myLike');
 

@@ -72,6 +72,11 @@ document.addEventListener("DOMContentLoaded", async function() {
             const commentDiv = document.createElement('div');
             commentDiv.classList.add('comment-container');
 
+            // 點擊 comment 跳轉至該 bookId 書籍頁面
+            commentDiv.addEventListener('click', function (){
+                window.location.href = `/bookDetail.html?bookId=${comment.bookId}`;
+            });
+
             const commentText = document.createElement('div');
             commentText.classList.add('comment-text');
             commentText.textContent = comment.comment;  // 顯示評論文字
@@ -93,6 +98,11 @@ document.addEventListener("DOMContentLoaded", async function() {
         quotes.forEach(quote => {
             const quoteDiv = document.createElement('div');
             quoteDiv.classList.add('quote-container');
+
+            // 點擊 quote 跳轉至該 bookId 書籍頁面
+            quoteDiv.addEventListener('click', function (){
+                window.location.href = `/bookDetail.html?bookId=${quote.bookId}`;
+            });
 
             const quoteText = document.createElement('div');
             quoteText.classList.add('quote-text');

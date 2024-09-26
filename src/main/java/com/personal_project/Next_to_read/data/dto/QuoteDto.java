@@ -14,12 +14,14 @@ public class QuoteDto {
     private String quote;
     private String bookName;
     private String date;
+    private Long bookId;
 
     public QuoteDto(Quote quote) {
         this.userId = quote.getUserId().getUserId();
         this.quote = quote.getQuote();
         this.bookName = quote.getBookId().getBookName();
         this.date = DateUtil.formatDate(quote.getTimestamp());
+        this.bookId = quote.getBookId().getBookId();
     }
 }
 
