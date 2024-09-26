@@ -35,4 +35,10 @@ public class Quote {
 
     @Column(name = "timestamp", nullable = false)
     private Timestamp timestamp;
+
+    @Column(name = "main_category", nullable = false)
+    private String mainCategory;
+
+    @Column(name = "sub_category", nullable = false)
+    private String subCategory;
 }

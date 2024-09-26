@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Index</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/bookDisplay.css"> <!-- 引入新的CSS -->
+    <link rel="stylesheet" href="css/bookDetail.css">  <!-- bookDetail相關的樣式 -->
+</head>
+<body>
+<header class="container-header">
+    <div class="middle-container">
+        <div id="header-1" class="header-item">
+            <a href="index.html">Home</a>
+        </div>
+        <div id="header-2" class="header-item">
+            <span>Category</span>
+            <div class="dropdown-content" id="mainCategoryContainer">
+                <!-- 主分類和次分類將動態加載 -->
+            </div>
+        </div>
+        <div id="header-3" class="header-item">
+            <span>Account</span>
+            <div class="dropdown-content" id="profileDropdown">
+                <div class="profile-box">
+                    <div class="profile-item"><a href="account.html">Login</a></div>
+                    <div class="profile-item"><a href="profile.html">Profile</a></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main>
+    <div class="latest-likes-container" id="latestLikesContainer">
+        <!-- 6本書的資料將會動態載入 -->
+    </div>
+    <div class="pagination" id="pagination-bookshelf">
+        <!-- 分頁按鈕將在這裡動態生成 -->
+    </div>
+    <!-- Likes 和 Collects 的切換 -->
+    <div id="containerB-switch-likes-collects">
+        <button id="switch-likes">Likes</button>
+        <button id="switch-collects">Collects</button>
+    </div>
+    <div id="containerB-controls-index-category">
+        <!-- 切換評論和引言的按鈕 -->
+        <button id="b-left">Comments</button>
+        <button id="b-right">Quotes</button>
+    </div>
+    <!-- 使用 b 大容器結構 -->
+   <div class="container-b" id="containerB">
+       <!-- 這裡會動態生成評論小容器 -->
+    </div>
+    <!-- 分頁按鈕 -->
+    <div class="pagination" id="pagination">
+        <!-- 分頁按鈕將在這裡動態生成 -->
+    </div>
+</main>
+
+<script src="js/style.js"></script>
+<script src="js/categoryNavBar.js"></script>
+<script src="js/bookshelfAll.js"></script>
+<script src="js/reviewsAll.js"></script> <!-- 新的 JS 文件 -->
+<script src="js/bookDetailPage.js"></script>
+
+</body>
+</html>

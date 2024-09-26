@@ -14,4 +14,8 @@ public interface QuoteRepository extends JpaRepository<Quote, Long> {
     List<Quote> findByBookId_BookIdOrderByTimestampDesc(Long bookId);
 
     List<Quote> findByUserId_UserIdOrderByTimestampDesc(Long UserId);
+
+    List<Quote> findBySubCategory_OrderByTimestampDesc(String subCategory);
+
+    List<Quote> findTop6ByOrderByTimestampDesc();
 }

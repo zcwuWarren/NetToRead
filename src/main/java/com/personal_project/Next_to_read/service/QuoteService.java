@@ -35,5 +35,16 @@ public class QuoteService {
         List<Quote> quotes = quoteRepository.findByUserId_UserIdOrderByTimestampDesc(userId);
         return quotes.stream().map(quote -> new QuoteDto(quote)).collect(Collectors.toList());
     }
+
+    public List<QuoteDto> getQuotesBySubCategory(String subCategory) {
+
+        List<Quote> quotes = quoteRepository.findBySubCategory_OrderByTimestampDesc(subCategory);
+        return quotes.stream().map(quote -> new QuoteDto(quote)).collect(Collectors.toList());
+    }
+
+    public List<QuoteDto> getQuotesWithoutCondition() {
+        List<Quote> quotes = quoteRepository.findTop6ByOrderByTimestampDesc();
+        return quotes.stream().map(quote -> new QuoteDto(quote)).collect(Collectors.toList());
+    }
 }
 

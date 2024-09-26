@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/account.css"> <!-- 引入新的CSS -->
+</head>
+<body>
+<header class="container-header">
+    <div class="middle-container">
+        <div id="header-1" class="header-item">
+            <a href="index.html">Home</a>
+        </div>
+        <div id="header-2" class="header-item">
+            <span>Category</span>
+            <div class="dropdown-content" id="mainCategoryContainer">
+                <!-- 主分類和次分類將動態加載 -->
+            </div>
+        </div>
+        <div id="header-3" class="header-item">
+            <span>Account</span>
+            <div class="dropdown-content" id="profileDropdown">
+                <div class="profile-box">
+                    <div class="profile-item"><a href="account.html">Login</a></div>
+                    <div class="profile-item"><a href="profile.html">Profile</a></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main>
+    <!-- 大的 a 容器 -->
+    <div class="container-a" id="containerA">
+        <!-- 左上切換 login 和 register -->
+        <div class="switch-buttons">
+            <button id="switch-login">Login</button>
+            <button id="switch-register">Register</button>
+        </div>
+
+        <!-- a-login 容器，預設顯示 -->
+        <div id="a-login">
+            <div class="container-a-login-1">
+                <input type="email" id="login-email" placeholder="Enter your email">
+            </div>
+            <div class="container-a-login-2">
+                <input type="password" id="login-password" placeholder="Enter your password">
+            </div>
+            <div class="container-a-login-3">
+                <button id="submit-login">Continue</button>
+            </div>
+        </div>
+
+        <!-- a-register 容器，切換顯示 -->
+        <div id="a-register" style="display:none;">
+            <div class="container-a-register-1">
+                <input type="text" id="register-username" placeholder="Enter your user name">
+            </div>
+            <div class="container-a-register-2">
+                <input type="email" id="register-email" placeholder="Enter your email">
+            </div>
+            <div class="container-a-register-3">
+                <input type="password" id="register-password" placeholder="Enter your password">
+            </div>
+            <div class="container-a-register-4">
+                <button id="submit-register">Continue</button>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="js/accountPage.js"></script> <!-- 引入 JS -->
+<script src="js/categoryNavBar.js"></script>
+</body>
+</html>

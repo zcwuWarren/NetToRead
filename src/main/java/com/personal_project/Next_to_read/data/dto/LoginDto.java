@@ -13,10 +13,10 @@ import lombok.NoArgsConstructor;
 @Builder
 public class LoginDto {
 
-    @JsonProperty("access_token")
+    @JsonProperty("token")
     private String accessToken;
 
-    @JsonProperty("access_expired")
+    @JsonProperty("expired")
     private long accessExpired;
 
 //    @JsonProperty("user")
