@@ -256,5 +256,36 @@ public class BookCommentSqlService {
         List<BookCommentSql> comments = bookCommentSqlRepository.findByUserId_UserIdOrderByTimestampDesc(userId);
         return comments.stream().map(comment -> new BookCommentDto(comment)).collect(Collectors.toList());
     }
+
+    public boolean deleteComment(Long id, String token) {
+        User user = jwtTokenUtil.getUserFromToken(token);
+
+        // 查找該評論
+        Optional<BookCommentSql> commentOpt = bookCommentSqlRepository.findById(id);
+        if (commentOpt.isPresent()) {
+            BookCommentSql comment = commentOpt.get();
+
+            // 驗證該評論是否屬於當前用戶
+            if (comment.getUserId().getUserId().equals(user.getUserId())) {
+                bookCommentSqlRepository.delete(comment);
+                return true;  // 刪除成功
+            }
+        }
+        return false;  // 刪除失敗，因為評論不存在或者權限不足
+    }
+
+    public boolean editComment(Long id, String token, String updatedComment) {
+        // 編輯評論的邏輯
+        User user = jwtTokenUtil.getUserFromToken(token);
+        Optional<BookCommentSql> comment = bookCommentSqlRepository.findById(id);
+
+        if (comment.isPresent() && comment.get().getUserId().getUserId().equals(user.getUserId())) {
+            BookCommentSql commentToUpdate = comment.get();
+            commentToUpdate.setComment(updatedComment); // 更新評論內容
+            bookCommentSqlRepository.save(commentToUpdate);
+            return true;
+        }
+        return false;
+    }
 }
 

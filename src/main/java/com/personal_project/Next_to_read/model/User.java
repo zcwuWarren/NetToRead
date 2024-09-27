@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CollectionId;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -27,7 +26,7 @@ public class User implements UserDetails {
     private Long userId;
 
     @Column(name = "user_name", nullable = false)
-    private String userName;
+    private String name;
 
     @Column(name = "email", unique = true, nullable = false)
     private String email;

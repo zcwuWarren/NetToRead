@@ -15,6 +15,8 @@ public class BookCommentDtoConverter {
                 .bookName(comment.getBookId().getBookName())
                 .bookId(comment.getBookId().getBookId())
                 .date(DateUtil.formatDate(comment.getTimestamp()))
+                .userName(comment.getUserId().getName())
+                .id(comment.getId())
                 .build();
     }
 

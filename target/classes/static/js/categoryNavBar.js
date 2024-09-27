@@ -1,3 +1,4 @@
+// categoryNavBar.js
 document.addEventListener("DOMContentLoaded", function() {
     // 從 API 獲取分類資料
     fetch("/api/bookPage/categories")

@@ -29,7 +29,7 @@ public class UserService {
         }
 
         User user = new User();
-        user.setUserName(form.getUserName());
+        user.setName(form.getUserName());
         user.setEmail(form.getEmail());
         user.setPassword(passwordEncoder.encode(form.getPassword()));
 

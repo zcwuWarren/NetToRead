@@ -106,14 +106,27 @@
 
 }
 
-/* 右側 userId 部分 */
-.comment-user-id, .quote-user-id, .comment-book-name, .quote-book-name {
+/* 左側 bookName, userName 部分 */
+.comment-user-id, .quote-user-id, .comment-book-name, .quote-book-name, .comment-user-name, .quote-user-name {
     /*width: 20%;*/
     /*text-align: right;*/
     text-align: left; /* Align the book name to the left */
     font-size: 16px;
     color: #666;
 }
+
+/*!* delete, edit 樣式 *!*/
+/*.delete-edit button {*/
+/*    margin: 0 5px;*/
+/*    padding: 5px 10px;*/
+/*    border: 1px solid #ccc;*/
+/*    background-color: #f0f0f0;*/
+/*    cursor: pointer;*/
+/*}*/
+
+/*.delete-edit button:hover {*/
+/*    background-color: #ddd;*/
+/*}*/
 
 /* 分頁按鈕樣式 */
 .pagination {
@@ -133,6 +146,19 @@
 .pagination button:hover {
     background-color: #ddd;
 }
+
+.delete-edit-button {
+    margin: 0 5px;
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    background-color: #f0f0f0;
+    cursor: pointer;
+}
+
+.delete-edit-button:hover {
+    background-color: #ddd;
+}
+
 
 .container-b-controls {
     display: flex;

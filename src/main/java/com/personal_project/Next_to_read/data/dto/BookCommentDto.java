@@ -17,6 +17,8 @@ public class BookCommentDto {
     private String bookName;
     private String date;
     private Long bookId;
+    private String userName;
+    private Long id;
 
     public BookCommentDto(BookCommentSql comment) {
         this.userId = comment.getUserId().getUserId();
@@ -24,5 +26,7 @@ public class BookCommentDto {
         this.bookName = comment.getBookId().getBookName();
         this.date = DateUtil.formatDate(comment.getTimestamp());
         this.bookId = comment.getBookId().getBookId();
+        this.userName = comment.getUserId().getName();
+        this.id = comment.getId();
     }
 }
