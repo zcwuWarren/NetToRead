@@ -27,4 +27,6 @@ public interface BookInfoRepository extends JpaRepository<BookInfo, Long> {
     List<BookInfo> findTop6ByBookIdIn(List<Long> bookIds);
 
     List<BookInfo> findByBookIdIn(List<Long> bookIds);
+
+    List<BookInfo> findByBookNameContaining(String keyword);
 }

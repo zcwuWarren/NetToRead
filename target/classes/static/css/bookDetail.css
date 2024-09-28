@@ -79,6 +79,17 @@
     background-color: lightgreen; /* 調試時 hover 顯示的效果 */
 }
 
+.search-library-button {
+    background-color: lightgreen;
+    display: block;
+    width: auto;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+}
+
 /* b 大容器樣式 */
 .container-b {
     width: 60%;

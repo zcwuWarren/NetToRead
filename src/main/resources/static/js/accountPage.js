@@ -13,12 +13,26 @@ document.addEventListener("DOMContentLoaded", function() {
 
     const token = localStorage.getItem('jwtToken');
 
-    if (token) {
-        // 如果有 token，直接跳轉到 profile 頁面
+    if (token && !isTokenExpired(token)) {
+        // Token 存在且未過期，跳轉到 profile 頁面
         window.location.href = '/profile.html';
     } else {
-        // 沒有 token 的情況下，顯示頁面
+        // 如果 token 過期或不存在，顯示頁面
         document.body.style.display = "block";
+    }
+
+    // 檢查 JWT Token 是否過期
+    function isTokenExpired(token) {
+        const tokenParts = token.split('.');
+        if (tokenParts.length !== 3) {
+            return true;  // 無效的 token
+        }
+
+        const decodedPayload = JSON.parse(atob(tokenParts[1]));
+        const expirationDate = new Date(decodedPayload.exp * 1000);  // exp 是以秒計算的
+        const now = new Date();
+
+        return expirationDate < now;  // 如果當前時間大於過期時間，token 已過期
     }
 
     // 切換至 Login

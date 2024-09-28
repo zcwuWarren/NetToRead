@@ -112,4 +112,9 @@ public class BookPageService {
         // turn to BookInfoDto
         return BookInfoDtoConverter.convertToDtoList(books);
     }
+
+    public List<BookInfoDto> searchBooksByKeyword(String keyword) {
+        List<BookInfo> books = bookInfoRepository.findByBookNameContaining(keyword);
+        return BookInfoDtoConverter.convertToDtoList(books);
+    }
 }

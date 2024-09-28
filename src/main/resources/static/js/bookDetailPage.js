@@ -4,11 +4,12 @@ document.addEventListener("DOMContentLoaded", async function() {
     // 從 URL 中提取 bookId
     const urlParams = new URLSearchParams(window.location.search);
     const bookId = urlParams.get('bookId');
+    let book;
 
     if (bookId) {
         try {
             const response = await fetch(`/api/bookPage/getBookInfo?bookId=${bookId}`);
-            const book = await response.json();
+            book = await response.json();
 
             const containerA1 = document.getElementById('containerA1');
             const containerA2 = document.getElementById('containerA2');
@@ -37,6 +38,17 @@ document.addEventListener("DOMContentLoaded", async function() {
             // 渲染書籍描述
             const bookDescription = `<div class="container-a-3-long-content">${book.description}</div>`;
             containerA3.innerHTML = bookDescription;
+
+            document.getElementById('A-2-search').addEventListener('click', function() {
+                const isbn = book.isbn;
+                const selectedLibrary = document.getElementById('library-select').value; // 取得選中的圖書館 URL 模板
+
+                // 替換 ${isbn} 為實際的 ISBN 值
+                const searchUrl = selectedLibrary.replace('${isbn}', isbn);
+
+                // 在新分頁中開啟查詢結果
+                window.open(searchUrl, '_blank');
+            });
 
             // 按讚功能
             likeButton.addEventListener('click', async () => {

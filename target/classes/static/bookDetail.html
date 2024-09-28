@@ -58,6 +58,35 @@
     <div class="like-collect-container">
         <div id="A-2-like" class="like-button">Like</div>
         <div id="A-2-collect" class="collect-button">Collect</div>
+
+        <!-- 圖書館查詢下拉選單 -->
+        <select id="library-select">
+            <option value="https://ipac.nlpi.edu.tw/search?searchInput=${isbn}&searchField=FullText">國立公共資訊圖書館</option>
+            <option value="https://book.tpml.edu.tw/search?searchInput=${isbn}&searchField=FullText">臺北市</option>
+            <option value="https://webpac.tphcc.gov.tw/webpac/search.cfm?m=ss&k0=${isbn}&t0=k&c0=and">新北市</option>
+            <option value="https://webpac.typl.gov.tw/search?searchField=ISBN&searchInput=${isbn}">桃園市</option>
+            <option value="https://rwd-library.taichung.gov.tw/webpac_rwd/search.cfm?m=ss&k0=${isbn}&t0=k&c0=and&fieldname=leader67">臺中市</option>
+            <option value="https://lib.tnml.tn.edu.tw/webpac/search.cfm?m=ss&k0=${isbn}&t0=k&c0=and">臺南市</option>
+            <option value="https://webpacx.ksml.edu.tw/search?searchInput=${isbn}&searchField=FullText">高雄市</option>
+            <option value="https://webpac.klccab.gov.tw/webpac/search.cfm?m=ss&k0=${isbn}&t0=k&c0=and">基隆市</option>
+            <option value="https://webpac.ilccb.gov.tw/search?searchField=ISBN&searchInput=${isbn}">宜蘭市</option>
+            <option value="https://webpac.hccg.gov.tw/search?searchField=ISBN&searchInput=${isbn}}">新竹市</option>
+            <option value="https://libline.hchcc.gov.tw/search?searchField=ISBN&searchInput=${isbn}">新竹縣</option>
+            <option value="https://webpacx.miaoli.gov.tw/search?searchField=ISBN&searchInput=${isbn}">苗栗縣</option>
+            <option value="https://library.toread.bocach.gov.tw/toread/opac?q=${isbn}">彰化</option>
+            <option value="https://webpac.nthcc.gov.tw/webpac/search.cfm?m=ss&k0=${isbn}&t0=k&c0=and">南投</option> <!-- 報錯 -->
+            <option value="https://webpacx.ylccb.gov.tw/search?searchInput=${isbn}&searchField=FullText">雲林</option>
+            <option value="https://webpacx.chiayi.gov.tw/search?searchField=ISBN&searchInput=${isbn}">嘉義</option>
+            <option value="https://library.pthg.gov.tw/search?searchInput=${isbn}&searchField=FullText">屏東</option>
+            <option value="https://center.hccc.gov.tw/search?searchField=ISBN&searchInput=${isbn}">花蓮</option>
+            <option value="https://library.ccl.ttct.edu.tw/bookSearchList.do?searchtype=simplesearch&search_field=ISBN&search_input=${isbn}&searchsymbol=hyLibCore.webpac.search.common_symbol&execodehidden=true&execode=&ebook=">台東</option>
+            <option value="https://webpac.phlib.nat.gov.tw/search?searchField=ISBN&searchInput=${isbn}">澎湖</option>
+            <option value="https://webpacx.km.edu.tw/search?searchField=ISBN&searchInput=${isbn}}">金門</option>
+        </select>
+
+        <!-- 查詢按鈕 -->
+        <div id="A-2-search" class="search-library-button">Search Library</div>
+
     </div>
     <div id="containerB-controls">
         <button id="b-left">Comments</button>

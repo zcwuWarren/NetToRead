@@ -35,6 +35,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     if (isTokenExpired(token)) {
         console.error("JWT Token has expired.");
+        localStorage.removeItem('jwtToken');  // 清除過期的 token
         window.location.href = '/account.html';  // 跳轉到登入頁面
         return;
     }

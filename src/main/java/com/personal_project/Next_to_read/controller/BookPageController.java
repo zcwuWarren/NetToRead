@@ -144,4 +144,10 @@ public class BookPageController {
         BookInfoDto bookInfoDto = bookPageService.getBookInfoById(bookId);
         return ResponseEntity.ok(bookInfoDto);
     }
+
+    @GetMapping("/getAutocomplete")
+    public ResponseEntity<List<BookInfoDto>> getAutoCompleteBooks(@RequestParam String keyword) {
+        List<BookInfoDto> books = bookPageService.searchBooksByKeyword(keyword);
+        return ResponseEntity.ok(books);
+    }
 }

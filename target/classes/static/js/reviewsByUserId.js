@@ -18,6 +18,25 @@ document.addEventListener("DOMContentLoaded", async function() {
         return;
     }
 
+    let userIdFromToken = null;
+
+    // 如果有 JWT，解析用戶 ID
+    if (token) {
+        const decodedToken = parseJwt(token);
+        userIdFromToken = decodedToken.userId; // 解析出 userId
+    }
+
+    // 解析 JWT Token 的函數
+    function parseJwt(token) {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+
+        return JSON.parse(jsonPayload);
+    }
+
     // 加載評論
     async function loadComments(page) {
         try {
@@ -71,6 +90,122 @@ document.addEventListener("DOMContentLoaded", async function() {
         }
     }
 
+    // 編輯評論
+    function editComment(commentId, commentTextElement) {
+        const newComment = prompt("Edit your comment:", commentTextElement.textContent);
+        if (newComment) {
+            const token = localStorage.getItem('jwtToken');
+            fetch(`/api/book/editComment`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    id: commentId,
+                    token: token,
+                    updatedComment: newComment })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        commentTextElement.textContent = newComment; // 更新頁面上的評論
+                    } else {
+                        alert("Failed to edit comment.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error editing comment:", error);
+                });
+        }
+    }
+
+    // 刪除評論
+    function deleteComment(commentId, commentDiv) {
+        const token = localStorage.getItem('jwtToken');
+        fetch('/api/book/deleteComment', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                id: commentId,
+                token: token
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                // todo 注意回傳 key 是message
+                if (data.message) {
+                    commentDiv.remove();
+                } else {
+                    alert("Failed to delete comment.");
+                }
+            })
+            .catch(error => {
+                console.error("Error deleting comment:", error);
+            });
+    }
+
+    // 編輯引言
+    function editQuote(quoteId, quoteTextElement) {
+        const newQuote = prompt("Edit your comment:", quoteTextElement.textContent);
+        if (newQuote) {
+            const token = localStorage.getItem('jwtToken');
+            fetch(`/api/book/editQuote`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    id: quoteId,
+                    token: token,
+                    updatedQuote: newQuote })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        quoteTextElement.textContent = newQuote; // 更新頁面上的評論
+                    } else {
+                        alert("Failed to edit quote.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error editing quote:", error);
+                });
+        }
+    }
+
+    // 刪除引言
+    function deleteQuote(quoteId, quoteDiv) {
+        const token = localStorage.getItem('jwtToken');
+        fetch('/api/book/deleteQuote', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                id: quoteId,
+                token: token
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                // 注意回傳 key 是message
+                if (data.message) {
+                    quoteDiv.remove(); // 從頁面中刪除該引言
+                } else {
+                    alert("Failed to delete quote.");
+                }
+            })
+            .catch(error => {
+                console.error("Error deleting quote:", error);
+            });
+    }
+
     // 渲染評論
     function renderComments(comments) {
         commentsContainer.innerHTML = "";  // 清空現有評論
@@ -79,8 +214,10 @@ document.addEventListener("DOMContentLoaded", async function() {
             const commentDiv = document.createElement('div');
             commentDiv.classList.add('comment-container');
 
-            // 點擊 comment 跳轉至該 bookId 書籍頁面
-            commentDiv.addEventListener('click', function (){
+            // 包裹 commentText 和 bookName 的容器
+            const commentContentDiv = document.createElement('div');
+            commentContentDiv.classList.add('comment-content-container');
+            commentContentDiv.addEventListener('click', function() {
                 window.location.href = `/bookDetail.html?bookId=${comment.bookId}`;
             });
 
@@ -92,8 +229,38 @@ document.addEventListener("DOMContentLoaded", async function() {
             bookName.classList.add('comment-book-name');
             bookName.textContent = comment.bookName;  // 顯示書名
 
-            commentDiv.appendChild(commentText);
-            commentDiv.appendChild(bookName);
+            commentContentDiv.appendChild(commentText);
+            commentContentDiv.appendChild(bookName);
+
+            // 包裹 editButton 和 deleteButton 的容器
+            const buttonContainer = document.createElement('div');
+            buttonContainer.classList.add('button-container');
+
+            // 如果 JWT 中的 userId 與評論的 userId 匹配，顯示編輯和刪除按鈕
+            if (userIdFromToken && userIdFromToken === comment.userId) {
+                const editButton = document.createElement('button');
+                editButton.classList.add('delete-edit-button');
+                editButton.textContent = "Edit";
+                editButton.addEventListener('click', (event) => {
+                    event.stopPropagation();  // 阻止事件冒泡到 commentContentDiv
+                    editComment(comment.id, commentText);
+                });
+
+                const deleteButton = document.createElement('button');
+                deleteButton.classList.add('delete-edit-button'); // 為 button 添加 class
+                deleteButton.textContent = "Delete";
+                deleteButton.addEventListener('click', (event) => {
+                    event.stopPropagation();  // 阻止事件冒泡到 commentContentDiv
+                    deleteComment(comment.id, commentDiv);
+                });
+
+                buttonContainer.appendChild(editButton);
+                buttonContainer.appendChild(deleteButton);
+            }
+
+            // 將 commentContentDiv 和 buttonContainer 添加到主 commentDiv 中
+            commentDiv.appendChild(commentContentDiv);
+            commentDiv.appendChild(buttonContainer);
             commentsContainer.appendChild(commentDiv);
         });
     }
@@ -106,8 +273,10 @@ document.addEventListener("DOMContentLoaded", async function() {
             const quoteDiv = document.createElement('div');
             quoteDiv.classList.add('quote-container');
 
-            // 點擊 quote 跳轉至該 bookId 書籍頁面
-            quoteDiv.addEventListener('click', function (){
+            // 包裹 quoteText 和 bookName 的容器
+            const quoteContentDiv = document.createElement('div');
+            quoteContentDiv.classList.add('quote-content-container');
+            quoteContentDiv.addEventListener('click', function() {
                 window.location.href = `/bookDetail.html?bookId=${quote.bookId}`;
             });
 
@@ -119,8 +288,35 @@ document.addEventListener("DOMContentLoaded", async function() {
             bookName.classList.add('comment-book-name');
             bookName.textContent = quote.bookName;  // 顯示書名
 
-            quoteDiv.appendChild(quoteText);
-            quoteDiv.appendChild(bookName);
+            quoteContentDiv.appendChild(quoteText);
+            quoteContentDiv.appendChild(bookName);
+
+            // 包裹 editButton 和 deleteButton 的容器
+            const buttonContainer = document.createElement('div');
+            buttonContainer.classList.add('button-container');
+
+            // 如果 JWT 中的 userId 與引言的 userId 匹配，顯示刪除按鈕
+            if (userIdFromToken && userIdFromToken === quote.userId) {
+                const editButton = document.createElement('button');
+                editButton.classList.add('delete-edit-button');
+                editButton.textContent = "Edit";
+                editButton.addEventListener('click', () => {
+                    editQuote(quote.id, quoteText);
+                });
+
+                const deleteButton = document.createElement('button');
+                deleteButton.classList.add('delete-edit-button');
+                deleteButton.textContent = "Delete";
+                deleteButton.addEventListener('click', () => {
+                    deleteQuote(quote.id, quoteDiv);
+                });
+
+                buttonContainer.appendChild(editButton);
+                buttonContainer.appendChild(deleteButton);
+            }
+            // 將 quoteContentDiv 和 buttonContainer 添加到主 quoteDiv 中
+            quoteDiv.appendChild(quoteContentDiv);
+            quoteDiv.appendChild(buttonContainer);
             commentsContainer.appendChild(quoteDiv);
         });
     }

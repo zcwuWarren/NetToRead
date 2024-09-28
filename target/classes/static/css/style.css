@@ -33,6 +33,7 @@ body {
     cursor: pointer;
 }
 
+
 .header-item a {
     text-decoration: none;
     color: black;
@@ -58,6 +59,84 @@ body {
 .header-item:hover .dropdown-content {
     display: block;
 }
+
+/* 搜索框樣式 */
+#header-search {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+    position: relative; /* 確保 suggestion-box 基於 header-search 定位 */
+}
+
+#search-input {
+    width: 100%;
+    padding: 8px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* 搜索框聚焦時的效果 */
+#search-input:focus {
+    outline: none;
+    border-color: #999;
+}
+
+/* 隱藏但對於屏幕閱讀器可見的樣式 */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    /*overflow: hidden;*/
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+/* 建議框的樣式 */
+/*#suggestion-box {*/
+/*    position: absolute;*/
+/*    background-color: white;*/
+/*    border: 1px solid #ccc;*/
+/*    max-height: 200px;*/
+/*    overflow-y: auto;*/
+/*    width: 100%;*/
+/*    z-index: 1000;*/
+/*    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);*/
+/*    margin-top: 5px;*/
+/*}*/
+#suggestion-box {
+    position: absolute;
+    top: 100%; /* 保證 suggestion-box 顯示在輸入框下方 */
+    left: 0;
+    background-color: white;
+    border: 1px solid #ccc;
+    max-height: 400px;
+    overflow-y: auto;
+    width: 100%;
+    z-index: 1000; /* 保證 suggestion-box 蓋在其他元素之上 */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 10px;
+}
+
+#suggestion-box .suggestion-item {
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+    font-size: 16px;
+}
+
+#suggestion-box .suggestion-item:last-child {
+    border-bottom: none;
+}
+
+#suggestion-box .suggestion-item:hover {
+    background-color: #f0f0f0;
+}
+
 
 /* 主分類與次分類樣式 */
 .category-item {
