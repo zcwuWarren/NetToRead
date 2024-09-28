@@ -1,6 +1,8 @@
 package com.personal_project.Next_to_read.repository;
 
 import com.personal_project.Next_to_read.model.UserBookshelfSql;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -28,5 +30,14 @@ public interface UserBookshelfSqlRepository extends JpaRepository<UserBookshelfS
 
     @Query("SELECT u.bookId.bookId FROM UserBookshelfSql u ORDER BY u.timestampCollect DESC")
     List<Long> findTop6BookIdsOrderByTimestampCollectDesc();
+
+    @Query(value = "SELECT ubs.book_id " +
+            "FROM user_bookshelf ubs " +
+            "WHERE ubs.likes = true " +
+            "GROUP BY ubs.book_id " +
+            "ORDER BY MAX(ubs.timestamp_like) DESC",
+            countQuery = "SELECT COUNT(DISTINCT ubs.book_id) FROM user_bookshelf ubs WHERE ubs.likes = true",
+            nativeQuery = true)
+    Page<Long> findBookIdsByOrderByTimestampLikeDesc(Pageable pageable);
 }
 

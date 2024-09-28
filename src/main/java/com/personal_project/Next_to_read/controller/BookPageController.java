@@ -69,9 +69,17 @@ public class BookPageController {
     }
 
     // likes without condition
+//    @GetMapping("/latest-likes")
+//    public ResponseEntity<List<BookInfoDto>> getLatestLikedBooks() {
+//        List<BookInfoDto> latestLikedBooks = bookPageService.getLatestLikedBooks();
+//        return ResponseEntity.ok(latestLikedBooks);
+//    }
+
     @GetMapping("/latest-likes")
-    public ResponseEntity<List<BookInfoDto>> getLatestLikedBooks() {
-        List<BookInfoDto> latestLikedBooks = bookPageService.getLatestLikedBooks();
+    public ResponseEntity<List<BookInfoDto>> getLatestLikedBooks(
+            @RequestParam(defaultValue = "0") int offset,
+            @RequestParam(defaultValue = "50") int limit) {
+        List<BookInfoDto> latestLikedBooks = bookPageService.getLatestLikedBooks(offset, limit);
         return ResponseEntity.ok(latestLikedBooks);
     }
 

@@ -19,7 +19,6 @@ document.addEventListener("DOMContentLoaded", async function() {
     }
 
     let userIdFromToken = null;
-
     // 如果有 JWT，解析用戶 ID
     if (token) {
         const decodedToken = parseJwt(token);
