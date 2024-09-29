@@ -15,16 +15,28 @@
         <div id="header-1" class="header-item">
             <a href="index.html">Home</a>
         </div>
+<!--        <div id="header-2" class="header-item">-->
+<!--            <span>Category</span>-->
+<!--            <div class="dropdown-content" id="categoryDropdown">-->
+<!--                <div class="category-box" id="mainCategoryContainer">-->
+<!--                    &lt;!&ndash; 主分類會在這裡動態載入 &ndash;&gt;-->
+<!--                </div>-->
+<!--                <div class="category-sub" id="categorySub">-->
+<!--                    &lt;!&ndash; 次分類會在這裡動態載入 &ndash;&gt;-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
         <div id="header-2" class="header-item">
             <span>Category</span>
-            <div class="dropdown-content" id="categoryDropdown">
-                <div class="category-box" id="mainCategoryContainer">
-                    <!-- 主分類會在這裡動態載入 -->
-                </div>
-                <div class="category-sub" id="categorySub">
-                    <!-- 次分類會在這裡動態載入 -->
-                </div>
+            <div class="dropdown-content" id="mainCategoryContainer">
+                <!-- 主分類和次分類將動態加載 -->
             </div>
+        </div>
+        <!-- 搜索框 -->
+        <div id="header-search" class="header-item">
+            <label for="search-input" class="visually-hidden">Search Books</label>
+            <input type="text" id="search-input" placeholder="Search books...">
+            <div id="suggestion-box"></div> <!-- 將 suggestion-box 放在這裡 -->
         </div>
         <div id="header-3" class="header-item">
             <span>Account</span>
