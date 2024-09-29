@@ -92,10 +92,18 @@ public class BookPageController {
     }
 
     // collect without condition
+//    @GetMapping("/latest-collect")
+//    public ResponseEntity<List<BookInfoDto>> getLatestCollectBooks() {
+//        List<BookInfoDto> latestCollectBooksByCategory = bookPageService.getLatestCollectBooks();
+//        return ResponseEntity.ok(latestCollectBooksByCategory);
+//    }
+
     @GetMapping("/latest-collect")
-    public ResponseEntity<List<BookInfoDto>> getLatestCollectBooks() {
-        List<BookInfoDto> latestCollectBooksByCategory = bookPageService.getLatestCollectBooks();
-        return ResponseEntity.ok(latestCollectBooksByCategory);
+    public ResponseEntity<List<BookInfoDto>> getLatestCollectBooks(
+            @RequestParam(defaultValue = "0") int offset,
+            @RequestParam(defaultValue = "50") int limit) {
+        List<BookInfoDto> latestCollectedBooks = bookPageService.getLatestCollectBooks(offset, limit);
+        return ResponseEntity.ok(latestCollectedBooks);
     }
 
     // comments
@@ -114,14 +122,20 @@ public class BookPageController {
         return ResponseEntity.ok(comments);
     }
 
-    // comment without condition
+//    // comment without condition
+//    @GetMapping("/latest-comments")
+//    public ResponseEntity<List<BookCommentDto>> getLatestComments() {
+//        List<BookCommentDto> comments = bookPageService.getLatestComments();
+//        return ResponseEntity.ok(comments);
+//    }
+
     @GetMapping("/latest-comments")
-    public ResponseEntity<List<BookCommentDto>> getLatestComments() {
-        List<BookCommentDto> comments = bookPageService.getLatestComments();
+    public ResponseEntity<List<BookCommentDto>> getLatestComments(
+            @RequestParam(defaultValue = "0") int offset,
+            @RequestParam(defaultValue = "10") int limit) {
+        List<BookCommentDto> comments = bookPageService.getLatestComments(offset, limit);
         return ResponseEntity.ok(comments);
     }
-
-
 
     // quotes
     // quotes by bookId
@@ -140,9 +154,17 @@ public class BookPageController {
     }
 
     // quotes without condition
+//    @GetMapping("/latest-quotes")
+//    public ResponseEntity<List<QuoteDto>> getLatestQuotes() {
+//        List<QuoteDto> quotes = quoteService.getQuotesWithoutCondition();
+//        return ResponseEntity.ok(quotes);
+//    }
+
     @GetMapping("/latest-quotes")
-    public ResponseEntity<List<QuoteDto>> getLatestQuotes() {
-        List<QuoteDto> quotes = quoteService.getQuotesWithoutCondition();
+    public ResponseEntity<List<QuoteDto>> getLatestQuotes(
+            @RequestParam(defaultValue = "0") int offset,
+            @RequestParam(defaultValue = "10") int limit) {
+        List<QuoteDto> quotes = quoteService.getQuotesWithoutCondition(offset, limit);
         return ResponseEntity.ok(quotes);
     }
 

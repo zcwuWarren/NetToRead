@@ -82,18 +82,60 @@
 /*}*/
 
 
-#containerB-controls-index-category {
-    width: 60%; /* 確保和 container-b 一樣的寬度 */
-    margin: 20px auto; /* 垂直和水平方向置中 */
-    display: flex;
-    justify-content: flex-start;
+/*#containerB-controls-index-category {*/
+/*    width: 60%; !* 確保和 container-b 一樣的寬度 *!*/
+/*    margin: 20px auto; !* 垂直和水平方向置中 *!*/
+/*    display: flex;*/
+/*    justify-content: flex-start;*/
+/*}*/
+
+/*#containerB-switch-likes-collects {*/
+/*    width: 60%; !* 確保和 container-b 一樣的寬度 *!*/
+/*    margin: 20px auto; !* 垂直和水平方向置中 *!*/
+/*    display: flex;*/
+/*    justify-content: flex-start;*/
+/*}*/
+
+/* 切換按鈕的容器樣式 */
+#containerB-switch-likes-collects, #containerB-controls-index-category  {
+    width: 300px; /* 設置固定寬度,根據需要調整 */
+    margin: 0px auto; /* 垂直和水平方向置中 */
+    display: flex; /* 使用flexbox佈局 */
+    justify-content: center; /* 水平居中對齊 */
+    background-color: #ffffff; /* 容器背景色 */
+    border-radius: 25px; /* 圓角效果,可調整數值 */
+    padding: 5px; /* 內邊距,為按鈕留出空間 */
+    /*box-shadow: 0 2px 5px rgba(0,0,0,0.1); !* 輕微陰影效果 *!*/
 }
 
-#containerB-switch-likes-collects {
-    width: 60%; /* 確保和 container-b 一樣的寬度 */
-    margin: 20px auto; /* 垂直和水平方向置中 */
-    display: flex;
-    justify-content: flex-start;
+/* 切換按鈕的共同樣式 */
+#switch-likes, #switch-collects, #b-left, #b-right {
+    flex: 1; /* 平均分配容器寬度 */
+    padding: 10px 20px; /* 上下10px,左右20px的內邊距 */
+    border: none; /* 移除邊框 */
+    /*background-color: transparent; !* 透明背景 *!*/
+    background-color: #ffffff; /* 透明背景 */
+    color: #000000; /* 文字顏色 */
+    font-size: 16px; /* 文字大小 */
+    cursor: pointer; /* 滑鼠懸停時顯示手型 */
+    transition: all 0.3s ease; /* 平滑過渡效果 */
+    border-radius: 20px; /* 按鈕圓角,稍小於容器 */
+}
+
+/* 選中狀態的按鈕樣式 */
+#switch-likes.active, #switch-collects.active, #b-left.active, #b-right.active {
+    background-color: #000000; /* 選中時的背景色 */
+    color: #ffffff; /* 選中時的文字顏色 */
+}
+
+/* 滑鼠懸停效果 */
+#switch-likes:hover, #switch-collects:hover, #b-left:hover, #b-right:hover {
+    background-color: #e0e0e0; /* 懸停時的背景色 */
+}
+
+/* 選中狀態下的懸停效果 */
+#switch-likes.active:hover, #switch-collects.active:hover, #b-left:hover, #b-right:hover {
+    background-color: #000000; /* 選中狀態下懸停時的背景色 */
 }
 
 /*最新按讚的書籍 by category*/

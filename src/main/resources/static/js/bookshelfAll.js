@@ -357,44 +357,5 @@ document.addEventListener("DOMContentLoaded", function () {
         return element.scrollLeft + element.clientWidth >= element.scrollWidth - 100;
     }
 
-    // 創建並添加 fade 元素
-    const fadeLeft = document.createElement('div');
-    fadeLeft.className = 'fade-effect fade-left';
-    const fadeRight = document.createElement('div');
-    fadeRight.className = 'fade-effect fade-right';
-    latestLikesContainer.parentNode.insertBefore(fadeLeft, latestLikesContainer);
-    latestLikesContainer.parentNode.appendChild(fadeRight);
-
-    // 更新 fade 效果的顯示邏輯
-    function updateFadeEffect() {
-        const scrollLeft = latestLikesContainer.scrollLeft;
-        const scrollWidth = latestLikesContainer.scrollWidth;
-        const clientWidth = latestLikesContainer.clientWidth;
-
-        // 控制左側 fade 效果
-        if (scrollLeft > 0) {
-            fadeLeft.style.opacity = '1';
-        } else {
-            fadeLeft.style.opacity = '0';
-        }
-
-        // 控制右側 fade 效果
-        if (scrollLeft + clientWidth < scrollWidth) {
-            fadeRight.style.opacity = '1';
-        } else {
-            fadeRight.style.opacity = '0';
-        }
-    }
-
-    // 初始化 fade 效果
-    updateFadeEffect();
-
-    // 在滾動事件中更新 fade 效果
-    latestLikesContainer.addEventListener('scroll', () => {
-        updateFadeEffect();
-        if (isNearRight(latestLikesContainer) && !isLoading && !isEndOfData) {
-            loadMoreBooks();
-        }
-    });
 });
 

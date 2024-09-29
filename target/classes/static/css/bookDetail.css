@@ -96,6 +96,8 @@
     margin: 20px auto;
     display: flex;
     flex-direction: column;
+    max-height: 600px; /* 設置最大高度，超過此高度時出現滾動條 */
+    overflow-y: auto; /* 允許垂直滾動 */
 }
 
 /* 小容器樣式 */
@@ -178,6 +180,7 @@
     margin-bottom: 20px;
 }
 
+/* #b-left, #b-right, #switch-likes, #switch-collects 樣式移到 bookDisplay.css*/
 #b-left, #b-right, #switch-likes, #switch-collects {
     padding: 10px 15px;
     cursor: pointer;

@@ -39,5 +39,14 @@ public interface UserBookshelfSqlRepository extends JpaRepository<UserBookshelfS
             countQuery = "SELECT COUNT(DISTINCT ubs.book_id) FROM user_bookshelf ubs WHERE ubs.likes = true",
             nativeQuery = true)
     Page<Long> findBookIdsByOrderByTimestampLikeDesc(Pageable pageable);
+
+    @Query(value = "SELECT ubs.book_id " +
+            "FROM user_bookshelf ubs " +
+            "WHERE ubs.collect = true " +
+            "GROUP BY ubs.book_id " +
+            "ORDER BY MAX(ubs.timestamp_collect) DESC",
+            countQuery = "SELECT COUNT(DISTINCT ubs.book_id) FROM user_bookshelf ubs WHERE ubs.collect = true",
+            nativeQuery = true)
+    Page<Long> findBookIdsByOrderByTimestampCollectDesc(Pageable pageable);
 }
 

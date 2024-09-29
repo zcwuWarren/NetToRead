@@ -6,6 +6,10 @@ import com.personal_project.Next_to_read.model.BookCommentSql;
 import com.personal_project.Next_to_read.model.Quote;
 import com.personal_project.Next_to_read.model.User;
 import com.personal_project.Next_to_read.repository.QuoteRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -44,9 +48,18 @@ public class QuoteService {
         return quotes.stream().map(quote -> new QuoteDto(quote)).collect(Collectors.toList());
     }
 
-    public List<QuoteDto> getQuotesWithoutCondition() {
-        List<Quote> quotes = quoteRepository.findTop6ByOrderByTimestampDesc();
-        return quotes.stream().map(quote -> new QuoteDto(quote)).collect(Collectors.toList());
+//    public List<QuoteDto> getQuotesWithoutCondition() {
+//        List<Quote> quotes = quoteRepository.findTop6ByOrderByTimestampDesc();
+//        return quotes.stream().map(quote -> new QuoteDto(quote)).collect(Collectors.toList());
+//    }
+
+    public List<QuoteDto> getQuotesWithoutCondition(int offset, int limit) {
+        Pageable pageable = PageRequest.of(offset / limit, limit, Sort.by("timestamp").descending());
+
+        Page<Quote> quotesPage = quoteRepository.findAll(pageable);
+        return quotesPage.getContent().stream()
+                .map(QuoteDto::new)
+                .collect(Collectors.toList());
     }
 
     public boolean deleteQuote(Long id, String token) {

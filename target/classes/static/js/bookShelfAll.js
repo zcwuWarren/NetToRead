@@ -356,4 +356,6 @@ document.addEventListener("DOMContentLoaded", function () {
     function isNearRight(element) {
         return element.scrollLeft + element.clientWidth >= element.scrollWidth - 100;
     }
+
 });
+

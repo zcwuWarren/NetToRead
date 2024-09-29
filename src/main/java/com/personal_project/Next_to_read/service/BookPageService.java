@@ -58,18 +58,24 @@ public class BookPageService {
         return BookInfoDtoConverter.convertToDto(book);
     }
 
-    public List<BookCommentDto> getLatestComments() {
-        List<BookCommentSql> comments = bookCommentSqlRepository.findTop6ByOrderByTimestampDesc();
-        return BookCommentDtoConverter.convertToDtoList(comments);
+//    public List<BookCommentDto> getLatestComments() {
+//        List<BookCommentSql> comments = bookCommentSqlRepository.findTop6ByOrderByTimestampDesc();
+//        return BookCommentDtoConverter.convertToDtoList(comments);
+//    }
+
+    public List<BookCommentDto> getLatestComments(int offset, int limit) {
+        Pageable pageable = PageRequest.of(offset / limit, limit, Sort.by("timestamp").descending());
+        Page<BookCommentSql> commentPage = bookCommentSqlRepository.findAll(pageable);
+        return BookCommentDtoConverter.convertToDtoList(commentPage.getContent());
     }
 
     public List<BookInfoDto> getLatestCollectBooksByCategory(String subCategory) {
 //        List<BookInfo> books = bookInfoRepository.findTop6BySubCategoryOrderByCollectDesc(subCategory);
         List<Long> bookIds = userBookshelfSqlRepository.findTop6BookIdsBySubCategoryOrderByTimestampCollectDesc(subCategory);
-        System.out.println(bookIds.toString());
+//        System.out.println(bookIds.toString());
         // get book data from bookinfo by bookIds
         List<BookInfo> books = bookInfoRepository.findByBookIdIn(bookIds);
-        System.out.println(books);
+//        System.out.println(books);
 
         // manually sort the list order
         books.sort(Comparator.comparingInt(book -> bookIds.indexOf(book.getBookId())));
@@ -81,7 +87,7 @@ public class BookPageService {
 
         // get bookId from user_bookshelf by subCategory and timestampLike
         List<Long> bookIds = userBookshelfSqlRepository.findTop6BookIdsBySubCategoryOrderByTimestampLikeDesc(subCategory);
-        System.out.println(bookIds.toString());
+//        System.out.println(bookIds.toString());
         // get book data from bookinfo by bookIds
         List<BookInfo> books = bookInfoRepository.findByBookIdIn(bookIds);
 
@@ -131,16 +137,42 @@ public class BookPageService {
         return BookInfoDtoConverter.convertToDtoList(sortedBooks);
     }
 
-    public List<BookInfoDto> getLatestCollectBooks() {
-        // get bookId from user_bookshelf by subCategory and timestampLike
-        List<Long> bookIds = userBookshelfSqlRepository.findTop6BookIdsOrderByTimestampCollectDesc();
-//        System.out.println(bookIds.toString());
-        List<BookInfo> books = bookInfoRepository.findByBookIdIn(bookIds);
+//    public List<BookInfoDto> getLatestCollectBooks() {
+//        // get bookId from user_bookshelf by subCategory and timestampLike
+//        List<Long> bookIds = userBookshelfSqlRepository.findTop6BookIdsOrderByTimestampCollectDesc();
+////        System.out.println(bookIds.toString());
+//        List<BookInfo> books = bookInfoRepository.findByBookIdIn(bookIds);
+//
+//        // manually sort the list order
+//        books.sort(Comparator.comparingInt(book -> bookIds.indexOf(book.getBookId())));
+//        // turn to BookInfoDto
+//        return BookInfoDtoConverter.convertToDtoList(books);
+//    }
 
-        // manually sort the list order
-        books.sort(Comparator.comparingInt(book -> bookIds.indexOf(book.getBookId())));
-        // turn to BookInfoDto
-        return BookInfoDtoConverter.convertToDtoList(books);
+    public List<BookInfoDto> getLatestCollectBooks(int offset, int limit) {
+        // Get bookIds from user_bookshelf by timestampLike with pagination
+        Pageable pageable = PageRequest.of(offset / limit, limit);
+        Page<Long> bookIdPage = userBookshelfSqlRepository.findBookIdsByOrderByTimestampCollectDesc(pageable);
+//        System.out.println(bookIdPage.toString());
+        List<Long> bookIds = bookIdPage.getContent();
+        System.out.println(bookIds);
+
+        if (bookIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // Fetch books and maintain the order
+        Map<Long, BookInfo> bookMap = bookInfoRepository.findByBookIdIn(bookIds).stream()
+                .collect(Collectors.toMap(BookInfo::getBookId, Function.identity()));
+
+        // Manually sort the list to maintain the order from bookIds
+        List<BookInfo> sortedBooks = bookIds.stream()
+                .map(bookMap::get)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        // Convert to BookInfoDto
+        return BookInfoDtoConverter.convertToDtoList(sortedBooks);
     }
 
     public List<BookInfoDto> searchBooksByKeyword(String keyword) {
