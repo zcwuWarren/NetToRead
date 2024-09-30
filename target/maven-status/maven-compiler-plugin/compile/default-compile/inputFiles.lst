@@ -6,6 +6,10 @@
 /Users/user/repo/NetToRead/src/main/java/com/personal_project/Next_to_read/controller/UserPageController.java
 /Users/user/repo/NetToRead/src/main/java/com/personal_project/Next_to_read/data/dto/BookCommentDto.java
 /Users/user/repo/NetToRead/src/main/java/com/personal_project/Next_to_read/data/dto/BookInfoDto.java
+/Users/user/repo/NetToRead/src/main/java/com/personal_project/Next_to_read/data/dto/DeleteCommentDto.java
+/Users/user/repo/NetToRead/src/main/java/com/personal_project/Next_to_read/data/dto/DeleteQuoteDto.java
+/Users/user/repo/NetToRead/src/main/java/com/personal_project/Next_to_read/data/dto/EditCommentDto.java
+/Users/user/repo/NetToRead/src/main/java/com/personal_project/Next_to_read/data/dto/EditQuoteDto.java
 /Users/user/repo/NetToRead/src/main/java/com/personal_project/Next_to_read/data/dto/LoginDto.java
 /Users/user/repo/NetToRead/src/main/java/com/personal_project/Next_to_read/data/dto/QuoteDto.java
 /Users/user/repo/NetToRead/src/main/java/com/personal_project/Next_to_read/data/dto/TokenDto.java

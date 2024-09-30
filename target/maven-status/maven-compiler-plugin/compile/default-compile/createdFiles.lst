@@ -20,6 +20,7 @@ com/personal_project/Next_to_read/data/dto/UserBookshelfDto.class
 com/personal_project/Next_to_read/data/dto/LoginDto.class
 com/personal_project/Next_to_read/exception/GlobalExceptionHandler.class
 com/personal_project/Next_to_read/util/EntityToDtoConverter/BookInfoDtoConverter.class
+com/personal_project/Next_to_read/data/dto/EditQuoteDto.class
 com/personal_project/Next_to_read/data/dto/LoginDto$LoginDtoBuilder.class
 com/personal_project/Next_to_read/util/EntityToDtoConverter/BookCommentDtoConverter.class
 com/personal_project/Next_to_read/repository/BookCommentSqlRepository.class
@@ -28,6 +29,7 @@ com/personal_project/Next_to_read/data/dto/BookCommentDto.class
 com/personal_project/Next_to_read/data/form/CommentForm.class
 com/personal_project/Next_to_read/model/User.class
 com/personal_project/Next_to_read/exception/ResourceNotFoundException.class
+com/personal_project/Next_to_read/data/dto/DeleteQuoteDto.class
 com/personal_project/Next_to_read/service/LoginServiceImpl.class
 com/personal_project/Next_to_read/data/dto/QuoteDto.class
 com/personal_project/Next_to_read/jwt/JwtTokenUtil.class
@@ -42,8 +44,10 @@ com/personal_project/Next_to_read/repository/UserRepository.class
 com/personal_project/Next_to_read/data/form/QuoteForm.class
 com/personal_project/Next_to_read/data/dto/BookInfoDto$BookInfoDtoBuilder.class
 com/personal_project/Next_to_read/exception/auth/UserException.class
+com/personal_project/Next_to_read/data/dto/DeleteCommentDto.class
 com/personal_project/Next_to_read/repository/QuoteRepository.class
 com/personal_project/Next_to_read/service/UserBookshelfSqlService.class
 com/personal_project/Next_to_read/NextToReadApplication.class
 com/personal_project/Next_to_read/controller/BookCommentSqlController.class
 com/personal_project/Next_to_read/service/LoginService.class
+com/personal_project/Next_to_read/data/dto/EditCommentDto.class

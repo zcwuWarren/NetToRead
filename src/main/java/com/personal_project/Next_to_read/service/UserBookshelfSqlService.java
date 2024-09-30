@@ -7,6 +7,10 @@ import com.personal_project.Next_to_read.model.BookInfo;
 import com.personal_project.Next_to_read.model.User;
 import com.personal_project.Next_to_read.model.UserBookshelfSql;
 import com.personal_project.Next_to_read.repository.UserBookshelfSqlRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -42,15 +46,41 @@ public class UserBookshelfSqlService {
         return collects.stream().map(collect -> new UserBookshelfDto(collect)).collect(Collectors.toList());
     }
 
-    public List<UserBookshelfDto> getLikeByUserId(String token) {
+//    public List<UserBookshelfDto> getLikeByUserId(String token) {
+//
+//        User user = jwtTokenUtil.getUserFromToken(token);
+//        Long userId = user.getUserId();
+//
+//        List<UserBookshelfSql> likes = userBookshelfSqlRepository.findByUserId_UserIdAndLikesTrueOrderByTimestampLikeDesc(userId);
+//
+//        // turn result to BookCollectDto
+//        return likes.stream().map(like -> new UserBookshelfDto(like)).collect(Collectors.toList());
+//    }
+
+    public List<UserBookshelfDto> getLikeByUserId(String token, int offset, int limit) {
 
         User user = jwtTokenUtil.getUserFromToken(token);
         Long userId = user.getUserId();
 
-        List<UserBookshelfSql> likes = userBookshelfSqlRepository.findByUserId_UserIdAndLikesTrueOrderByTimestampLikeDesc(userId);
+        Pageable pageable = PageRequest.of(offset / limit, limit);
+        Page<UserBookshelfSql> likesPage = userBookshelfSqlRepository.findLikedBooksByUserId(userId, pageable);
 
-        // turn result to BookCollectDto
-        return likes.stream().map(like -> new UserBookshelfDto(like)).collect(Collectors.toList());
+        return likesPage.getContent().stream()
+                .map(UserBookshelfDto::new)
+                .collect(Collectors.toList());
+    }
+
+    public List<UserBookshelfDto> getCollectByUserId(String token, int offset, int limit) {
+
+        User user = jwtTokenUtil.getUserFromToken(token);
+        Long userId = user.getUserId();
+
+        Pageable pageable = PageRequest.of(offset / limit, limit);
+        Page<UserBookshelfSql> likesPage = userBookshelfSqlRepository.findCollectedBooksByUserId(userId, pageable);
+
+        return likesPage.getContent().stream()
+                .map(UserBookshelfDto::new)
+                .collect(Collectors.toList());
     }
 }
 

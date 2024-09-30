@@ -250,10 +250,11 @@
 //     });
 // });
 
+/* reviewsAll.js */
 document.addEventListener("DOMContentLoaded", async function() {
     let commentOffset = 0;
     let quoteOffset = 0;
-    const limit = 10;
+    const limit = 50;
     let isLoading = false;
     let hasMoreComments = true;
     let hasMoreQuotes = true;

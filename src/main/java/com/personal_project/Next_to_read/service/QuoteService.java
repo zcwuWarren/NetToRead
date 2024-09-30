@@ -27,31 +27,36 @@ public class QuoteService {
         this.jwtTokenUtil = jwtTokenUtil;
     }
 
-    public List<QuoteDto> getQuotesByBookId(Long bookId) {
+    public List<QuoteDto> getQuotesByBookId(Long bookId, int offset, int limit) {
+        Pageable pageable = PageRequest.of(offset / limit, limit);
 
-        List<Quote> quotes = quoteRepository.findByBookId_BookIdOrderByTimestampDesc(bookId);
-        return quotes.stream().map(quote -> new QuoteDto(quote)).collect(Collectors.toList());
+        Page<Quote> quotesPage = quoteRepository.findByBookIdOrderByTimestampDesc(bookId, pageable);
+        return quotesPage.getContent().stream()
+                .map(QuoteDto::new)
+                .collect(Collectors.toList());
     }
 
-    public List<QuoteDto> getQuotesByUserId(String token) {
+    public List<QuoteDto> getQuotesByUserId(String token, int offset, int limit) {
 
         User user = jwtTokenUtil.getUserFromToken(token);
         Long userId = user.getUserId();
 
-        List<Quote> quotes = quoteRepository.findByUserId_UserIdOrderByTimestampDesc(userId);
-        return quotes.stream().map(quote -> new QuoteDto(quote)).collect(Collectors.toList());
+        Pageable pageable = PageRequest.of(offset / limit, limit);
+
+        Page<Quote> quotesPage = quoteRepository.findByUserIdOrderByTimestampDesc(userId, pageable);
+        return quotesPage.getContent().stream()
+                .map(QuoteDto::new)
+                .collect(Collectors.toList());
     }
 
-    public List<QuoteDto> getQuotesBySubCategory(String subCategory) {
+    public List<QuoteDto> getQuotesBySubCategory(String subCategory, int offset, int limit) {
+        Pageable pageable = PageRequest.of(offset / limit, limit);
 
-        List<Quote> quotes = quoteRepository.findBySubCategory_OrderByTimestampDesc(subCategory);
-        return quotes.stream().map(quote -> new QuoteDto(quote)).collect(Collectors.toList());
+        Page<Quote> quotesPage = quoteRepository.findBySubCategoryOrderByTimestampDesc(subCategory, pageable);
+        return quotesPage.getContent().stream()
+                .map(QuoteDto::new)
+                .collect(Collectors.toList());
     }
-
-//    public List<QuoteDto> getQuotesWithoutCondition() {
-//        List<Quote> quotes = quoteRepository.findTop6ByOrderByTimestampDesc();
-//        return quotes.stream().map(quote -> new QuoteDto(quote)).collect(Collectors.toList());
-//    }
 
     public List<QuoteDto> getQuotesWithoutCondition(int offset, int limit) {
         Pageable pageable = PageRequest.of(offset / limit, limit, Sort.by("timestamp").descending());
