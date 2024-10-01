@@ -61,20 +61,6 @@ document.addEventListener("DOMContentLoaded", async function() {
                 console.error("Library select element not found");
             }
 
-
-
-            // // 圖書館查詢功能 click
-            // document.getElementById('A-2-search').addEventListener('click', function() {
-            //     const isbn = book.isbn;
-            //     const selectedLibrary = document.getElementById('library-select').value; // 取得選中的圖書館 URL 模板
-            //
-            //     // 替換 ${isbn} 為實際的 ISBN 值
-            //     const searchUrl = selectedLibrary.replace('${isbn}', isbn);
-            //
-            //     // 在新分頁中開啟查詢結果
-            //     window.open(searchUrl, '_blank');
-            // });
-
             // 按讚功能
             likeButton.addEventListener('click', async () => {
                 const token = localStorage.getItem('jwtToken');
@@ -333,94 +319,6 @@ document.addEventListener("DOMContentLoaded", async function() {
                 console.error("Error deleting quote:", error);
             });
     }
-
-
-
-    // // 渲染評論
-    // function renderComments(comments) {
-    //     const commentsContainer = document.getElementById('containerB');
-    //     commentsContainer.innerHTML = "";  // 清空現有評論
-    //
-    //     comments.forEach(comment => {
-    //         const commentDiv = document.createElement('div');
-    //         commentDiv.classList.add('comment-container');
-    //
-    //         const commentText = document.createElement('div');
-    //         commentText.classList.add('comment-text');
-    //         commentText.textContent = comment.comment;  // 顯示評論文字
-    //
-    //         const userNameDiv = document.createElement('div');
-    //         userNameDiv.classList.add('comment-user-name');
-    //         userNameDiv.textContent = comment.userName;  // 顯示 userName
-    //
-    //         commentDiv.appendChild(commentText);
-    //         commentDiv.appendChild(userNameDiv);
-    //
-    //         // 如果 JWT 中的 userId 與評論的 userId 匹配，顯示編輯和刪除按鈕
-    //         if (userIdFromToken && userIdFromToken === comment.userId) {
-    //             const editButton = document.createElement('button');
-    //             editButton.classList.add('delete-edit-button');
-    //             editButton.textContent = "Edit";
-    //             editButton.addEventListener('click', () => {
-    //                 editComment(comment.id, commentText);
-    //             });
-    //
-    //             const deleteButton = document.createElement('button');
-    //             deleteButton.classList.add('delete-edit-button'); // 為 button 添加 class
-    //             deleteButton.textContent = "Delete";
-    //             deleteButton.addEventListener('click', () => {
-    //                 deleteComment(comment.id, commentDiv);
-    //             });
-    //
-    //             commentDiv.appendChild(editButton);
-    //             commentDiv.appendChild(deleteButton);
-    //         }
-    //
-    //         commentsContainer.appendChild(commentDiv);
-    //     });
-    // }
-    //
-    // // 渲染引用
-    // function renderQuotes(quotes) {
-    //     commentsContainer.innerHTML = "";  // 清空現有引用
-    //
-    //     quotes.forEach(quote => {
-    //         const quoteDiv = document.createElement('div');
-    //         quoteDiv.classList.add('quote-container');
-    //
-    //         const quoteText = document.createElement('div');
-    //         quoteText.classList.add('quote-text');
-    //         quoteText.textContent = quote.quote;  // 顯示引用文字
-    //
-    //         const userNameDiv = document.createElement('div');
-    //         userNameDiv.classList.add('quote-user-name');
-    //         userNameDiv.textContent = quote.userName;  // 顯示 userName
-    //
-    //         quoteDiv.appendChild(quoteText);
-    //         quoteDiv.appendChild(userNameDiv);
-    //
-    //         // 如果 JWT 中的 userId 與引言的 userId 匹配，顯示刪除按鈕
-    //         if (userIdFromToken && userIdFromToken === quote.userId) {
-    //             const editButton = document.createElement('button');
-    //             editButton.classList.add('delete-edit-button');
-    //             editButton.textContent = "Edit";
-    //             editButton.addEventListener('click', () => {
-    //                 editQuote(quote.id, quoteText);
-    //             });
-    //
-    //             const deleteButton = document.createElement('button');
-    //             deleteButton.classList.add('delete-edit-button');
-    //             deleteButton.textContent = "Delete";
-    //             deleteButton.addEventListener('click', () => {
-    //                 deleteQuote(quote.id, quoteDiv);
-    //             });
-    //
-    //             quoteDiv.appendChild(editButton);
-    //             quoteDiv.appendChild(deleteButton);
-    //         }
-    //         commentsContainer.appendChild(quoteDiv);
-    //     });
-    // }
 
     function renderComments(comments) {
         const commentsContainer = document.getElementById('containerB');

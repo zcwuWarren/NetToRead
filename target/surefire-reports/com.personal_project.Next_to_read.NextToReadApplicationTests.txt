@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: com.personal_project.Next_to_read.NextToReadApplicationTests
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.454 s -- in com.personal_project.Next_to_read.NextToReadApplicationTests
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.502 s -- in com.personal_project.Next_to_read.NextToReadApplicationTests
