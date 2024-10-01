@@ -5,8 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile</title>
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/bookDisplay.css">
-    <link rel="stylesheet" href="css/bookDetail.css">  <!-- bookDetail相關的樣式 -->
+<!--    <link rel="stylesheet" href="css/bookDisplay.css">-->
+    <link rel="stylesheet" href="css/bookDisplay_enlarge.css">
+<!--    <link rel="stylesheet" href="css/bookDetail.css">  &lt;!&ndash; bookDetail相關的樣式 &ndash;&gt;-->
+    <link rel="stylesheet" href="css/bookDetail_enlarge.css">
 </head>
 <!--<body>-->
 <!-- 先隱藏 body，待確認 jwtToken 存在後再顯示 -->
@@ -83,6 +85,8 @@
     <div class="container-category" id="container-category">
         <!-- 按讚書籍的資料將會動態載入 -->
     </div>
+    <!-- 新增書名顯示容器 -->
+    <div id="bookNameDisplay"></div>
     <!-- 使用 b 大容器結構 -->
     <div class="container-b" id="containerB">
         <!-- 這裡會動態生成評論小容器 -->

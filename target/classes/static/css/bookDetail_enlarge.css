@@ -101,16 +101,6 @@
     padding: 0 20px;
 }
 
-/* 小容器樣式 */
-/*.comment-container, .quote-container {*/
-/*    display: flex;*/
-/*    flex-direction: column; !* Stack items vertically *!*/
-/*    !*justify-content: space-between;*!*/
-/*    margin-bottom: 10px;*/
-/*    border-bottom: 1px solid #ddd;*/
-/*    padding: 10px;*/
-/*}*/
-
 .comment-container, .quote-container {
     display: flex;
     flex-direction: column;
@@ -119,6 +109,7 @@
     padding: 10px;
     transition: transform 0.3s ease, box-shadow 0.3s ease; /* 添加過渡效果 */
     cursor: pointer; /* 改變鼠標樣式，表示可點擊 */
+    position: relative; /* 為絕對定位的按鈕容器提供參考 */
 }
 
 /* 懸停效果 */
@@ -171,38 +162,6 @@
     fill: #041723; /* 或者你想要的任何顏色 */
 }
 
-/*!* delete, edit 樣式 *!*/
-/*.delete-edit button {*/
-/*    margin: 0 5px;*/
-/*    padding: 5px 10px;*/
-/*    border: 1px solid #ccc;*/
-/*    background-color: #f0f0f0;*/
-/*    cursor: pointer;*/
-/*}*/
-
-/*.delete-edit button:hover {*/
-/*    background-color: #ddd;*/
-/*}*/
-
-/* 分頁按鈕樣式 */
-.pagination {
-    display: flex;
-    justify-content: center;
-    margin-top: 10px;
-}
-
-.pagination button {
-    margin: 0 5px;
-    padding: 5px 10px;
-    border: 1px solid #ccc;
-    background-color: #f0f0f0;
-    cursor: pointer;
-}
-
-.pagination button:hover {
-    background-color: #ddd;
-}
-
 .delete-edit-button {
     margin: 0 5px;
     padding: 5px 10px;
@@ -223,19 +182,6 @@
     margin-bottom: 20px;
 }
 
-/*!* #b-left, #b-right, #switch-likes, #switch-collects 樣式移到 bookDisplay.css*!*/
-/*#b-left, #b-right, #switch-likes, #switch-collects {*/
-/*    padding: 10px 15px;*/
-/*    cursor: pointer;*/
-/*    border: 1px solid #ccc;*/
-/*    background-color: #f0f0f0;*/
-/*    margin-right: 10px;*/
-/*}*/
-
-/*#b-left:hover, #b-right:hover, #switch-likes:hover, #switch-collects:hover {*/
-/*    background-color: #ddd;*/
-/*}*/
-
 /* 容器 C 的樣式 */
 #containerC {
     width: 60%;
@@ -243,7 +189,6 @@
     padding: 20px;
     display: flex;
     flex-direction: column;
-    background-color: #f9f9f9;
 }
 
 #input-box {
@@ -252,24 +197,27 @@
     padding: 10px;
     margin-bottom: 10px;
     border: 1px solid #ccc;
-    border-radius: 4px;
+    border-radius: 10px;
     font-size: 16px;
 }
 
 #submit-button {
-    padding: 10px 20px;
-    background-color: #007BFF;
-    color: white;
+    padding: 10px 0;
+    background-color: #E1F5F4;
+    color: #000000;
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    width: 120px;
 }
 
-/*.switch-buttons {*/
-/*    display: flex;*/
-/*    gap: 10px;*/
-/*    margin-bottom: 10px;*/
-/*}*/
+/* 創建一個包裹按鈕的容器 */
+.button-container {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end; /* 使按鈕靠右 */
+}
+
 
 
 

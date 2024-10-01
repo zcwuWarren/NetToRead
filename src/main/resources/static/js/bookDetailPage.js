@@ -444,24 +444,24 @@ document.addEventListener("DOMContentLoaded", async function() {
         });
     }
 
-    // 渲染分頁按鈕
-    function renderPagination(totalPages, currentPage) {
-        const paginationContainer = document.getElementById('pagination');
-        paginationContainer.innerHTML = "";
-
-        for (let i = 1; i <= totalPages; i++) {
-            const button = document.createElement('button');
-            button.textContent = i;
-            button.disabled = i === currentPage;
-
-            button.addEventListener('click', () => {
-                currentPage = i;
-                loadComments(currentPage);  // 重新加載對應頁的評論
-            });
-
-            paginationContainer.appendChild(button);
-        }
-    }
+    // // 渲染分頁按鈕
+    // function renderPagination(totalPages, currentPage) {
+    //     const paginationContainer = document.getElementById('pagination');
+    //     paginationContainer.innerHTML = "";
+    //
+    //     for (let i = 1; i <= totalPages; i++) {
+    //         const button = document.createElement('button');
+    //         button.textContent = i;
+    //         button.disabled = i === currentPage;
+    //
+    //         button.addEventListener('click', () => {
+    //             currentPage = i;
+    //             loadComments(currentPage);  // 重新加載對應頁的評論
+    //         });
+    //
+    //         paginationContainer.appendChild(button);
+    //     }
+    // }
 
 
     // 預設加載評論
@@ -482,25 +482,39 @@ document.addEventListener("DOMContentLoaded", async function() {
 
 // container C
 document.addEventListener("DOMContentLoaded", function() {
-    const switchCommentButton = document.getElementById('switch-comment');
-    const switchQuoteButton = document.getElementById('switch-quote');
+    // const switchCommentButton = document.getElementById('switch-comment');
+    // const switchQuoteButton = document.getElementById('switch-quote');
+    const switchCommentButton = document.getElementById('b-left');
+    const switchQuoteButton = document.getElementById('b-right');
     const submitButton = document.getElementById('submit-button');
     const inputBox = document.getElementById('input-box');
     const commentsContainer = document.getElementById('containerB'); // 這裡應該是評論/引用的容器
 
     let currentMode = 'comment'; // 預設為 Comment 模式
 
+    // 更新標題和輸入框提示的函數
+    function updateUIForMode(mode) {
+        if (mode === 'comment') {
+            inputBox.placeholder = "Write a Comment";
+        } else {
+            inputBox.placeholder = "Write a Quote";
+        }
+    }
+
+    // 初始化UI
+    updateUIForMode(currentMode);
+
     // 切換至 Comment 模式
     switchCommentButton.addEventListener('click', () => {
         currentMode = 'comment';
-        inputBox.placeholder = "Enter your comment...";
+        updateUIForMode(currentMode);
         loadComments(1); // 切換至評論時重新加載評論
     });
 
     // 切換至 Quote 模式
     switchQuoteButton.addEventListener('click', () => {
         currentMode = 'quote';
-        inputBox.placeholder = "Enter your quote...";
+        updateUIForMode(currentMode);
         loadQuotes(1); // 切換至引用時重新加載引用
     });
 

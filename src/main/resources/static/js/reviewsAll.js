@@ -62,6 +62,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         }
     }
 
+    // 渲染評論 enlarge
     function renderComments(comments) {
         comments.forEach(comment => {
             const commentDiv = document.createElement('div');
@@ -85,6 +86,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         });
     }
 
+    // 渲染引用 enlarge
     function renderQuotes(quotes) {
         quotes.forEach(quote => {
             const quoteDiv = document.createElement('div');
