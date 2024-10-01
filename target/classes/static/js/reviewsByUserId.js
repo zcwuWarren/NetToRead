@@ -97,34 +97,82 @@ document.addEventListener("DOMContentLoaded", async function() {
         }
     }
 
-    // 編輯評論
-    function editComment(commentId, commentTextElement) {
-        const newComment = prompt("Edit your comment:", commentTextElement.textContent);
-        if (newComment) {
-            const token = localStorage.getItem('jwtToken');
-            fetch(`/api/book/editComment`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    id: commentId,
-                    token: token,
-                    updatedComment: newComment })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.message) {
-                        commentTextElement.textContent = newComment; // 更新頁面上的評論
-                    } else {
-                        alert("Failed to edit comment.");
-                    }
-                })
-                .catch(error => {
-                    console.error("Error editing comment:", error);
-                });
+    // 新增 toggleEdit
+    function toggleEdit(textElement, editButton, id, type) {
+        const isEditing = textElement.getAttribute('contenteditable') === 'true';
+        if (isEditing) {
+            saveEdit(textElement, editButton, id, type);
+        } else {
+            // 開始編輯
+            textElement.setAttribute('contenteditable', 'true');
+            textElement.focus();
+            editButton.innerHTML = `
+            <svg viewBox="0 0 24 24" width="24" height="24">
+                <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
+            </svg>
+        `;
+
+            // 添加 keydown 事件監聽器
+            textElement.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter' && !event.shiftKey) {
+                    event.preventDefault();
+                    saveEdit(textElement, editButton, id, type);
+                }
+            });
         }
+    }
+
+    function saveEdit(textElement, editButton, id, type) {
+        const newText = textElement.textContent.trim();
+        if (newText !== '') {
+            if (type === 'comment') {
+                saveEditedComment(id, newText, textElement);
+            } else {
+                saveEditedQuote(id, newText, textElement);
+            }
+        }
+        textElement.setAttribute('contenteditable', 'false');
+        editButton.innerHTML = `
+        <svg viewBox="0 0 24 24" width="24" height="24">
+            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+        </svg>
+    `;
+
+        // 移除 keydown 事件監聽器
+        textElement.removeEventListener('keydown', function(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                saveEdit(textElement, editButton, id, type);
+            }
+        });
+    }
+
+    // 編輯評論 支援 container 內編輯
+    function saveEditedComment(commentId, newComment, commentTextElement) {
+        const token = localStorage.getItem('jwtToken');
+        fetch(`/api/book/editComment`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                id: commentId,
+                token: token,
+                updatedComment: newComment
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    commentTextElement.textContent = newComment;
+                } else {
+                    alert("Failed to edit comment.");
+                }
+            })
+            .catch(error => {
+                console.error("Error editing comment:", error);
+            });
     }
 
     // 刪除評論
@@ -155,34 +203,32 @@ document.addEventListener("DOMContentLoaded", async function() {
             });
     }
 
-    // 編輯引言
-    function editQuote(quoteId, quoteTextElement) {
-        const newQuote = prompt("Edit your comment:", quoteTextElement.textContent);
-        if (newQuote) {
-            const token = localStorage.getItem('jwtToken');
-            fetch(`/api/book/editQuote`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    id: quoteId,
-                    token: token,
-                    updatedQuote: newQuote })
+    // 編輯引言 支援 container 內編輯
+    function saveEditedQuote(quoteId, newQuote, quoteTextElement) {
+        const token = localStorage.getItem('jwtToken');
+        fetch(`/api/book/editQuote`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                id: quoteId,
+                token: token,
+                updatedQuote: newQuote
             })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.message) {
-                        quoteTextElement.textContent = newQuote; // 更新頁面上的評論
-                    } else {
-                        alert("Failed to edit quote.");
-                    }
-                })
-                .catch(error => {
-                    console.error("Error editing quote:", error);
-                });
-        }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    quoteTextElement.textContent = newQuote;
+                } else {
+                    alert("Failed to edit quote.");
+                }
+            })
+            .catch(error => {
+                console.error("Error editing quote:", error);
+            });
     }
 
     // 刪除引言
@@ -213,6 +259,7 @@ document.addEventListener("DOMContentLoaded", async function() {
             });
     }
 
+    // 渲染評論 支援 container 內編輯
     function renderComments(comments) {
         const commentsContainer = document.getElementById('containerB');
         commentsContainer.innerHTML = "";  // 清空現有評論
@@ -227,6 +274,7 @@ document.addEventListener("DOMContentLoaded", async function() {
             const commentText = document.createElement('div');
             commentText.classList.add('comment-text');
             commentText.textContent = comment.comment;  // 顯示評論文字
+            commentText.setAttribute('contenteditable', 'false');
 
             const userNameDiv = document.createElement('div');
             userNameDiv.classList.add('comment-user-name');
@@ -251,7 +299,7 @@ document.addEventListener("DOMContentLoaded", async function() {
             `;
                 editButton.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    editComment(comment.id, commentText);
+                    toggleEdit(commentText, editButton, comment.id, 'comment');
                 });
 
                 const deleteButton = document.createElement('button');
@@ -275,6 +323,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         });
     }
 
+    // 選染引言 支援 container 編輯
     function renderQuotes(quotes) {
         const commentsContainer = document.getElementById('containerB');
         commentsContainer.innerHTML = "";  // 清空現有引用
@@ -289,6 +338,7 @@ document.addEventListener("DOMContentLoaded", async function() {
             const quoteText = document.createElement('div');
             quoteText.classList.add('quote-text');
             quoteText.textContent = quote.quote;  // 顯示引用文字
+            quoteText.setAttribute('contenteditable', 'false');
 
             const userNameDiv = document.createElement('div');
             userNameDiv.classList.add('quote-user-name');
@@ -313,7 +363,7 @@ document.addEventListener("DOMContentLoaded", async function() {
             `;
                 editButton.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    editQuote(quote.id, quoteText);
+                    toggleEdit(quoteText, editButton, quote.id, 'quote');
                 });
 
                 const deleteButton = document.createElement('button');

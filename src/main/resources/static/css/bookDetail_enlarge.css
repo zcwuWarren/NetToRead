@@ -130,7 +130,6 @@
     word-wrap: break-word;
     font-size: 20px;
     margin-bottom: 5px; /* Add some space between comment and book name */
-
 }
 
 /* 左側 bookName, userName 部分 */
@@ -147,10 +146,23 @@
     flex-grow: 1;
 }
 
-/* 固定 button-container 在右上角*/
+/* comment, quote 在 container 內直接編輯*/
+[contenteditable="true"] {
+    border: 1px solid #007bff;
+    padding: 5px;
+    border-radius: 4px;
+}
+
+[contenteditable="true"]:focus {
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+}
+
+/* 固定 button-container 在右下角*/
 .button-container {
     position: absolute;
-    top: 10px;
+    /*top: 10px;*/
+    bottom: 6px;
     right: 10px;
     display: none; /* 默認隱藏按鈕 */
     gap: 10px;

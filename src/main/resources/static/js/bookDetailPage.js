@@ -158,6 +158,26 @@ document.addEventListener("DOMContentLoaded", async function() {
         return JSON.parse(jsonPayload);
     }
 
+    // 檢查 JWT Token 是否過期
+    function isTokenExpired(token) {
+        const tokenParts = token.split('.');
+        if (tokenParts.length !== 3) {
+            return true;  // 無效的 token
+        }
+
+        const decodedPayload = JSON.parse(atob(tokenParts[1]));
+        const expirationDate = new Date(decodedPayload.exp * 1000);  // exp 是以秒計算的
+        const now = new Date();
+
+        return expirationDate < now;  // 如果當前時間大於過期時間，token 已過期
+    }
+
+    if (isTokenExpired(token)) {
+        console.error("JWT Token has expired.");
+        localStorage.removeItem('jwtToken');  // 清除過期的 token
+        return;
+    }
+
     // 加載評論
     async function loadComments(page) {
         try {
@@ -204,34 +224,82 @@ document.addEventListener("DOMContentLoaded", async function() {
         }
     }
 
-    // 編輯評論
-    function editComment(commentId, commentTextElement) {
-        const newComment = prompt("Edit your comment:", commentTextElement.textContent);
-        if (newComment) {
-            const token = localStorage.getItem('jwtToken');
-            fetch(`/api/book/editComment`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    id: commentId,
-                    token: token,
-                    updatedComment: newComment })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.message) {
-                        commentTextElement.textContent = newComment; // 更新頁面上的評論
-                    } else {
-                        alert("Failed to edit comment.");
-                    }
-                })
-                .catch(error => {
-                    console.error("Error editing comment:", error);
-                });
+    // 新增 toggleEdit
+    function toggleEdit(textElement, editButton, id, type) {
+        const isEditing = textElement.getAttribute('contenteditable') === 'true';
+        if (isEditing) {
+            saveEdit(textElement, editButton, id, type);
+        } else {
+            // 開始編輯
+            textElement.setAttribute('contenteditable', 'true');
+            textElement.focus();
+            editButton.innerHTML = `
+            <svg viewBox="0 0 24 24" width="24" height="24">
+                <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
+            </svg>
+        `;
+
+            // 添加 keydown 事件監聽器
+            textElement.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter' && !event.shiftKey) {
+                    event.preventDefault();
+                    saveEdit(textElement, editButton, id, type);
+                }
+            });
         }
+    }
+
+    function saveEdit(textElement, editButton, id, type) {
+        const newText = textElement.textContent.trim();
+        if (newText !== '') {
+            if (type === 'comment') {
+                saveEditedComment(id, newText, textElement);
+            } else {
+                saveEditedQuote(id, newText, textElement);
+            }
+        }
+        textElement.setAttribute('contenteditable', 'false');
+        editButton.innerHTML = `
+        <svg viewBox="0 0 24 24" width="24" height="24">
+            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+        </svg>
+    `;
+
+        // 移除 keydown 事件監聽器
+        textElement.removeEventListener('keydown', function(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                saveEdit(textElement, editButton, id, type);
+            }
+        });
+    }
+
+    // 編輯評論 支援 container 內編輯
+    function saveEditedComment(commentId, newComment, commentTextElement) {
+        const token = localStorage.getItem('jwtToken');
+        fetch(`/api/book/editComment`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                id: commentId,
+                token: token,
+                updatedComment: newComment
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    commentTextElement.textContent = newComment;
+                } else {
+                    alert("Failed to edit comment.");
+                }
+            })
+            .catch(error => {
+                console.error("Error editing comment:", error);
+            });
     }
 
     // 刪除評論
@@ -262,34 +330,32 @@ document.addEventListener("DOMContentLoaded", async function() {
             });
     }
 
-    // 編輯引言
-    function editQuote(quoteId, quoteTextElement) {
-        const newQuote = prompt("Edit your comment:", quoteTextElement.textContent);
-        if (newQuote) {
-            const token = localStorage.getItem('jwtToken');
-            fetch(`/api/book/editQuote`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    id: quoteId,
-                    token: token,
-                    updatedQuote: newQuote })
+    // 編輯引言 支援 container 內編輯
+    function saveEditedQuote(quoteId, newQuote, quoteTextElement) {
+        const token = localStorage.getItem('jwtToken');
+        fetch(`/api/book/editQuote`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                id: quoteId,
+                token: token,
+                updatedQuote: newQuote
             })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.message) {
-                        quoteTextElement.textContent = newQuote; // 更新頁面上的評論
-                    } else {
-                        alert("Failed to edit quote.");
-                    }
-                })
-                .catch(error => {
-                    console.error("Error editing quote:", error);
-                });
-        }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    quoteTextElement.textContent = newQuote;
+                } else {
+                    alert("Failed to edit quote.");
+                }
+            })
+            .catch(error => {
+                console.error("Error editing quote:", error);
+            });
     }
 
     // 刪除引言
@@ -320,6 +386,7 @@ document.addEventListener("DOMContentLoaded", async function() {
             });
     }
 
+    // 渲染評論 支援 container 內編輯
     function renderComments(comments) {
         const commentsContainer = document.getElementById('containerB');
         commentsContainer.innerHTML = "";  // 清空現有評論
@@ -333,18 +400,18 @@ document.addEventListener("DOMContentLoaded", async function() {
 
             const commentText = document.createElement('div');
             commentText.classList.add('comment-text');
-            commentText.textContent = comment.comment;  // 顯示評論文字
+            commentText.textContent = comment.comment;
+            commentText.setAttribute('contenteditable', 'false');
 
             const userNameDiv = document.createElement('div');
             userNameDiv.classList.add('comment-user-name');
-            userNameDiv.textContent = comment.userName;  // 顯示 userName
+            userNameDiv.textContent = comment.userName;
 
             contentDiv.appendChild(commentText);
             contentDiv.appendChild(userNameDiv);
 
             commentDiv.appendChild(contentDiv);
 
-            // 如果 JWT 中的 userId 與評論的 userId 匹配，顯示編輯和刪除按鈕
             if (userIdFromToken && userIdFromToken === comment.userId) {
                 const buttonContainer = document.createElement('div');
                 buttonContainer.classList.add('button-container');
@@ -358,7 +425,7 @@ document.addEventListener("DOMContentLoaded", async function() {
             `;
                 editButton.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    editComment(comment.id, commentText);
+                    toggleEdit(commentText, editButton, comment.id, 'comment');
                 });
 
                 const deleteButton = document.createElement('button');
@@ -382,6 +449,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         });
     }
 
+    // 選染引言 支援 container 編輯
     function renderQuotes(quotes) {
         const commentsContainer = document.getElementById('containerB');
         commentsContainer.innerHTML = "";  // 清空現有引用
@@ -396,6 +464,7 @@ document.addEventListener("DOMContentLoaded", async function() {
             const quoteText = document.createElement('div');
             quoteText.classList.add('quote-text');
             quoteText.textContent = quote.quote;  // 顯示引用文字
+            quoteText.setAttribute('contenteditable', 'false');
 
             const userNameDiv = document.createElement('div');
             userNameDiv.classList.add('quote-user-name');
@@ -420,7 +489,7 @@ document.addEventListener("DOMContentLoaded", async function() {
             `;
                 editButton.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    editQuote(quote.id, quoteText);
+                    toggleEdit(quoteText, editButton, quote.id, 'quote');
                 });
 
                 const deleteButton = document.createElement('button');
@@ -443,26 +512,6 @@ document.addEventListener("DOMContentLoaded", async function() {
             commentsContainer.appendChild(quoteDiv);
         });
     }
-
-    // // 渲染分頁按鈕
-    // function renderPagination(totalPages, currentPage) {
-    //     const paginationContainer = document.getElementById('pagination');
-    //     paginationContainer.innerHTML = "";
-    //
-    //     for (let i = 1; i <= totalPages; i++) {
-    //         const button = document.createElement('button');
-    //         button.textContent = i;
-    //         button.disabled = i === currentPage;
-    //
-    //         button.addEventListener('click', () => {
-    //             currentPage = i;
-    //             loadComments(currentPage);  // 重新加載對應頁的評論
-    //         });
-    //
-    //         paginationContainer.appendChild(button);
-    //     }
-    // }
-
 
     // 預設加載評論
     loadComments(currentPage);
@@ -518,16 +567,16 @@ document.addEventListener("DOMContentLoaded", function() {
         loadQuotes(1); // 切換至引用時重新加載引用
     });
 
-    // 點擊送出按鈕
-    submitButton.addEventListener('click', async () => {
-        const token = localStorage.getItem('jwtToken'); // 取得 localStorage 中的 jwtToken
-        const commentOrQuote = inputBox.value.trim(); // 取得輸入框的內容
+    // 點擊 或 enter 提交
+    async function handleSubmit() {
+        const token = localStorage.getItem('jwtToken');
+        const commentOrQuote = inputBox.value.trim();
         const urlParams = new URLSearchParams(window.location.search);
-        const bookId = urlParams.get('bookId'); // 從 URL 取得 bookId
+        const bookId = urlParams.get('bookId');
 
         if (!token) {
             alert("Please log in to submit.");
-            window.location.href = "account.html"; // 跳轉至登入頁面
+            window.location.href = "account.html";
             return;
         }
 
@@ -540,7 +589,6 @@ document.addEventListener("DOMContentLoaded", function() {
             let apiUrl;
             let requestBody;
 
-            // 根據當前模式設定 API 和 Request Body
             if (currentMode === 'comment') {
                 apiUrl = `/api/book/addComment`;
                 requestBody = { comment: commentOrQuote, token: token };
@@ -560,20 +608,30 @@ document.addEventListener("DOMContentLoaded", function() {
             const result = await response.json();
 
             if (response.ok) {
-                // 即時將新評論或引用渲染到頁面
                 if (currentMode === 'comment') {
-                    renderNewComment(commentOrQuote); // 渲染新評論
+                    renderNewComment(commentOrQuote);
                 } else {
-                    renderNewQuote(commentOrQuote); // 渲染新引用
+                    renderNewQuote(commentOrQuote);
                 }
 
-                inputBox.value = ""; // 清空輸入框
+                inputBox.value = "";
             } else {
                 alert(result.message);
             }
         } catch (error) {
-            console.error("Error submitting data: ", error);
+            console.error("Error submitting data:", error);
             alert("Failed to submit.");
+        }
+    }
+
+// 點擊送出按鈕
+    submitButton.addEventListener('click', handleSubmit);
+
+// 監聽輸入框的 keydown 事件
+    inputBox.addEventListener('keydown', async (event) => {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault(); // 阻止默認的換行行為
+            await handleSubmit();
         }
     });
 
