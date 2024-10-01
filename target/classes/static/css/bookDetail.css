@@ -180,18 +180,18 @@
     margin-bottom: 20px;
 }
 
-/* #b-left, #b-right, #switch-likes, #switch-collects 樣式移到 bookDisplay.css*/
-#b-left, #b-right, #switch-likes, #switch-collects {
-    padding: 10px 15px;
-    cursor: pointer;
-    border: 1px solid #ccc;
-    background-color: #f0f0f0;
-    margin-right: 10px;
-}
+/*!* #b-left, #b-right, #switch-likes, #switch-collects 樣式移到 bookDisplay.css*!*/
+/*#b-left, #b-right, #switch-likes, #switch-collects {*/
+/*    padding: 10px 15px;*/
+/*    cursor: pointer;*/
+/*    border: 1px solid #ccc;*/
+/*    background-color: #f0f0f0;*/
+/*    margin-right: 10px;*/
+/*}*/
 
-#b-left:hover, #b-right:hover, #switch-likes:hover, #switch-collects:hover {
-    background-color: #ddd;
-}
+/*#b-left:hover, #b-right:hover, #switch-likes:hover, #switch-collects:hover {*/
+/*    background-color: #ddd;*/
+/*}*/
 
 /* 容器 C 的樣式 */
 #containerC {
@@ -222,11 +222,11 @@
     cursor: pointer;
 }
 
-.switch-buttons {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
-}
+/*.switch-buttons {*/
+/*    display: flex;*/
+/*    gap: 10px;*/
+/*    margin-bottom: 10px;*/
+/*}*/
 
 
 
