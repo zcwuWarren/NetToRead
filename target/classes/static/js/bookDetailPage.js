@@ -14,8 +14,8 @@ document.addEventListener("DOMContentLoaded", async function() {
             const containerA1 = document.getElementById('containerA1');
             const containerA2 = document.getElementById('containerA2');
             const containerA3 = document.getElementById('containerA3');
-            const likeButton = document.getElementById('A-2-like');
-            const collectButton = document.getElementById('A-2-collect');
+            const likeButton = document.getElementById('like-button');
+            const collectButton = document.getElementById('collect-button');
 
             // 渲染書籍封面
             const bookCover = document.createElement('img');
@@ -39,16 +39,41 @@ document.addEventListener("DOMContentLoaded", async function() {
             const bookDescription = `<div class="container-a-3-long-content">${book.description}</div>`;
             containerA3.innerHTML = bookDescription;
 
-            document.getElementById('A-2-search').addEventListener('click', function() {
-                const isbn = book.isbn;
-                const selectedLibrary = document.getElementById('library-select').value; // 取得選中的圖書館 URL 模板
+            // 圖書館主容器下拉選單查詢功能
+            const librarySelect = document.getElementById('library-select');
+            if (librarySelect) {
+                librarySelect.addEventListener('change', function() {
+                    const selectedLibrary = this.value;
+                    if (selectedLibrary) {
+                        if (book && book.isbn) {
+                            const isbn = book.isbn;
+                            const searchUrl = selectedLibrary.replace('${isbn}', isbn);
+                            console.log('Opening library search URL:', searchUrl);
+                            window.open(searchUrl, '_blank');
+                        } else {
+                            console.error('Book or ISBN not available:', book);
+                        }
+                    } else {
+                        console.log('No library selected');
+                    }
+                });
+            } else {
+                console.error("Library select element not found");
+            }
 
-                // 替換 ${isbn} 為實際的 ISBN 值
-                const searchUrl = selectedLibrary.replace('${isbn}', isbn);
 
-                // 在新分頁中開啟查詢結果
-                window.open(searchUrl, '_blank');
-            });
+
+            // // 圖書館查詢功能 click
+            // document.getElementById('A-2-search').addEventListener('click', function() {
+            //     const isbn = book.isbn;
+            //     const selectedLibrary = document.getElementById('library-select').value; // 取得選中的圖書館 URL 模板
+            //
+            //     // 替換 ${isbn} 為實際的 ISBN 值
+            //     const searchUrl = selectedLibrary.replace('${isbn}', isbn);
+            //
+            //     // 在新分頁中開啟查詢結果
+            //     window.open(searchUrl, '_blank');
+            // });
 
             // 按讚功能
             likeButton.addEventListener('click', async () => {
@@ -311,7 +336,92 @@ document.addEventListener("DOMContentLoaded", async function() {
 
 
 
-    // 渲染評論
+    // // 渲染評論
+    // function renderComments(comments) {
+    //     const commentsContainer = document.getElementById('containerB');
+    //     commentsContainer.innerHTML = "";  // 清空現有評論
+    //
+    //     comments.forEach(comment => {
+    //         const commentDiv = document.createElement('div');
+    //         commentDiv.classList.add('comment-container');
+    //
+    //         const commentText = document.createElement('div');
+    //         commentText.classList.add('comment-text');
+    //         commentText.textContent = comment.comment;  // 顯示評論文字
+    //
+    //         const userNameDiv = document.createElement('div');
+    //         userNameDiv.classList.add('comment-user-name');
+    //         userNameDiv.textContent = comment.userName;  // 顯示 userName
+    //
+    //         commentDiv.appendChild(commentText);
+    //         commentDiv.appendChild(userNameDiv);
+    //
+    //         // 如果 JWT 中的 userId 與評論的 userId 匹配，顯示編輯和刪除按鈕
+    //         if (userIdFromToken && userIdFromToken === comment.userId) {
+    //             const editButton = document.createElement('button');
+    //             editButton.classList.add('delete-edit-button');
+    //             editButton.textContent = "Edit";
+    //             editButton.addEventListener('click', () => {
+    //                 editComment(comment.id, commentText);
+    //             });
+    //
+    //             const deleteButton = document.createElement('button');
+    //             deleteButton.classList.add('delete-edit-button'); // 為 button 添加 class
+    //             deleteButton.textContent = "Delete";
+    //             deleteButton.addEventListener('click', () => {
+    //                 deleteComment(comment.id, commentDiv);
+    //             });
+    //
+    //             commentDiv.appendChild(editButton);
+    //             commentDiv.appendChild(deleteButton);
+    //         }
+    //
+    //         commentsContainer.appendChild(commentDiv);
+    //     });
+    // }
+    //
+    // // 渲染引用
+    // function renderQuotes(quotes) {
+    //     commentsContainer.innerHTML = "";  // 清空現有引用
+    //
+    //     quotes.forEach(quote => {
+    //         const quoteDiv = document.createElement('div');
+    //         quoteDiv.classList.add('quote-container');
+    //
+    //         const quoteText = document.createElement('div');
+    //         quoteText.classList.add('quote-text');
+    //         quoteText.textContent = quote.quote;  // 顯示引用文字
+    //
+    //         const userNameDiv = document.createElement('div');
+    //         userNameDiv.classList.add('quote-user-name');
+    //         userNameDiv.textContent = quote.userName;  // 顯示 userName
+    //
+    //         quoteDiv.appendChild(quoteText);
+    //         quoteDiv.appendChild(userNameDiv);
+    //
+    //         // 如果 JWT 中的 userId 與引言的 userId 匹配，顯示刪除按鈕
+    //         if (userIdFromToken && userIdFromToken === quote.userId) {
+    //             const editButton = document.createElement('button');
+    //             editButton.classList.add('delete-edit-button');
+    //             editButton.textContent = "Edit";
+    //             editButton.addEventListener('click', () => {
+    //                 editQuote(quote.id, quoteText);
+    //             });
+    //
+    //             const deleteButton = document.createElement('button');
+    //             deleteButton.classList.add('delete-edit-button');
+    //             deleteButton.textContent = "Delete";
+    //             deleteButton.addEventListener('click', () => {
+    //                 deleteQuote(quote.id, quoteDiv);
+    //             });
+    //
+    //             quoteDiv.appendChild(editButton);
+    //             quoteDiv.appendChild(deleteButton);
+    //         }
+    //         commentsContainer.appendChild(quoteDiv);
+    //     });
+    // }
+
     function renderComments(comments) {
         const commentsContainer = document.getElementById('containerB');
         commentsContainer.innerHTML = "";  // 清空現有評論
@@ -319,6 +429,9 @@ document.addEventListener("DOMContentLoaded", async function() {
         comments.forEach(comment => {
             const commentDiv = document.createElement('div');
             commentDiv.classList.add('comment-container');
+
+            const contentDiv = document.createElement('div');
+            contentDiv.classList.add('comment-content');
 
             const commentText = document.createElement('div');
             commentText.classList.add('comment-text');
@@ -328,40 +441,59 @@ document.addEventListener("DOMContentLoaded", async function() {
             userNameDiv.classList.add('comment-user-name');
             userNameDiv.textContent = comment.userName;  // 顯示 userName
 
-            commentDiv.appendChild(commentText);
-            commentDiv.appendChild(userNameDiv);
+            contentDiv.appendChild(commentText);
+            contentDiv.appendChild(userNameDiv);
+
+            commentDiv.appendChild(contentDiv);
 
             // 如果 JWT 中的 userId 與評論的 userId 匹配，顯示編輯和刪除按鈕
             if (userIdFromToken && userIdFromToken === comment.userId) {
+                const buttonContainer = document.createElement('div');
+                buttonContainer.classList.add('button-container');
+
                 const editButton = document.createElement('button');
-                editButton.classList.add('delete-edit-button');
-                editButton.textContent = "Edit";
-                editButton.addEventListener('click', () => {
+                editButton.classList.add('icon-button');
+                editButton.innerHTML = `
+                <svg viewBox="0 0 24 24" width="24" height="24">
+                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                </svg>
+            `;
+                editButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
                     editComment(comment.id, commentText);
                 });
 
                 const deleteButton = document.createElement('button');
-                deleteButton.classList.add('delete-edit-button'); // 為 button 添加 class
-                deleteButton.textContent = "Delete";
-                deleteButton.addEventListener('click', () => {
+                deleteButton.classList.add('icon-button');
+                deleteButton.innerHTML = `
+                <svg viewBox="0 0 24 24" width="24" height="24">
+                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                </svg>
+            `;
+                deleteButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
                     deleteComment(comment.id, commentDiv);
                 });
 
-                commentDiv.appendChild(editButton);
-                commentDiv.appendChild(deleteButton);
+                buttonContainer.appendChild(editButton);
+                buttonContainer.appendChild(deleteButton);
+                commentDiv.appendChild(buttonContainer);
             }
 
             commentsContainer.appendChild(commentDiv);
         });
     }
 
-    // 渲染引用
     function renderQuotes(quotes) {
+        const commentsContainer = document.getElementById('containerB');
         commentsContainer.innerHTML = "";  // 清空現有引用
 
         quotes.forEach(quote => {
             const quoteDiv = document.createElement('div');
             quoteDiv.classList.add('quote-container');
+
+            const contentDiv = document.createElement('div');
+            contentDiv.classList.add('quote-content');
 
             const quoteText = document.createElement('div');
             quoteText.classList.add('quote-text');
@@ -371,28 +503,45 @@ document.addEventListener("DOMContentLoaded", async function() {
             userNameDiv.classList.add('quote-user-name');
             userNameDiv.textContent = quote.userName;  // 顯示 userName
 
-            quoteDiv.appendChild(quoteText);
-            quoteDiv.appendChild(userNameDiv);
+            contentDiv.appendChild(quoteText);
+            contentDiv.appendChild(userNameDiv);
 
-            // 如果 JWT 中的 userId 與引言的 userId 匹配，顯示刪除按鈕
+            quoteDiv.appendChild(contentDiv);
+
+            // 如果 JWT 中的 userId 與引言的 userId 匹配，顯示編輯和刪除按鈕
             if (userIdFromToken && userIdFromToken === quote.userId) {
+                const buttonContainer = document.createElement('div');
+                buttonContainer.classList.add('button-container');
+
                 const editButton = document.createElement('button');
-                editButton.classList.add('delete-edit-button');
-                editButton.textContent = "Edit";
-                editButton.addEventListener('click', () => {
+                editButton.classList.add('icon-button');
+                editButton.innerHTML = `
+                <svg viewBox="0 0 24 24" width="24" height="24">
+                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                </svg>
+            `;
+                editButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
                     editQuote(quote.id, quoteText);
                 });
 
                 const deleteButton = document.createElement('button');
-                deleteButton.classList.add('delete-edit-button');
-                deleteButton.textContent = "Delete";
-                deleteButton.addEventListener('click', () => {
+                deleteButton.classList.add('icon-button');
+                deleteButton.innerHTML = `
+                <svg viewBox="0 0 24 24" width="24" height="24">
+                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                </svg>
+            `;
+                deleteButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
                     deleteQuote(quote.id, quoteDiv);
                 });
 
-                quoteDiv.appendChild(editButton);
-                quoteDiv.appendChild(deleteButton);
+                buttonContainer.appendChild(editButton);
+                buttonContainer.appendChild(deleteButton);
+                quoteDiv.appendChild(buttonContainer);
             }
+
             commentsContainer.appendChild(quoteDiv);
         });
     }

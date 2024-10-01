@@ -453,125 +453,365 @@ document.addEventListener("DOMContentLoaded", async function() {
         }
     }
 
-    // 編輯評論函數保持不變
+    // 編輯評論
     function editComment(commentId, commentTextElement) {
-        // ... 保持原有的編輯評論邏輯 ...
+        const newComment = prompt("Edit your comment:", commentTextElement.textContent);
+        if (newComment) {
+            const token = localStorage.getItem('jwtToken');
+            fetch(`/api/book/editComment`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    id: commentId,
+                    token: token,
+                    updatedComment: newComment })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        commentTextElement.textContent = newComment; // 更新頁面上的評論
+                    } else {
+                        alert("Failed to edit comment.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error editing comment:", error);
+                });
+        }
     }
 
-    // 刪除評論函數保持不變
+    // 刪除評論
     function deleteComment(commentId, commentDiv) {
-        // ... 保持原有的刪除評論邏輯 ...
+        const token = localStorage.getItem('jwtToken');
+        fetch('/api/book/deleteComment', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                id: commentId,
+                token: token
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                // todo 注意回傳 key 是message
+                if (data.message) {
+                    commentDiv.remove();
+                } else {
+                    alert("Failed to delete comment.");
+                }
+            })
+            .catch(error => {
+                console.error("Error deleting comment:", error);
+            });
     }
 
-    // 編輯引言函數保持不變
+    // 編輯引言
     function editQuote(quoteId, quoteTextElement) {
-        // ... 保持原有的編輯引言邏輯 ...
+        const newQuote = prompt("Edit your comment:", quoteTextElement.textContent);
+        if (newQuote) {
+            const token = localStorage.getItem('jwtToken');
+            fetch(`/api/book/editQuote`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    id: quoteId,
+                    token: token,
+                    updatedQuote: newQuote })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        quoteTextElement.textContent = newQuote; // 更新頁面上的評論
+                    } else {
+                        alert("Failed to edit quote.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error editing quote:", error);
+                });
+        }
     }
 
-    // 刪除引言函數保持不變
+    // 刪除引言
     function deleteQuote(quoteId, quoteDiv) {
-        // ... 保持原有的刪除引言邏輯 ...
+        const token = localStorage.getItem('jwtToken');
+        fetch('/api/book/deleteQuote', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                id: quoteId,
+                token: token
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                // 注意回傳 key 是message
+                if (data.message) {
+                    quoteDiv.remove(); // 從頁面中刪除該引言
+                } else {
+                    alert("Failed to delete quote.");
+                }
+            })
+            .catch(error => {
+                console.error("Error deleting quote:", error);
+            });
     }
+
+    // // 編輯評論函數保持不變
+    // function editComment(commentId, commentTextElement) {
+    //     // ... 保持原有的編輯評論邏輯 ...
+    // }
+    //
+    // // 刪除評論函數保持不變
+    // function deleteComment(commentId, commentDiv) {
+    //     // ... 保持原有的刪除評論邏輯 ...
+    // }
+    //
+    // // 編輯引言函數保持不變
+    // function editQuote(quoteId, quoteTextElement) {
+    //     // ... 保持原有的編輯引言邏輯 ...
+    // }
+    //
+    // // 刪除引言函數保持不變
+    // function deleteQuote(quoteId, quoteDiv) {
+    //     // ... 保持原有的刪除引言邏輯 ...
+    // }
+
+    // function renderComments(comments) {
+    //     comments.forEach(comment => {
+    //         const commentDiv = document.createElement('div');
+    //         commentDiv.classList.add('comment-container');
+    //
+    //         const commentContentDiv = document.createElement('div');
+    //         commentContentDiv.classList.add('comment-content-container');
+    //         commentContentDiv.addEventListener('click', function() {
+    //             window.location.href = `/bookDetail.html?bookId=${comment.bookId}`;
+    //         });
+    //
+    //         const commentText = document.createElement('div');
+    //         commentText.classList.add('comment-text');
+    //         commentText.textContent = comment.comment;
+    //
+    //         const bookName = document.createElement('div');
+    //         bookName.classList.add('comment-book-name');
+    //         bookName.textContent = comment.bookName;
+    //
+    //         commentContentDiv.appendChild(commentText);
+    //         commentContentDiv.appendChild(bookName);
+    //
+    //         const buttonContainer = document.createElement('div');
+    //         buttonContainer.classList.add('button-container');
+    //
+    //         if (userIdFromToken && userIdFromToken === comment.userId) {
+    //             const editButton = document.createElement('button');
+    //             editButton.classList.add('delete-edit-button');
+    //             editButton.textContent = "Edit";
+    //             editButton.addEventListener('click', (event) => {
+    //                 event.stopPropagation();
+    //                 editComment(comment.id, commentText);
+    //             });
+    //
+    //             const deleteButton = document.createElement('button');
+    //             deleteButton.classList.add('delete-edit-button');
+    //             deleteButton.textContent = "Delete";
+    //             deleteButton.addEventListener('click', (event) => {
+    //                 event.stopPropagation();
+    //                 deleteComment(comment.id, commentDiv);
+    //             });
+    //
+    //             buttonContainer.appendChild(editButton);
+    //             buttonContainer.appendChild(deleteButton);
+    //         }
+    //
+    //         commentDiv.appendChild(commentContentDiv);
+    //         commentDiv.appendChild(buttonContainer);
+    //         containerB.appendChild(commentDiv);
+    //     });
+    // }
+    //
+    // function renderQuotes(quotes) {
+    //     quotes.forEach(quote => {
+    //         const quoteDiv = document.createElement('div');
+    //         quoteDiv.classList.add('quote-container');
+    //
+    //         const quoteContentDiv = document.createElement('div');
+    //         quoteContentDiv.classList.add('quote-content-container');
+    //         quoteContentDiv.addEventListener('click', function() {
+    //             window.location.href = `/bookDetail.html?bookId=${quote.bookId}`;
+    //         });
+    //
+    //         const quoteText = document.createElement('div');
+    //         quoteText.classList.add('quote-text');
+    //         quoteText.textContent = quote.quote;
+    //
+    //         const bookName = document.createElement('div');
+    //         bookName.classList.add('comment-book-name');
+    //         bookName.textContent = quote.bookName;
+    //
+    //         quoteContentDiv.appendChild(quoteText);
+    //         quoteContentDiv.appendChild(bookName);
+    //
+    //         const buttonContainer = document.createElement('div');
+    //         buttonContainer.classList.add('button-container');
+    //
+    //         if (userIdFromToken && userIdFromToken === quote.userId) {
+    //             const editButton = document.createElement('button');
+    //             editButton.classList.add('delete-edit-button');
+    //             editButton.textContent = "Edit";
+    //             editButton.addEventListener('click', () => {
+    //                 editQuote(quote.id, quoteText);
+    //             });
+    //
+    //             const deleteButton = document.createElement('button');
+    //             deleteButton.classList.add('delete-edit-button');
+    //             deleteButton.textContent = "Delete";
+    //             deleteButton.addEventListener('click', () => {
+    //                 deleteQuote(quote.id, quoteDiv);
+    //             });
+    //
+    //             buttonContainer.appendChild(editButton);
+    //             buttonContainer.appendChild(deleteButton);
+    //         }
+    //
+    //         quoteDiv.appendChild(quoteContentDiv);
+    //         quoteDiv.appendChild(buttonContainer);
+    //         containerB.appendChild(quoteDiv);
+    //     });
+    // }
 
     function renderComments(comments) {
+        const commentsContainer = document.getElementById('containerB');
+        commentsContainer.innerHTML = "";  // 清空現有評論
+
         comments.forEach(comment => {
             const commentDiv = document.createElement('div');
             commentDiv.classList.add('comment-container');
 
-            const commentContentDiv = document.createElement('div');
-            commentContentDiv.classList.add('comment-content-container');
-            commentContentDiv.addEventListener('click', function() {
-                window.location.href = `/bookDetail.html?bookId=${comment.bookId}`;
-            });
+            const contentDiv = document.createElement('div');
+            contentDiv.classList.add('comment-content');
 
             const commentText = document.createElement('div');
             commentText.classList.add('comment-text');
-            commentText.textContent = comment.comment;
+            commentText.textContent = comment.comment;  // 顯示評論文字
 
-            const bookName = document.createElement('div');
-            bookName.classList.add('comment-book-name');
-            bookName.textContent = comment.bookName;
+            const userNameDiv = document.createElement('div');
+            userNameDiv.classList.add('comment-user-name');
+            userNameDiv.textContent = comment.userName;  // 顯示 userName
 
-            commentContentDiv.appendChild(commentText);
-            commentContentDiv.appendChild(bookName);
+            contentDiv.appendChild(commentText);
+            contentDiv.appendChild(userNameDiv);
 
-            const buttonContainer = document.createElement('div');
-            buttonContainer.classList.add('button-container');
+            commentDiv.appendChild(contentDiv);
 
+            // 如果 JWT 中的 userId 與評論的 userId 匹配，顯示編輯和刪除按鈕
             if (userIdFromToken && userIdFromToken === comment.userId) {
+                const buttonContainer = document.createElement('div');
+                buttonContainer.classList.add('button-container');
+
                 const editButton = document.createElement('button');
-                editButton.classList.add('delete-edit-button');
-                editButton.textContent = "Edit";
-                editButton.addEventListener('click', (event) => {
-                    event.stopPropagation();
+                editButton.classList.add('icon-button');
+                editButton.innerHTML = `
+                <svg viewBox="0 0 24 24" width="24" height="24">
+                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                </svg>
+            `;
+                editButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
                     editComment(comment.id, commentText);
                 });
 
                 const deleteButton = document.createElement('button');
-                deleteButton.classList.add('delete-edit-button');
-                deleteButton.textContent = "Delete";
-                deleteButton.addEventListener('click', (event) => {
-                    event.stopPropagation();
+                deleteButton.classList.add('icon-button');
+                deleteButton.innerHTML = `
+                <svg viewBox="0 0 24 24" width="24" height="24">
+                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                </svg>
+            `;
+                deleteButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
                     deleteComment(comment.id, commentDiv);
                 });
 
                 buttonContainer.appendChild(editButton);
                 buttonContainer.appendChild(deleteButton);
+                commentDiv.appendChild(buttonContainer);
             }
 
-            commentDiv.appendChild(commentContentDiv);
-            commentDiv.appendChild(buttonContainer);
-            containerB.appendChild(commentDiv);
+            commentsContainer.appendChild(commentDiv);
         });
     }
 
     function renderQuotes(quotes) {
+        const commentsContainer = document.getElementById('containerB');
+        commentsContainer.innerHTML = "";  // 清空現有引用
+
         quotes.forEach(quote => {
             const quoteDiv = document.createElement('div');
             quoteDiv.classList.add('quote-container');
 
-            const quoteContentDiv = document.createElement('div');
-            quoteContentDiv.classList.add('quote-content-container');
-            quoteContentDiv.addEventListener('click', function() {
-                window.location.href = `/bookDetail.html?bookId=${quote.bookId}`;
-            });
+            const contentDiv = document.createElement('div');
+            contentDiv.classList.add('quote-content');
 
             const quoteText = document.createElement('div');
             quoteText.classList.add('quote-text');
-            quoteText.textContent = quote.quote;
+            quoteText.textContent = quote.quote;  // 顯示引用文字
 
-            const bookName = document.createElement('div');
-            bookName.classList.add('comment-book-name');
-            bookName.textContent = quote.bookName;
+            const userNameDiv = document.createElement('div');
+            userNameDiv.classList.add('quote-user-name');
+            userNameDiv.textContent = quote.userName;  // 顯示 userName
 
-            quoteContentDiv.appendChild(quoteText);
-            quoteContentDiv.appendChild(bookName);
+            contentDiv.appendChild(quoteText);
+            contentDiv.appendChild(userNameDiv);
 
-            const buttonContainer = document.createElement('div');
-            buttonContainer.classList.add('button-container');
+            quoteDiv.appendChild(contentDiv);
 
+            // 如果 JWT 中的 userId 與引言的 userId 匹配，顯示編輯和刪除按鈕
             if (userIdFromToken && userIdFromToken === quote.userId) {
+                const buttonContainer = document.createElement('div');
+                buttonContainer.classList.add('button-container');
+
                 const editButton = document.createElement('button');
-                editButton.classList.add('delete-edit-button');
-                editButton.textContent = "Edit";
-                editButton.addEventListener('click', () => {
+                editButton.classList.add('icon-button');
+                editButton.innerHTML = `
+                <svg viewBox="0 0 24 24" width="24" height="24">
+                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                </svg>
+            `;
+                editButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
                     editQuote(quote.id, quoteText);
                 });
 
                 const deleteButton = document.createElement('button');
-                deleteButton.classList.add('delete-edit-button');
-                deleteButton.textContent = "Delete";
-                deleteButton.addEventListener('click', () => {
+                deleteButton.classList.add('icon-button');
+                deleteButton.innerHTML = `
+                <svg viewBox="0 0 24 24" width="24" height="24">
+                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                </svg>
+            `;
+                deleteButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
                     deleteQuote(quote.id, quoteDiv);
                 });
 
                 buttonContainer.appendChild(editButton);
                 buttonContainer.appendChild(deleteButton);
+                quoteDiv.appendChild(buttonContainer);
             }
 
-            quoteDiv.appendChild(quoteContentDiv);
-            quoteDiv.appendChild(buttonContainer);
-            containerB.appendChild(quoteDiv);
+            commentsContainer.appendChild(quoteDiv);
         });
     }
 
