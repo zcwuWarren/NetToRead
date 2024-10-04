@@ -268,6 +268,10 @@ document.addEventListener("DOMContentLoaded", async function() {
             const commentDiv = document.createElement('div');
             commentDiv.classList.add('comment-container');
 
+            commentDiv.addEventListener('click', function() {
+                window.location.href = `/bookDetail.html?bookId=${comment.bookId}`;
+            });
+
             const contentDiv = document.createElement('div');
             contentDiv.classList.add('comment-content');
 
@@ -276,12 +280,12 @@ document.addEventListener("DOMContentLoaded", async function() {
             commentText.textContent = comment.comment;  // 顯示評論文字
             commentText.setAttribute('contenteditable', 'false');
 
-            const userNameDiv = document.createElement('div');
-            userNameDiv.classList.add('comment-user-name');
-            userNameDiv.textContent = comment.userName;  // 顯示 userName
+            const bookName = document.createElement('div');
+            bookName.classList.add('comment-book-name');
+            bookName.textContent = comment.bookName;  // 顯示 userName
 
             contentDiv.appendChild(commentText);
-            contentDiv.appendChild(userNameDiv);
+            contentDiv.appendChild(bookName);
 
             commentDiv.appendChild(contentDiv);
 
@@ -332,6 +336,10 @@ document.addEventListener("DOMContentLoaded", async function() {
             const quoteDiv = document.createElement('div');
             quoteDiv.classList.add('quote-container');
 
+            quoteDiv.addEventListener('click', function() {
+                window.location.href = `/bookDetail.html?bookId=${quote.bookId}`;
+            });
+
             const contentDiv = document.createElement('div');
             contentDiv.classList.add('quote-content');
 
@@ -340,12 +348,12 @@ document.addEventListener("DOMContentLoaded", async function() {
             quoteText.textContent = quote.quote;  // 顯示引用文字
             quoteText.setAttribute('contenteditable', 'false');
 
-            const userNameDiv = document.createElement('div');
-            userNameDiv.classList.add('quote-user-name');
-            userNameDiv.textContent = quote.userName;  // 顯示 userName
+            const bookName = document.createElement('div');
+            bookName.classList.add('quote-book-name');
+            bookName.textContent = quote.bookName;  // 顯示 userName
 
             contentDiv.appendChild(quoteText);
-            contentDiv.appendChild(userNameDiv);
+            contentDiv.appendChild(bookName);
 
             quoteDiv.appendChild(contentDiv);
 
