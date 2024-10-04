@@ -55,86 +55,95 @@ public class BookPageController {
 
     // likes
     // likes by subCategory
-    // todo have to modify pathVariable to requestParameter, but keep first,
-//    @GetMapping("/{mainCategory}/{subCategory}/latest-likes-by-category")
-//    public ResponseEntity<List<BookInfoDto>> getLatestLikedBooksByCategory(@PathVariable String subCategory) {
-//        List<BookInfoDto> latestLikedBooks = bookPageService.getLatestLikedBooksByCategory(subCategory);
-//        return ResponseEntity.ok(latestLikedBooks);
-//    }
-
     @GetMapping("/latest-likes-by-subCategory")
-    public ResponseEntity<List<BookInfoDto>> getLatestLikedBooksByCategory(@RequestParam String subCategory) {
-        List<BookInfoDto> latestLikedBooks = bookPageService.getLatestLikedBooksByCategory(subCategory);
+    public ResponseEntity<List<BookInfoDto>> getLatestLikedBooksByCategory(@RequestParam String subCategory,
+                                                                           @RequestParam(defaultValue = "0") int offset,
+                                                                           @RequestParam(defaultValue = "50") int limit) {
+        List<BookInfoDto> latestLikedBooks = bookPageService.getLatestLikedBooksByCategory(subCategory, offset, limit);
         return ResponseEntity.ok(latestLikedBooks);
     }
 
     // likes without condition
     @GetMapping("/latest-likes")
-    public ResponseEntity<List<BookInfoDto>> getLatestLikedBooks() {
-        List<BookInfoDto> latestLikedBooks = bookPageService.getLatestLikedBooks();
+    public ResponseEntity<List<BookInfoDto>> getLatestLikedBooks(
+            @RequestParam(defaultValue = "0") int offset,
+            @RequestParam(defaultValue = "50") int limit) {
+        List<BookInfoDto> latestLikedBooks = bookPageService.getLatestLikedBooks(offset, limit);
         return ResponseEntity.ok(latestLikedBooks);
     }
 
     // collects
     // collect by subCategory
     @GetMapping("/latest-collect-by-subCategory")
-    public ResponseEntity<List<BookInfoDto>> getLatestCollectBooksByCategory(@RequestParam String subCategory) {
-        List<BookInfoDto> latestCollectBooksByCategory = bookPageService.getLatestCollectBooksByCategory(subCategory);
+    public ResponseEntity<List<BookInfoDto>> getLatestCollectBooksByCategory(@RequestParam String subCategory,
+                                                                             @RequestParam(defaultValue = "0") int offset,
+                                                                             @RequestParam(defaultValue = "50") int limit) {
+        List<BookInfoDto> latestCollectBooksByCategory = bookPageService.getLatestCollectBooksByCategory(subCategory, offset, limit);
         return ResponseEntity.ok(latestCollectBooksByCategory);
     }
 
     // collect without condition
     @GetMapping("/latest-collect")
-    public ResponseEntity<List<BookInfoDto>> getLatestCollectBooks() {
-        List<BookInfoDto> latestCollectBooksByCategory = bookPageService.getLatestCollectBooks();
-        return ResponseEntity.ok(latestCollectBooksByCategory);
+    public ResponseEntity<List<BookInfoDto>> getLatestCollectBooks(
+            @RequestParam(defaultValue = "0") int offset,
+            @RequestParam(defaultValue = "50") int limit) {
+        List<BookInfoDto> latestCollectedBooks = bookPageService.getLatestCollectBooks(offset, limit);
+        return ResponseEntity.ok(latestCollectedBooks);
     }
 
     // comments
     // comment by bookId
     @GetMapping("/switchToComment")
-    public ResponseEntity<List<BookCommentDto>> getCommentsByBookId(@RequestParam Long bookId) {
-        List<BookCommentDto> comments = bookCommentSqlService.getCommentsByBookId(bookId);
+    public ResponseEntity<List<BookCommentDto>> getCommentsByBookId(@RequestParam Long bookId,
+                                                                    @RequestParam(defaultValue = "0") int offset,
+                                                                    @RequestParam(defaultValue = "50") int limit) {
+        List<BookCommentDto> comments = bookPageService.getCommentsByBookId(bookId, offset, limit);
         return ResponseEntity.ok(comments);
     }
 
     // comment by subCategory
-    // modify from pathVariable to requestParameter
     @GetMapping("/latest-comments-by-subCategory")
-    public ResponseEntity<List<BookCommentDto>> getLatestCommentsBySubCategory(@RequestParam String subCategory) {
-        List<BookCommentDto> comments = bookPageService.getLatestCommentsBySubCategory(subCategory);
+    public ResponseEntity<List<BookCommentDto>> getCommentsBySubCategory(@RequestParam String subCategory,
+                                                                       @RequestParam(defaultValue = "0") int offset,
+                                                                       @RequestParam(defaultValue = "50") int limit) {
+        List<BookCommentDto> comments = bookPageService.getCommentsBySubCategory(subCategory, offset, limit);
         return ResponseEntity.ok(comments);
     }
 
-    // comment without condition
+//    // comment without condition
     @GetMapping("/latest-comments")
-    public ResponseEntity<List<BookCommentDto>> getLatestComments() {
-        List<BookCommentDto> comments = bookPageService.getLatestComments();
+    public ResponseEntity<List<BookCommentDto>> getLatestComments(
+            @RequestParam(defaultValue = "0") int offset,
+            @RequestParam(defaultValue = "50") int limit) {
+        List<BookCommentDto> comments = bookPageService.getLatestComments(offset, limit);
         return ResponseEntity.ok(comments);
     }
-
-
 
     // quotes
     // quotes by bookId
     @GetMapping("/switchToQuote")
-    public ResponseEntity<List<QuoteDto>> getQuotesByBookId(@RequestParam Long bookId) {
-        List<QuoteDto> quotes = quoteService.getQuotesByBookId(bookId);
+    public ResponseEntity<List<QuoteDto>> getQuotesByBookId(@RequestParam Long bookId,
+                                                            @RequestParam(defaultValue = "0") int offset,
+                                                            @RequestParam(defaultValue = "50") int limit) {
+        List<QuoteDto> quotes = quoteService.getQuotesByBookId(bookId, offset, limit);
         return ResponseEntity.ok(quotes);
     }
 
     // quotes by sub-category
-    // modify from pathVariable to requestParameter
     @GetMapping("/latest-quotes-by-subCategory")
-    public ResponseEntity<List<QuoteDto>> getLatestQuotesBySubCategory(@RequestParam String subCategory) {
-        List<QuoteDto> quotes = quoteService.getQuotesBySubCategory(subCategory);
+    public ResponseEntity<List<QuoteDto>> getLatestQuotesBySubCategory(@RequestParam String subCategory,
+                                                                       @RequestParam(defaultValue = "0") int offset,
+                                                                       @RequestParam(defaultValue = "50") int limit) {
+        List<QuoteDto> quotes = quoteService.getQuotesBySubCategory(subCategory,offset, limit);
         return ResponseEntity.ok(quotes);
     }
 
     // quotes without condition
     @GetMapping("/latest-quotes")
-    public ResponseEntity<List<QuoteDto>> getLatestQuotes() {
-        List<QuoteDto> quotes = quoteService.getQuotesWithoutCondition();
+    public ResponseEntity<List<QuoteDto>> getLatestQuotes(
+            @RequestParam(defaultValue = "0") int offset,
+            @RequestParam(defaultValue = "50") int limit) {
+        List<QuoteDto> quotes = quoteService.getQuotesWithoutCondition(offset, limit);
         return ResponseEntity.ok(quotes);
     }
 
@@ -143,5 +152,11 @@ public class BookPageController {
     public ResponseEntity<BookInfoDto> getBookInfoById(@RequestParam Long bookId) {
         BookInfoDto bookInfoDto = bookPageService.getBookInfoById(bookId);
         return ResponseEntity.ok(bookInfoDto);
+    }
+
+    @GetMapping("/getAutocomplete")
+    public ResponseEntity<List<BookInfoDto>> getAutoCompleteBooks(@RequestParam String keyword) {
+        List<BookInfoDto> books = bookPageService.searchBooksByKeyword(keyword);
+        return ResponseEntity.ok(books);
     }
 }

@@ -79,12 +79,25 @@
     background-color: lightgreen; /* 調試時 hover 顯示的效果 */
 }
 
+.search-library-button {
+    background-color: lightgreen;
+    display: block;
+    width: auto;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+}
+
 /* b 大容器樣式 */
 .container-b {
     width: 60%;
     margin: 20px auto;
     display: flex;
     flex-direction: column;
+    max-height: 600px; /* 設置最大高度，超過此高度時出現滾動條 */
+    overflow-y: auto; /* 允許垂直滾動 */
 }
 
 /* 小容器樣式 */
@@ -106,14 +119,51 @@
 
 }
 
-/* 右側 userId 部分 */
-.comment-user-id, .quote-user-id, .comment-book-name, .quote-book-name {
+/* 左側 bookName, userName 部分 */
+.comment-user-id, .quote-user-id, .comment-book-name, .quote-book-name, .comment-user-name, .quote-user-name {
     /*width: 20%;*/
     /*text-align: right;*/
     text-align: left; /* Align the book name to the left */
     font-size: 16px;
     color: #666;
 }
+
+.comment-content, .quote-content {
+    flex-grow: 1;
+}
+
+.button-container {
+    display: flex;
+    gap: 10px;
+}
+
+.icon-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+.icon-button svg {
+    fill: #666666FF;
+}
+
+.icon-button:hover svg {
+    fill: #041723; /* 或者你想要的任何顏色 */
+}
+
+/*!* delete, edit 樣式 *!*/
+/*.delete-edit button {*/
+/*    margin: 0 5px;*/
+/*    padding: 5px 10px;*/
+/*    border: 1px solid #ccc;*/
+/*    background-color: #f0f0f0;*/
+/*    cursor: pointer;*/
+/*}*/
+
+/*.delete-edit button:hover {*/
+/*    background-color: #ddd;*/
+/*}*/
 
 /* 分頁按鈕樣式 */
 .pagination {
@@ -134,6 +184,19 @@
     background-color: #ddd;
 }
 
+.delete-edit-button {
+    margin: 0 5px;
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    background-color: #f0f0f0;
+    cursor: pointer;
+}
+
+.delete-edit-button:hover {
+    background-color: #ddd;
+}
+
+
 .container-b-controls {
     display: flex;
     justify-content: flex-start;
@@ -141,17 +204,18 @@
     margin-bottom: 20px;
 }
 
-#b-left, #b-right, #switch-likes, #switch-collects {
-    padding: 10px 15px;
-    cursor: pointer;
-    border: 1px solid #ccc;
-    background-color: #f0f0f0;
-    margin-right: 10px;
-}
+/*!* #b-left, #b-right, #switch-likes, #switch-collects 樣式移到 bookDisplay.css*!*/
+/*#b-left, #b-right, #switch-likes, #switch-collects {*/
+/*    padding: 10px 15px;*/
+/*    cursor: pointer;*/
+/*    border: 1px solid #ccc;*/
+/*    background-color: #f0f0f0;*/
+/*    margin-right: 10px;*/
+/*}*/
 
-#b-left:hover, #b-right:hover, #switch-likes:hover, #switch-collects:hover {
-    background-color: #ddd;
-}
+/*#b-left:hover, #b-right:hover, #switch-likes:hover, #switch-collects:hover {*/
+/*    background-color: #ddd;*/
+/*}*/
 
 /* 容器 C 的樣式 */
 #containerC {
@@ -182,11 +246,11 @@
     cursor: pointer;
 }
 
-.switch-buttons {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
-}
+/*.switch-buttons {*/
+/*    display: flex;*/
+/*    gap: 10px;*/
+/*    margin-bottom: 10px;*/
+/*}*/
 
 
 

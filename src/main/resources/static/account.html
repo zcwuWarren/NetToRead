@@ -7,7 +7,8 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/account.css"> <!-- 引入新的CSS -->
 </head>
-<body>
+<!-- 先隱藏 body，待確認 jwtToken 存在後再顯示 -->
+<body style="display:none;">
 <header class="container-header">
     <div class="middle-container">
         <div id="header-1" class="header-item">
@@ -18,6 +19,12 @@
             <div class="dropdown-content" id="mainCategoryContainer">
                 <!-- 主分類和次分類將動態加載 -->
             </div>
+        </div>
+        <!-- 搜索框 -->
+        <div id="header-search" class="header-item">
+            <label for="search-input" class="visually-hidden">Search Books</label>
+            <input type="text" id="search-input" placeholder="Search books...">
+            <div id="suggestion-box"></div> <!-- 將 suggestion-box 放在這裡 -->
         </div>
         <div id="header-3" class="header-item">
             <span>Account</span>

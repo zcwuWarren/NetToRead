@@ -1,3 +1,4 @@
+// categoryNavBar.js
 document.addEventListener("DOMContentLoaded", function() {
     // 從 API 獲取分類資料
     fetch("/api/bookPage/categories")
@@ -45,3 +46,83 @@ document.addEventListener("DOMContentLoaded", function() {
         })
         .catch(error => console.error("Error fetching categories:", error));
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+    const suggestionBox = document.getElementById('suggestion-box');
+    suggestionBox.style.display = 'none';  // 初始化时隐藏建议框
+    console.log('Suggestion box initially hidden');
+});
+
+document.getElementById('search-input').addEventListener('input', function() {
+    const keyword = this.value.trim();
+    const suggestionBox = document.getElementById('suggestion-box');
+
+    if (keyword.length >= 1) {
+        fetchSuggestions(keyword);
+
+    } else {
+        suggestionBox.innerHTML = ''; // 如果 keyword 為空，清空建議框
+        suggestionBox.style.display = 'none'; // 沒有關鍵字時隱藏建議框
+    }
+});
+
+// 添加 focus 事件來重新觸發搜索
+document.getElementById('search-input').addEventListener('focus', function() {
+    const keyword = this.value.trim();
+    const suggestionBox = document.getElementById('suggestion-box');
+
+    if (keyword.length >= 1) {
+        fetchSuggestions(keyword); // 如果已有內容，重新執行搜索
+    }
+});
+
+function fetchSuggestions(keyword) {
+    fetch(`/api/bookPage/getAutocomplete?keyword=${encodeURIComponent(keyword)}`)
+        .then(response => response.json())
+        .then(books => {
+            displayAutocompleteSuggestions(books);
+        });
+}
+
+function displayAutocompleteSuggestions(books) {
+    const suggestionBox = document.getElementById('suggestion-box');
+    suggestionBox.innerHTML = '';
+    suggestionBox.style.display = 'block';  // 确保建议框可见
+
+    books.forEach(book => {
+        const suggestionItem = document.createElement('div');
+        suggestionItem.textContent = book.bookName;
+        suggestionItem.classList.add('suggestion-item');
+        suggestionBox.appendChild(suggestionItem);
+
+        // 點擊建議項目後跳轉到書籍詳細頁面
+        suggestionItem.addEventListener('click', () => {
+            window.location.href = `/bookDetail.html?bookId=${book.bookId}`;
+        });
+    });
+}
+
+// 監聽鍵盤退格和刪除鍵
+document.getElementById('search-input').addEventListener('keyup', function(event) {
+    if (event.key === 'Backspace' || event.key === 'Delete') {
+        const keyword = this.value.trim();
+        const suggestionBox = document.getElementById('suggestion-box');
+
+        if (keyword.length === 0) {
+            suggestionBox.innerHTML = ''; // 清空建議框
+            suggestionBox.style.display = 'none';
+        }
+    }
+});
+
+// 點擊搜索框外部時清空建議框
+document.addEventListener('click', function(event) {
+    const searchInput = document.getElementById('search-input');
+    const suggestionBox = document.getElementById('suggestion-box');
+
+    if (!searchInput.contains(event.target) && !suggestionBox.contains(event.target)) {
+        suggestionBox.innerHTML = '';
+        suggestionBox.style.display = 'none';
+    }
+});
+
