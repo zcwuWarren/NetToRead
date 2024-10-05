@@ -158,14 +158,25 @@
 /*    padding-top: 20px;*/
 /*}*/
 
+/*#container-category {*/
+/*    display: flex;*/
+/*    overflow-x: auto;*/
+/*    scroll-behavior: smooth;*/
+/*    -webkit-overflow-scrolling: touch;*/
+/*    padding: 25px;*/
+/*    justify-content: flex-start;*/
+/*    width: 60%;*/
+/*    margin: 0 auto;*/
+/*}*/
+
 #container-category {
     display: flex;
     overflow-x: auto;
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
-    padding: 25px;
+    padding: 25px 0; /* 移除左右内边距，因为外部容器已有内边距 */
     justify-content: flex-start;
-    width: 60%;
+    width: 100%; /* 占满包装容器的宽度 */
     margin: 0 auto;
 }
 
