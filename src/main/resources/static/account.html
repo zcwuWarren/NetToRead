@@ -6,74 +6,129 @@
     <title>Account</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/account.css"> <!-- 引入新的CSS -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 </head>
 <!-- 先隱藏 body，待確認 jwtToken 存在後再顯示 -->
 <body style="display:none;">
+<!--<header class="container-header">-->
+<!--    <div class="middle-container">-->
+<!--        <div id="header-1" class="header-item">-->
+<!--            <a href="index.html">Home</a>-->
+<!--        </div>-->
+<!--        <div id="header-2" class="header-item">-->
+<!--            <span>Category</span>-->
+<!--            <div class="dropdown-content" id="mainCategoryContainer">-->
+<!--                &lt;!&ndash; 主分類和次分類將動態加載 &ndash;&gt;-->
+<!--            </div>-->
+<!--        </div>-->
+<!--        &lt;!&ndash; 搜索框 &ndash;&gt;-->
+<!--        <div id="header-search" class="header-item">-->
+<!--            <label for="search-input" class="visually-hidden">Search Books</label>-->
+<!--            <input type="text" id="search-input" placeholder="Search books...">-->
+<!--            <div id="suggestion-box"></div> &lt;!&ndash; 將 suggestion-box 放在這裡 &ndash;&gt;-->
+<!--        </div>-->
+<!--        <div id="header-3" class="header-item">-->
+<!--            <span>Account</span>-->
+<!--            <div class="dropdown-content" id="profileDropdown">-->
+<!--                <div class="profile-box">-->
+<!--                    <div class="profile-item"><a href="account.html">Login</a></div>-->
+<!--                    <div class="profile-item"><a href="profile.html">Profile</a></div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</header>-->
+
 <header class="container-header">
     <div class="middle-container">
         <div id="header-1" class="header-item">
-            <a href="index.html">Home</a>
+            <a href="index.html">來 Quote 冊</a>
         </div>
         <div id="header-2" class="header-item">
-            <span>Category</span>
+            <span class="material-symbols-outlined">menu_book</span>
+            <span>類別</span>
             <div class="dropdown-content" id="mainCategoryContainer">
                 <!-- 主分類和次分類將動態加載 -->
             </div>
         </div>
         <!-- 搜索框 -->
         <div id="header-search" class="header-item">
-            <label for="search-input" class="visually-hidden">Search Books</label>
-            <input type="text" id="search-input" placeholder="Search books...">
+            <label for="search-input" class="visually-hidden">書名關鍵字搜尋</label>
+            <input type="text" id="search-input" placeholder="輸入書名關鍵字找看看...">
+            <span class="material-symbols-outlined search-icon">search</span>
             <div id="suggestion-box"></div> <!-- 將 suggestion-box 放在這裡 -->
         </div>
         <div id="header-3" class="header-item">
-            <span>Account</span>
+            <span class="material-symbols-outlined account-icon">account_circle</span>
             <div class="dropdown-content" id="profileDropdown">
                 <div class="profile-box">
-                    <div class="profile-item"><a href="account.html">Login</a></div>
-                    <div class="profile-item"><a href="profile.html">Profile</a></div>
+                    <div class="profile-item"><a href="account.html">登入 / 註冊</a></div>
+                    <div class="profile-item"><a href="profile.html">我的書庫</a></div>
                 </div>
             </div>
         </div>
     </div>
 </header>
 
+<!--<main>-->
+<!--    &lt;!&ndash; 大的 a 容器 &ndash;&gt;-->
+<!--    <div class="container-a" id="containerA">-->
+<!--        &lt;!&ndash; 左上切換 login 和 register &ndash;&gt;-->
+<!--        <div class="switch-buttons">-->
+<!--            <button id="switch-login">Login</button>-->
+<!--            <button id="switch-register">Register</button>-->
+<!--        </div>-->
+
+<!--        &lt;!&ndash; a-login 容器，預設顯示 &ndash;&gt;-->
+<!--        <div id="a-login">-->
+<!--            <div class="container-a-login-1">-->
+<!--                <input type="email" id="login-email" placeholder="Enter your email">-->
+<!--            </div>-->
+<!--            <div class="container-a-login-2">-->
+<!--                <input type="password" id="login-password" placeholder="Enter your password">-->
+<!--            </div>-->
+<!--            <div class="container-a-login-3">-->
+<!--                <button id="submit-login">Continue</button>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        &lt;!&ndash; a-register 容器，切換顯示 &ndash;&gt;-->
+<!--        <div id="a-register" style="display:none;">-->
+<!--            <div class="container-a-register-1">-->
+<!--                <input type="text" id="register-username" placeholder="Enter your user name">-->
+<!--            </div>-->
+<!--            <div class="container-a-register-2">-->
+<!--                <input type="email" id="register-email" placeholder="Enter your email">-->
+<!--            </div>-->
+<!--            <div class="container-a-register-3">-->
+<!--                <input type="password" id="register-password" placeholder="Enter your password">-->
+<!--            </div>-->
+<!--            <div class="container-a-register-4">-->
+<!--                <button id="submit-register">Continue</button>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</main>-->
+
 <main>
-    <!-- 大的 a 容器 -->
     <div class="container-a" id="containerA">
-        <!-- 左上切換 login 和 register -->
-        <div class="switch-buttons">
-            <button id="switch-login">Login</button>
-            <button id="switch-register">Register</button>
+<!--        <div class="switch-buttons">-->
+<!--            <button id="switch-login" class="active">Login</button>-->
+<!--&lt;!&ndash;            <button id="switch-register">Register</button>&ndash;&gt;-->
+<!--        </div>-->
+
+        <div id="container-a-login-1" class="login-container">
+            <input type="text" id="login-email" placeholder="電子郵件地址或手機號碼">
+            <input type="password" id="login-password" placeholder="密碼">
+            <button id="submit-login">登入</button>
+            <button id="create-account" class="secondary-button">建立新帳號</button>
         </div>
 
-        <!-- a-login 容器，預設顯示 -->
-        <div id="a-login">
-            <div class="container-a-login-1">
-                <input type="email" id="login-email" placeholder="Enter your email">
-            </div>
-            <div class="container-a-login-2">
-                <input type="password" id="login-password" placeholder="Enter your password">
-            </div>
-            <div class="container-a-login-3">
-                <button id="submit-login">Continue</button>
-            </div>
-        </div>
-
-        <!-- a-register 容器，切換顯示 -->
-        <div id="a-register" style="display:none;">
-            <div class="container-a-register-1">
-                <input type="text" id="register-username" placeholder="Enter your user name">
-            </div>
-            <div class="container-a-register-2">
-                <input type="email" id="register-email" placeholder="Enter your email">
-            </div>
-            <div class="container-a-register-3">
-                <input type="password" id="register-password" placeholder="Enter your password">
-            </div>
-            <div class="container-a-register-4">
-                <button id="submit-register">Continue</button>
-            </div>
+        <div id="container-a-login-2" class="register-container" style="display:none;">
+            <input type="text" id="register-username" placeholder="使用者名稱">
+            <input type="email" id="register-email" placeholder="電子郵件地址">
+            <input type="password" id="register-password" placeholder="密碼">
+            <button id="submit-register">建立新帳號</button>
         </div>
     </div>
 </main>

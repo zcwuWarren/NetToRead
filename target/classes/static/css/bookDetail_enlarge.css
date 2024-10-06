@@ -1,10 +1,20 @@
 /* bookDetail.css */
 /* 容器 a 的樣式 */
+/*.container-a {*/
+/*    width: 60%;*/
+/*    margin: 20px auto;*/
+/*    display: flex;*/
+/*    flex-direction: column;*/
+/*}*/
+
 .container-a {
-    width: 60%;
-    margin: 20px auto;
-    display: flex;
-    flex-direction: column;
+    width: 70%;
+    margin: 10px auto;
+    /*border: 2px solid #ccc;*/
+    border-radius: 10px;
+    padding: 20px 20px 30px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* 添加阴影以区分内容 */
 }
 
 .container-a-top {
@@ -13,9 +23,15 @@
     justify-content: space-between;
 }
 
+.container-a-left {
+    width: 30%; /* 匹配原来 container-a-1 的宽度 */
+    display: flex;
+    flex-direction: column;
+}
+
 .container-a-1 {
-    width: 30%; /* a-1 的寬度較小 */
-    padding-right: 20px;
+    width: 100%;
+    /*padding-right: 20px;*/
 }
 
 .container-a-1 img {
@@ -32,6 +48,67 @@
     margin-bottom: 10px;
 }
 
+.book-info-item {
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.book-info-item strong {
+    display: inline-block;
+    width: 100px; /* 调整标签宽度 */
+    font-weight: bold;
+    color: #666666;
+}
+
+.book-info-item span {
+    color: #000000;
+}
+
+/* 可以为特定的信息项添加自定义样式 */
+#bookName strong, #bookName span {
+    font-size: 36px;
+    color: #000;
+    font-weight: bold;
+}
+
+#author strong, #author span {
+    font-style: italic;
+    font-size: 20px;
+}
+
+#publisher, #publishDate, #isbn {
+    font-size: 14px;
+}
+
+/*.book-info-item#content {*/
+/*    position: relative;*/
+/*    padding-bottom: 30px; !* 为展开按钮留出空间 *!*/
+/*}*/
+
+/*.expand-button {*/
+/*    position: absolute;*/
+/*    bottom: 0;*/
+/*    left: 100px; !* 与其他标签对齐 *!*/
+/*    background-color: transparent;*/
+/*    border: none;*/
+/*    color: #007bff;*/
+/*    cursor: pointer;*/
+/*    padding: 5px 10px;*/
+/*    font-size: 0.9em;*/
+/*}*/
+
+/*.expand-button:hover {*/
+/*    text-decoration: underline;*/
+/*}*/
+
+/*.truncated-content, .full-content {*/
+/*    display: inline;*/
+/*}*/
+
+/*.full-content {*/
+/*    display: none;*/
+/*}*/
+
 .container-a-3 {
     width: 100%; /* a-3 寬度與 a-1, a-2 的總和一致 */
     margin-top: 20px;
@@ -45,49 +122,57 @@
     overflow-y: auto;
 }
 
-.like-button, .collect-button {
-    padding: 10px 20px;
-    background-color: #f0f0f0;
-    cursor: pointer;
-    margin-top: 10px;
-    border: 1px solid #ccc;
-    display: inline-block;
-    margin-right: 10px;
-}
-
-.like-collect-container {
+/* 書封下面按鈕 */
+.container-a-1-buttons {
+    width: 80%;
     display: flex;
-    /*flex-direction: column;*/
-    margin-right: 20px;
+    flex-direction: column;
+    align-items: stretch;
+    margin: 10px auto 0; /* 使用 auto 左右边距实现水平居中 */
 }
 
-
-.like-button:hover, .collect-button:hover {
-    background-color: #ddd;
-}
-
-#A-2-like, #A-2-collect {
-    background-color: lightblue; /* 調試時用來確認按鈕是否渲染 */
-    display: block; /* 確保它們顯示為 block 元素，避免 inline-block 帶來的問題 */
-    width: auto; /* 確保寬度自動適應內容 */
+.action-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /*justify-content: flex-start;*/
     padding: 10px;
-    margin: 10px 0; /* 添加一些外邊距，讓它們在視覺上更分明 */
-    border-radius: 5px; /* 添加圓角效果 */
-}
-
-#A-2-like:hover, #A-2-collect:hover {
-    background-color: lightgreen; /* 調試時 hover 顯示的效果 */
-}
-
-.search-library-button {
-    background-color: lightgreen;
-    display: block;
-    width: auto;
-    padding: 10px;
-    margin: 10px 0;
+    background-color: #f0f0f0;
+    border: none;
     border-radius: 5px;
     cursor: pointer;
-    text-align: center;
+    font-size: 14px;
+    margin-bottom: 5px;
+    width: 100%; /* 确保按钮填满容器宽度 */
+}
+
+.action-button .btn-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+}
+
+.action-button span {
+    white-space: nowrap;
+}
+
+.library-dropdown .action-button {
+    justify-content: center;
+}
+
+.library-dropdown-content {
+    width: 100%; /* 使下拉内容与按钮等宽 */
+    box-sizing: border-box; /* 确保内边距不会增加总宽度 */
+}
+
+.library-dropdown:hover .library-dropdown-content {
+    display: block;
+}
+
+#library-select {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
 }
 
 /* b 大容器樣式 */
