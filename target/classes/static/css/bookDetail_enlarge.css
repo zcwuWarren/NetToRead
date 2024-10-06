@@ -144,6 +144,7 @@
     font-size: 14px;
     margin-bottom: 5px;
     width: 100%; /* 确保按钮填满容器宽度 */
+    position: relative; /* 为绝对定位的子元素提供参考 */
 }
 
 .action-button .btn-icon {
@@ -155,6 +156,25 @@
 .action-button span {
     white-space: nowrap;
 }
+
+.count-display {
+    position: absolute;
+    right: 10px;
+    background-color: #e0e0e0;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 14px;
+    color: #333;
+}
+
+/*!* 可以为不同的按钮添加不同的颜色 *!*/
+/*#like-button .count-display {*/
+/*    background-color: #ffcccb; !* 浅红色 *!*/
+/*}*/
+
+/*#collect-button .count-display {*/
+/*    background-color: #c2f0c2; !* 浅绿色 *!*/
+/*}*/
 
 .library-dropdown .action-button {
     justify-content: center;

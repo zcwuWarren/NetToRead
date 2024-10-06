@@ -14,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -81,6 +82,22 @@ public class UserBookshelfSqlService {
         return likesPage.getContent().stream()
                 .map(UserBookshelfDto::new)
                 .collect(Collectors.toList());
+    }
+
+    public boolean isBookLikedByUser(Long bookId, String token) {
+        User user = jwtTokenUtil.getUserFromToken(token);
+        Long userId = user.getUserId();
+
+        Boolean likeStatus = userBookshelfSqlRepository.findLikeStatusByUserIdAndBookId(userId, bookId);
+        return likeStatus != null && likeStatus;
+    }
+
+    public boolean isBookCollectedByUser(Long bookId, String token) {
+        User user = jwtTokenUtil.getUserFromToken(token);
+        Long userId = user.getUserId();
+
+        Boolean collectStatus = userBookshelfSqlRepository.findCollectStatusByUserIdAndBookId(userId, bookId);
+        return collectStatus != null && collectStatus;
     }
 }
 

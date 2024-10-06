@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", async function() {
     // 從 URL 中提取 bookId
     const urlParams = new URLSearchParams(window.location.search);
     const bookId = urlParams.get('bookId');
+    const token = localStorage.getItem('jwtToken');
     let book;
 
     if (bookId) {
@@ -22,18 +23,9 @@ document.addEventListener("DOMContentLoaded", async function() {
             bookCover.src = book.bookCover;
             containerA1.appendChild(bookCover);
 
-            // // 渲染書籍資訊
-            // const bookInfo = `
-            //     <div><strong>Book Name:</strong> ${book.bookName}</div>
-            //     <div><strong>Author:</strong> ${book.author}</div>
-            //     <div><strong>Publisher:</strong> ${book.publisher}</div>
-            //     <div><strong>Publish Date:</strong> ${book.publishDate}</div>
-            //     <div><strong>ISBN:</strong> ${book.isbn}</div>
-            //     <div><strong>Likes:</strong> ${book.like}</div>
-            //     <div><strong>Collects:</strong> ${book.collect}</div>
-            //     <div><strong>Content:</strong> ${book.content}</div>
-            // `;
-            // containerA2.innerHTML = bookInfo;
+            // 更新点赞和收藏按钮的数字
+            document.getElementById('like-count').textContent = book.like;
+            document.getElementById('collect-count').textContent = book.collect;
 
             // 渲染书籍信息
             document.getElementById('bookName').innerHTML = `<span>${book.bookName}</span>`;
@@ -44,45 +36,6 @@ document.addEventListener("DOMContentLoaded", async function() {
             document.getElementById('likes').innerHTML = `<strong>點讚數：</strong> <span>${book.like}</span>`;
             document.getElementById('collects').innerHTML = `<strong>收藏數：</strong> <span>${book.collect}</span>`;
             document.getElementById('content').innerHTML = `<span>${book.content}</span>`;
-
-            // function truncateContent(content, limit = 250) {
-            //     if (content.length <= limit) return content;
-            //     return content.slice(0, limit) + '...';
-            // }
-            //
-            // function renderContent(content) {
-            //     const contentElement = document.getElementById('content');
-            //     const truncated = truncateContent(content);
-            //
-            //     if (content.length > 250) {
-            //         contentElement.innerHTML = `
-            //     <strong>目录：</strong>
-            //     <span class="truncated-content">${truncated}</span>
-            //     <span class="full-content" style="display:none;">${content}</span>
-            //     <button class="expand-button">展开</button>
-            // `;
-            //
-            //         const expandButton = contentElement.querySelector('.expand-button');
-            //         expandButton.addEventListener('click', function() {
-            //             const truncatedSpan = contentElement.querySelector('.truncated-content');
-            //             const fullSpan = contentElement.querySelector('.full-content');
-            //
-            //             if (truncatedSpan.style.display !== 'none') {
-            //                 truncatedSpan.style.display = 'none';
-            //                 fullSpan.style.display = 'inline';
-            //                 expandButton.textContent = '收起';
-            //             } else {
-            //                 truncatedSpan.style.display = 'inline';
-            //                 fullSpan.style.display = 'none';
-            //                 expandButton.textContent = '展开';
-            //             }
-            //         });
-            //     } else {
-            //         contentElement.innerHTML = `<strong>目录：</strong> <span>${content}</span>`;
-            //     }
-            // }
-            //
-            // renderContent(book.content);
 
             // 渲染書籍描述
             const bookDescription = `<div class="container-a-3-long-content">${book.description}</div>`;
