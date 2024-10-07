@@ -73,9 +73,10 @@ public class UserPageController {
         return ResponseEntity.ok(likes);
     }
 
-    @GetMapping("/userInteraction")
-    public ResponseEntity<?> getUserBookInteraction(@RequestParam Long bookId, @RequestParam String token) {
+    @PostMapping("/userInteraction")
+    public ResponseEntity<?> getUserBookInteraction(@RequestParam Long bookId, @RequestBody TokenDto tokenDto) {
         try {
+            String token = tokenDto.getToken();
             boolean isLiked = userBookshelfSqlService.isBookLikedByUser(bookId, token);
             boolean isCollected = userBookshelfSqlService.isBookCollectedByUser(bookId, token);
 

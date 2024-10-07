@@ -157,6 +157,12 @@
     white-space: nowrap;
 }
 
+.action-button.active {
+    background-color: #50A57D; /* 選中時的背景色 */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* 輕微陰影效果 */
+    /*color: #041723; !* 可以設置一個對比色,使文字更清晰 *!*/
+}
+
 .count-display {
     position: absolute;
     right: 10px;

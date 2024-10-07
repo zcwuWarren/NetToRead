@@ -289,7 +289,7 @@ body {
     top: 50%;
     transform: translateY(-50%);
     color: #041723; /* 与 Category 图标相同的颜色 */
-    cursor: default;
+    cursor: pointer;
 }
 /*#header-3 {*/
 /*    display: flex;*/

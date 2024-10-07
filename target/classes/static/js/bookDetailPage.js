@@ -7,6 +7,10 @@ document.addEventListener("DOMContentLoaded", async function() {
     const token = localStorage.getItem('jwtToken');
     let book;
 
+    if (bookId && token) {
+        checkUserInteraction(bookId);
+    }
+
     if (bookId) {
         try {
             const response = await fetch(`/api/bookPage/getBookInfo?bookId=${bookId}`);
@@ -83,8 +87,18 @@ document.addEventListener("DOMContentLoaded", async function() {
                     const result = await response.json();
                     if (response.ok) {
                         alert(result.message);
+                        // 立即更新按钮状态
+                        likeButton.classList.toggle('active');
+                        // 更新点赞数
+                        const likeCountElement = document.getElementById('like-count');
+                        let currentLikes = parseInt(likeCountElement.textContent);
+                        likeCountElement.textContent = likeButton.classList.contains('active') ? currentLikes + 1 : currentLikes - 1;
                     } else {
                         alert(result.message);
+                        likeButton.classList.remove('active');
+                        const likeCountElement = document.getElementById('like-count');
+                        let currentLikes = parseInt(likeCountElement.textContent);
+                        currentLikes - 1;
                     }
                 } catch (error) {
                     console.error("Error liking the book:", error);
@@ -111,8 +125,15 @@ document.addEventListener("DOMContentLoaded", async function() {
                     const result = await response.json();
                     if (response.ok) {
                         alert(result.message);
+                        // 立即更新按钮状态
+                        collectButton.classList.toggle('active');
+                        // 更新收藏数
+                        const collectCountElement = document.getElementById('collect-count');
+                        let currentCollects = parseInt(collectCountElement.textContent);
+                        collectCountElement.textContent = collectButton.classList.contains('active') ? currentCollects + 1 : currentCollects - 1;
                     } else {
                         alert(result.message);
+                        collectButton.classList.remove('active');
                     }
                 } catch (error) {
                     console.error("Error collecting the book:", error);
@@ -124,6 +145,50 @@ document.addEventListener("DOMContentLoaded", async function() {
         }
     } else {
         console.error("缺少 bookId");
+    }
+
+    async function checkUserInteraction(bookId) {
+        const token = localStorage.getItem('jwtToken');
+        if (!token) {
+            console.log('User not logged in');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/userPage/userInteraction?bookId=${bookId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ token: token })
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const data = await response.json();
+            updateButtonStates(data);
+        } catch (error) {
+            console.error('Error checking user interaction:', error);
+        }
+    }
+
+    function updateButtonStates(interaction) {
+        const likeButton = document.getElementById('like-button');
+        const collectButton = document.getElementById('collect-button');
+
+        if (interaction.liked) {
+            likeButton.classList.add('active');
+        } else {
+            likeButton.classList.remove('active');
+        }
+
+        if (interaction.collected) {
+            collectButton.classList.add('active');
+        } else {
+            collectButton.classList.remove('active');
+        }
     }
 });
 
