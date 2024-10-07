@@ -52,6 +52,40 @@
     padding: 20px 20px 30px;
     background-color: #ffffff;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* 添加阴影以区分内容 */
+    /*height: 384.32px; !* 固定高度，避免閃爍 *!*/
+    /*overflow: hidden; !* 隱藏超出的內容 *!*/
+    --loading-gif-size: 150px; /* Adjust this value to change the GIF size */
+    min-height: 434.32px; /* 使用最小高度而不是固定高度 */
+    overflow: visible; /* 允許內容溢出 */
+    position: relative;
+}
+
+/* loading gif */
+.loading-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.8);
+    z-index: 10;
+}
+
+.loading-gif {
+    width: var(--loading-gif-size, 100px); /* 默認大小為 100px，可通過 CSS 變量調整 */
+    height: auto;
+}
+
+.latest-likes-container {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.latest-likes-container.loaded {
+    opacity: 1;
 }
 
 #latestLikesContainer {

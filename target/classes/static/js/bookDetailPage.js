@@ -96,9 +96,6 @@ document.addEventListener("DOMContentLoaded", async function() {
                     } else {
                         alert(result.message);
                         likeButton.classList.remove('active');
-                        const likeCountElement = document.getElementById('like-count');
-                        let currentLikes = parseInt(likeCountElement.textContent);
-                        currentLikes - 1;
                     }
                 } catch (error) {
                     console.error("Error liking the book:", error);
