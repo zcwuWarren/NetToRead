@@ -204,7 +204,13 @@ document.addEventListener("DOMContentLoaded", async function() {
         const bRightButton = document.getElementById('b-right');
         const submitButton = document.getElementById('submit-button');
         const inputBox = document.getElementById('input-box');
+        const bookshelfReviewTitleCommentQuote = document.getElementById('bookshelfReviewTitleCommentQuote').querySelector('h2');
+
         let currentLoadFunction = loadComments;
+
+        // 設置初始 active 狀態
+        setActiveState(bLeftButton);
+        updateBookshelfTitle('comments');
 
         const urlParams = new URLSearchParams(window.location.search);
         const bookId = urlParams.get('bookId');
@@ -612,6 +618,9 @@ document.addEventListener("DOMContentLoaded", async function() {
             commentOffset = 0;
             hasMoreComments = true;
             currentLoadFunction = loadComments;
+            setActiveState(bLeftButton);
+            removeActiveState(bRightButton);
+            updateBookshelfTitle('comments');
             loadComments();
         });
 
@@ -623,6 +632,9 @@ document.addEventListener("DOMContentLoaded", async function() {
             quoteOffset = 0;
             hasMoreQuotes = true;
             currentLoadFunction = loadQuotes;
+            setActiveState(bRightButton);
+            removeActiveState(bLeftButton);
+            updateBookshelfTitle('quotes')
             loadQuotes();
         });
 
@@ -701,4 +713,27 @@ document.addEventListener("DOMContentLoaded", async function() {
 
         // 初始加载评论
         loadComments();
+
+        // 設置 active 狀態
+        function setActiveState(button) {
+            button.classList.add('active');
+            button.style.backgroundColor = '#B6ADA5';
+            button.style.color = '#041723';
+        }
+
+        // 移除 active 狀態
+        function removeActiveState(button) {
+            button.classList.remove('active');
+            button.style.backgroundColor = '';
+            button.style.color = '';
+        }
+
+        // 更新書架標題
+        function updateBookshelfTitle(type) {
+            if (type === 'comments') {
+                bookshelfReviewTitleCommentQuote.textContent = '最新評論';
+            } else if (type === 'quotes') {
+                bookshelfReviewTitleCommentQuote.textContent = '最新引言';
+            }
+        }
 });

@@ -3,6 +3,8 @@ document.addEventListener("DOMContentLoaded", function() {
     const containerCategory = document.getElementById('container-category');
     const token = localStorage.getItem('jwtToken');
     const loadingContainer = document.querySelector('.loading-container');
+    const bookshelfReviewTitleLikeCollect = document.getElementById('bookshelfReviewTitleLikeCollect').querySelector('h2');
+
 
     let offset = 0;
     const limit = 50; // 每次加載的書籍數量
@@ -44,18 +46,52 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     // 如果 Token 有效，繼續執行頁面渲染邏輯
+
+    // 設置初始 active 狀態
+    setActiveState(likesButton);
+    updateBookshelfTitle('likes');
+
     // 預設載入 Likes 書籍
     loadMoreBooks();
 
     // 點擊 Likes 時載入
     likesButton.addEventListener('click', () => {
         resetBookshelf('/api/userPage/myLike');
+        setActiveState(likesButton);
+        removeActiveState(collectsButton);
+        updateBookshelfTitle('likes');
     });
 
     // 點擊 Collects 時載入
     collectsButton.addEventListener('click', () => {
         resetBookshelf('/api/userPage/myCollect');
+        setActiveState(collectsButton);
+        removeActiveState(likesButton);
+        updateBookshelfTitle('collects');
     });
+
+    // 設置 active 狀態
+    function setActiveState(button) {
+        button.classList.add('active');
+        button.style.backgroundColor = '#B6ADA5';
+        button.style.color = '#041723';
+    }
+
+    // 移除 active 狀態
+    function removeActiveState(button) {
+        button.classList.remove('active');
+        button.style.backgroundColor = '';
+        button.style.color = '';
+    }
+
+    // 更新書架標題
+    function updateBookshelfTitle(type) {
+        if (type === 'likes') {
+            bookshelfReviewTitleLikeCollect.textContent = '我的按讚';
+        } else if (type === 'collects') {
+            bookshelfReviewTitleLikeCollect.textContent = '我的收藏';
+        }
+    }
 
     // 顯示加載動畫
     function showLoading() {

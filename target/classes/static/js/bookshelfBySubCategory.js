@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const collectsButton = document.getElementById('switch-collects');
     const containerCategory = document.getElementById('container-category');
     const loadingContainer = document.querySelector('.loading-container');
+    const bookshelfReviewTitleLikeCollect = document.getElementById('bookshelfReviewTitleLikeCollect').querySelector('h2');
     let isLoading = false;
     let currentApi = `/api/bookPage/latest-likes-by-subCategory?subCategory=${encodeURIComponent(subCategory)}`;
     let offset = 0;
@@ -20,18 +21,51 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
     }
 
+    // 設置初始 active 狀態
+    setActiveState(likesButton);
+    updateBookshelfTitle('likes');
+
     // 預設顯示 likes 書籍
     loadMoreBooks();
 
     // 點擊 "Likes" 按鈕時，重置並載入最新的 likes 書籍
     likesButton.addEventListener('click', () => {
         resetBookshelf(`/api/bookPage/latest-likes-by-subCategory?subCategory=${encodeURIComponent(subCategory)}`);
+        setActiveState(likesButton);
+        removeActiveState(collectsButton);
+        updateBookshelfTitle('likes');
     });
 
     // 點擊 "Collects" 按鈕時，重置並載入最新的 collects 書籍
     collectsButton.addEventListener('click', () => {
         resetBookshelf(`/api/bookPage/latest-collect-by-subCategory?subCategory=${encodeURIComponent(subCategory)}`);
+        setActiveState(collectsButton);
+        removeActiveState(likesButton);
+        updateBookshelfTitle('collects');
     });
+
+    // 設置 active 狀態
+    function setActiveState(button) {
+        button.classList.add('active');
+        button.style.backgroundColor = '#B6ADA5';
+        button.style.color = '#041723';
+    }
+
+    // 移除 active 狀態
+    function removeActiveState(button) {
+        button.classList.remove('active');
+        button.style.backgroundColor = '';
+        button.style.color = '';
+    }
+
+    // 更新書架標題
+    function updateBookshelfTitle(type) {
+        if (type === 'likes') {
+            bookshelfReviewTitleLikeCollect.textContent = '最新按讚';
+        } else if (type === 'collects') {
+            bookshelfReviewTitleLikeCollect.textContent = '最新收藏';
+        }
+    }
 
     // 監聽滾動事件
     containerCategory.addEventListener('scroll', () => {
