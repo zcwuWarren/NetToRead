@@ -2,6 +2,8 @@
 document.addEventListener("DOMContentLoaded", function() {
     const containerCategory = document.getElementById('container-category');
     const token = localStorage.getItem('jwtToken');
+    const loadingContainer = document.querySelector('.loading-container');
+
     let offset = 0;
     const limit = 50; // 每次加載的書籍數量
     let isLoading = false;
@@ -55,12 +57,25 @@ document.addEventListener("DOMContentLoaded", function() {
         resetBookshelf('/api/userPage/myCollect');
     });
 
+    // 顯示加載動畫
+    function showLoading() {
+        loadingContainer.style.display = 'flex';
+        containerCategory.classList.remove('loaded');
+    }
+
+    // 隱藏加載動畫
+    function hideLoading() {
+        loadingContainer.style.display = 'none';
+        containerCategory.classList.add('loaded');
+    }
+
     // 重置書架
     function resetBookshelf(apiUrl) {
         currentApi = apiUrl;
         offset = 0;
         isEndOfData = false;
         containerCategory.innerHTML = '';
+        showLoading();
         loadMoreBooks();
     }
 
@@ -68,6 +83,7 @@ document.addEventListener("DOMContentLoaded", function() {
     function loadMoreBooks() {
         if (isLoading || isEndOfData) return;
         isLoading = true;
+        showLoading();
 
         fetch(`${currentApi}?offset=${offset}&limit=${limit}`, {
             method: 'POST',
@@ -86,12 +102,15 @@ document.addEventListener("DOMContentLoaded", function() {
                     }
                 } else {
                     isEndOfData = true;
+                    // isLoading = false;
                 }
+                hideLoading();
                 isLoading = false;
             })
             .catch(error => {
                 console.error(`Error fetching books from ${currentApi}:`, error);
                 isLoading = false;
+                hideLoading();
             });
     }
 
