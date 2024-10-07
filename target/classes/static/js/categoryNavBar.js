@@ -126,3 +126,18 @@ document.addEventListener('click', function(event) {
     }
 });
 
+// search book
+document.getElementById('search-input').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        performSearch();
+    }
+});
+
+document.querySelector('.search-icon').addEventListener('click', performSearch);
+
+function performSearch() {
+    const keyword = document.getElementById('search-input').value.trim();
+    if (keyword) {
+        window.location.href = `/searchResult.html?keyword=${encodeURIComponent(keyword)}`;
+    }
+}

@@ -188,8 +188,16 @@ public class BookPageService {
         return BookInfoDtoConverter.convertToDtoList(sortedBooks);
     }
 
+    // searchbar autocomplete
     public List<BookInfoDto> searchBooksByKeyword(String keyword) {
         List<BookInfo> books = bookInfoRepository.findByBookNameContaining(keyword);
         return BookInfoDtoConverter.convertToDtoList(books);
+    }
+
+    // search book
+    public Page<BookInfoDto> searchBooksByKeywordPaged(String keyword, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<BookInfo> booksPage = bookInfoRepository.findByBookNameContainingIgnoreCase(keyword, pageable);
+        return booksPage.map(BookInfoDtoConverter::convertToDto);
     }
 }

@@ -9,6 +9,7 @@ import com.personal_project.Next_to_read.service.BookCommentSqlService;
 import com.personal_project.Next_to_read.service.BookPageService;
 import com.personal_project.Next_to_read.service.QuoteService;
 import com.personal_project.Next_to_read.service.UserBookshelfSqlService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -157,6 +158,15 @@ public class BookPageController {
     @GetMapping("/getAutocomplete")
     public ResponseEntity<List<BookInfoDto>> getAutoCompleteBooks(@RequestParam String keyword) {
         List<BookInfoDto> books = bookPageService.searchBooksByKeyword(keyword);
+        return ResponseEntity.ok(books);
+    }
+
+    @GetMapping("/searchBooks")
+    public ResponseEntity<Page<BookInfoDto>> searchBooks(
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "40") int size) {
+        Page<BookInfoDto> books = bookPageService.searchBooksByKeywordPaged(keyword, page, size);
         return ResponseEntity.ok(books);
     }
 }
