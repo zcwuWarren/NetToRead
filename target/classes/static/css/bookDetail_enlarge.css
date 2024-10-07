@@ -202,18 +202,56 @@
 }
 
 /* b 大容器樣式 */
+/*.container-b {*/
+/*    width: 70%;*/
+/*    margin: 10px auto;*/
+/*    display: flex;*/
+/*    flex-direction: column;*/
+/*    max-height: 600px; !* 設置最大高度，超過此高度時出現滾動條 *!*/
+/*    overflow-y: auto; !* 允許垂直滾動 *!*/
+/*    padding: 10px 20px;*/
+/*    !*border: 2px solid #ccc;*!*/
+/*    border-radius: 10px;*/
+/*    background-color: #ffffff;*/
+/*    box-shadow: 0 2px 4px rgba(0,0,0,0.1); !* 添加阴影以区分内容 *!*/
+/*}*/
+
 .container-b {
     width: 70%;
     margin: 10px auto;
     display: flex;
     flex-direction: column;
+    min-height: 600px; /* 設置最小高度 */
     max-height: 600px; /* 設置最大高度，超過此高度時出現滾動條 */
     overflow-y: auto; /* 允許垂直滾動 */
     padding: 10px 20px;
-    /*border: 2px solid #ccc;*/
     border-radius: 10px;
     background-color: #ffffff;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* 添加阴影以区分内容 */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: relative; /* 為絕對定位的子元素提供參考 */
+}
+
+.loading-container-b {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.8);
+    z-index: 10;
+}
+
+/* 新增用於控制內容可見性的樣式 */
+.container-b-content {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.container-b-content.loaded {
+    opacity: 1;
 }
 
 .comment-container, .quote-container {

@@ -12,11 +12,26 @@ document.addEventListener("DOMContentLoaded", async function() {
     const containerB = document.getElementById('containerB');
     const bLeftButton = document.getElementById('b-left');
     const bRightButton = document.getElementById('b-right');
+    const loadingContainer = document.querySelector('.loading-container-b');
+
     let currentLoadFunction = loadComments;
+
+    // 顯示載入動畫
+    function showLoading() {
+        loadingContainer.style.display = 'flex';
+        containerB.classList.remove('loaded');
+    }
+
+    // 隱藏載入動畫
+    function hideLoading() {
+        loadingContainer.style.display = 'none';
+        containerB.classList.add('loaded');
+    }
 
     async function loadComments() {
         if (isLoading || !hasMoreComments) return;
         isLoading = true;
+        showLoading();
 
         try {
             const response = await fetch(`/api/bookPage/latest-comments?offset=${commentOffset}&limit=${limit}`);
@@ -35,12 +50,14 @@ document.addEventListener("DOMContentLoaded", async function() {
             console.error("無法載入評論：", error);
         } finally {
             isLoading = false;
+            hideLoading();
         }
     }
 
     async function loadQuotes() {
         if (isLoading || !hasMoreQuotes) return;
         isLoading = true;
+        showLoading();
 
         try {
             const response = await fetch(`/api/bookPage/latest-quotes?offset=${quoteOffset}&limit=${limit}`);
@@ -59,6 +76,7 @@ document.addEventListener("DOMContentLoaded", async function() {
             console.error("無法載入引用：", error);
         } finally {
             isLoading = false;
+            hideLoading();
         }
     }
 

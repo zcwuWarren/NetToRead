@@ -10,9 +10,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const limit = 50;
     let isEndOfData = false;
 
-    // // 立即顯示載入動畫
-    // showLoading();
-
     // 預設顯示 likes 書籍
     loadMoreBooks();
 
