@@ -37,11 +37,6 @@ document.addEventListener("DOMContentLoaded", async function() {
             const likeButton = document.getElementById('like-button');
             const collectButton = document.getElementById('collect-button');
 
-            // // 渲染書籍封面
-            // const bookCover = document.createElement('img');
-            // bookCover.src = book.bookCover;
-            // containerA1.appendChild(bookCover);
-
             // 預加載圖片
             const img = new Image();
             img.onload = function() {

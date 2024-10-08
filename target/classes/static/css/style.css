@@ -46,6 +46,35 @@
 /*    font-weight: 600;*/
 /*}*/
 
+.lxgw-wenkai-mono-tc-light {
+    font-family: "LXGW WenKai Mono TC", monospace;
+    font-weight: 300;
+    font-style: normal;
+}
+
+.lxgw-wenkai-mono-tc-regular {
+    font-family: "LXGW WenKai Mono TC", monospace;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.lxgw-wenkai-mono-tc-bold {
+    font-family: "LXGW WenKai Mono TC", monospace;
+    font-weight: 700;
+    font-style: normal;
+}
+
+#header-1 a {
+    font-family: 'LXGW WenKai Mono TC', monospace;
+    font-weight: 700; /* 您可以根據需要調整粗細 */
+}
+
+#header-1 a {
+    font-size: 2.5em; /* 調整大小 */
+    letter-spacing: 0.05em; /* 調整字母間距 */
+    /* 其他樣式... */
+}
+
 body {
     font-family: Arial, sans-serif;
     /*font-family: 'Source Han Serif TW', serif;*/
