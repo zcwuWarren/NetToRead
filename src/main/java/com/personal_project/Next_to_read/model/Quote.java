@@ -30,7 +30,7 @@ public class Quote {
     @JoinColumn(name = "book_id", nullable = false)
     private BookInfo bookId;
 
-    @Column(name = "quote", nullable = false)
+    @Column(name = "quote", length = 1000, nullable = false)
     private String quote;
 
     @Column(name = "timestamp", nullable = false)

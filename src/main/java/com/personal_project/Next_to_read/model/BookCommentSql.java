@@ -29,7 +29,7 @@ public class BookCommentSql {
     @JoinColumn(name = "book_id", nullable = false)
     private BookInfo bookId;
 
-    @Column(name = "comment")
+    @Column(name = "comment", length = 1000, nullable = false)
     private String comment;
 
     @Column(name = "timestamp", nullable = false)

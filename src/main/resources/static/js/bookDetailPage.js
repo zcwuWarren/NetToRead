@@ -1,6 +1,19 @@
 // bookDetailPage.js
 // container a
 document.addEventListener("DOMContentLoaded", async function() {
+    const loadingContainer = document.querySelector('.loading-container');
+    const containerA1 = document.getElementById('containerA1');
+
+    // 顯示 loading
+    function showLoading() {
+        loadingContainer.style.display = 'flex';
+    }
+
+    // 隱藏 loading
+    function hideLoading() {
+        loadingContainer.style.display = 'none';
+    }
+
     // 從 URL 中提取 bookId
     const urlParams = new URLSearchParams(window.location.search);
     const bookId = urlParams.get('bookId');
@@ -13,6 +26,8 @@ document.addEventListener("DOMContentLoaded", async function() {
 
     if (bookId) {
         try {
+            showLoading(); // 顯示 loading
+
             const response = await fetch(`/api/bookPage/getBookInfo?bookId=${bookId}`);
             book = await response.json();
 
@@ -22,14 +37,36 @@ document.addEventListener("DOMContentLoaded", async function() {
             const likeButton = document.getElementById('like-button');
             const collectButton = document.getElementById('collect-button');
 
-            // 渲染書籍封面
-            const bookCover = document.createElement('img');
-            bookCover.src = book.bookCover;
-            containerA1.appendChild(bookCover);
+            // // 渲染書籍封面
+            // const bookCover = document.createElement('img');
+            // bookCover.src = book.bookCover;
+            // containerA1.appendChild(bookCover);
+
+            // 預加載圖片
+            const img = new Image();
+            img.onload = function() {
+                // 圖片加載完成後，將其添加到 DOM 並淡入
+                containerA1.innerHTML = ''; // 清空可能存在的佔位符
+                containerA1.appendChild(img);
+                setTimeout(() => {
+                    img.classList.add('loaded');
+                    hideLoading();
+                }, 100); // 短暫延遲以確保過渡效果順滑
+            };
+            img.onerror = function() {
+                console.error('無法加載圖片');
+                hideLoading();
+            };
+            img.src = book.bookCover;
+            img.alt = book.bookName;
 
             // 更新点赞和收藏按钮的裡面的数字
             document.getElementById('like-count').textContent = book.like;
             document.getElementById('collect-count').textContent = book.collect;
+
+            // 更新點讚和收藏按鈕裡面的數字，並根據數值決定是否顯示
+            updateCountDisplay('like-count', book.like);
+            updateCountDisplay('collect-count', book.collect);
 
             // 渲染书籍信息
             document.getElementById('bookName').innerHTML = `<span>${book.bookName}</span>`;
@@ -37,8 +74,8 @@ document.addEventListener("DOMContentLoaded", async function() {
             document.getElementById('publisher').innerHTML = `<strong>出版社：</strong> <span>${book.publisher}</span>`;
             document.getElementById('publishDate').innerHTML = `<strong>出版日期：</strong> <span>${book.publishDate}</span>`;
             document.getElementById('isbn').innerHTML = `<strong>ISBN：</strong> <span>${book.isbn}</span>`;
-            document.getElementById('likes').innerHTML = `<strong>點讚數：</strong> <span>${book.like}</span>`;
-            document.getElementById('collects').innerHTML = `<strong>收藏數：</strong> <span>${book.collect}</span>`;
+            // document.getElementById('likes').innerHTML = `<strong>點讚數：</strong> <span>${book.like}</span>`;
+            // document.getElementById('collects').innerHTML = `<strong>收藏數：</strong> <span>${book.collect}</span>`;
             document.getElementById('content').innerHTML = `<span>${book.content}</span>`;
 
             // 渲染書籍描述
@@ -102,10 +139,7 @@ document.addEventListener("DOMContentLoaded", async function() {
                     // 更新點讚數
                     const likeCountElement = document.getElementById('like-count');
                     likeCountElement.textContent = updatedBook.like;
-
-                    // 更新其他可能變化的信息
-                    document.getElementById('likes').innerHTML = `<strong>點讚數：</strong> <span>${updatedBook.like}</span>`;
-                    // document.getElementById('collects').innerHTML = `<strong>收藏數：</strong> <span>${updatedBook.collect}</span>`;
+                    updateCountDisplay('like-count', updatedBook.like);
 
                     // 更新全局的 book 對象
                     book = updatedBook;
@@ -150,9 +184,7 @@ document.addEventListener("DOMContentLoaded", async function() {
                     // 更新收藏數
                     const collectCountElement = document.getElementById('collect-count');
                     collectCountElement.textContent = updatedBook.collect;
-
-                    // 更新其他可能變化的信息
-                    document.getElementById('collects').innerHTML = `<strong>收藏數：</strong> <span>${updatedBook.collect}</span>`;
+                    updateCountDisplay('collect-count', updatedBook.collect);
 
                     // 更新全局的 book 對象
                     book = updatedBook;
@@ -162,11 +194,25 @@ document.addEventListener("DOMContentLoaded", async function() {
                 }
             });
 
+            hideLoading(); // 隱藏 loading
         } catch (error) {
             console.error("無法加載書籍詳細信息：", error);
+            hideLoading(); // 發生錯誤時也要隱藏 loading
         }
     } else {
         console.error("缺少 bookId");
+        hideLoading(); // 如果沒有 bookId，也隱藏 loading
+    }
+
+    // 新增的函數：更新計數顯示
+    function updateCountDisplay(elementId, count) {
+        const countElement = document.getElementById(elementId);
+        if (count >= 1) {
+            countElement.textContent = count;
+            countElement.style.display = 'flex'; // 或 'block'，取決於您的樣式需求
+        } else {
+            countElement.style.display = 'none';
+        }
     }
 
     // 確認 user 是否已經對書按讚或收藏
@@ -232,12 +278,25 @@ document.addEventListener("DOMContentLoaded", async function() {
         const submitButton = document.getElementById('submit-button');
         const inputBox = document.getElementById('input-box');
         const bookshelfReviewTitleCommentQuote = document.getElementById('bookshelfReviewTitleCommentQuote').querySelector('h2');
+        const loadingContainer = document.querySelector('.loading-container-b');
 
         let currentLoadFunction = loadComments;
 
         // 設置初始 active 狀態
         setActiveState(bLeftButton);
         updateBookshelfTitle('comments');
+
+        // 顯示載入動畫
+        function showLoading() {
+            loadingContainer.style.display = 'flex';
+            containerB.classList.remove('loaded');
+        }
+
+        // 隱藏載入動畫
+        function hideLoading() {
+            loadingContainer.style.display = 'none';
+            containerB.classList.add('loaded');
+        }
 
         const urlParams = new URLSearchParams(window.location.search);
         const bookId = urlParams.get('bookId');
@@ -286,6 +345,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         async function loadComments() {
             if (isLoading || !hasMoreComments) return;
             isLoading = true;
+            showLoading();
 
             try {
                 const response = await fetch(`/api/bookPage/switchToComment?bookId=${bookId}&offset=${commentOffset}&limit=${limit}`);
@@ -304,6 +364,7 @@ document.addEventListener("DOMContentLoaded", async function() {
                 console.error("无法加载评论：", error);
             } finally {
                 isLoading = false;
+                hideLoading();
             }
         }
 
@@ -311,6 +372,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         async function loadQuotes() {
             if (isLoading || !hasMoreQuotes) return;
             isLoading = true;
+            showLoading();
 
             try {
                 const response = await fetch(`/api/bookPage/switchToQuote?bookId=${bookId}&offset=${quoteOffset}&limit=${limit}`);
@@ -329,6 +391,7 @@ document.addEventListener("DOMContentLoaded", async function() {
                 console.error("无法加载引用：", error);
             } finally {
                 isLoading = false;
+                hideLoading();
             }
         }
 

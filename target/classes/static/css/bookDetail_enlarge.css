@@ -1,12 +1,5 @@
 /* bookDetail.css */
 /* 容器 a 的樣式 */
-/*.container-a {*/
-/*    width: 60%;*/
-/*    margin: 20px auto;*/
-/*    display: flex;*/
-/*    flex-direction: column;*/
-/*}*/
-
 .container-a {
     width: 70%;
     margin: 10px auto;
@@ -15,6 +8,14 @@
     padding: 20px 20px 30px;
     background-color: #ffffff;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* 添加阴影以区分内容 */
+    /* loading gif */
+    min-height: 584.234px; /* 使用最小高度確保有足夠空間顯示 loading */
+    /*min-height: 1045.23px; !* 使用最小高度確保有足夠空間顯示 loading *!*/
+    overflow: visible;
+    --loading-gif-size: 150px;
+    /* flicker */
+    /* 保持原有樣式 */
+    position: relative;
 }
 
 .container-a-top {
@@ -32,20 +33,37 @@
 .container-a-1 {
     width: 100%;
     /*padding-right: 20px;*/
+    /* flicker */
+    position: relative;
+    background-color: #ffffff; /* 佔位符顏色 */
+    aspect-ratio: 341 / 440; /* 假設書籍封面的比例為 2:3，請根據實際情況調整 */
 }
 
 .container-a-1 img {
     width: 100%;
     height: auto;
+    /* flicker */
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.container-a-1 img.loaded {
+    opacity: 1;
 }
 
 .container-a-2 {
     width: 70%; /* a-2 的寬度較大 */
     word-wrap: break-word; /* 防止文字超出容器寬度 */
+    padding: 0 10px;
 }
 
 .container-a-2 div {
-    margin-bottom: 10px;
+    /*margin-bottom: 10px;*/
+    padding: 0px 10px;
 }
 
 .book-info-item {
@@ -80,38 +98,16 @@
     font-size: 14px;
 }
 
-/*.book-info-item#content {*/
-/*    position: relative;*/
-/*    padding-bottom: 30px; !* 为展开按钮留出空间 *!*/
-/*}*/
-
-/*.expand-button {*/
-/*    position: absolute;*/
-/*    bottom: 0;*/
-/*    left: 100px; !* 与其他标签对齐 *!*/
-/*    background-color: transparent;*/
-/*    border: none;*/
-/*    color: #007bff;*/
-/*    cursor: pointer;*/
-/*    padding: 5px 10px;*/
-/*    font-size: 0.9em;*/
-/*}*/
-
-/*.expand-button:hover {*/
-/*    text-decoration: underline;*/
-/*}*/
-
-/*.truncated-content, .full-content {*/
-/*    display: inline;*/
-/*}*/
-
-/*.full-content {*/
-/*    display: none;*/
-/*}*/
+#content {
+    font-size: 16px;
+    max-height: 278px;
+    overflow-y: auto; /* 內容超過 max-height 時顯示垂直滾動條 */
+    padding-right: 10px; /* 為滾動條預留空間 */
+}
 
 .container-a-3 {
     width: 100%; /* a-3 寬度與 a-1, a-2 的總和一致 */
-    margin-top: 20px;
+    /*margin-top: 10px;*/
     padding-top: 10px;
     border-top: 1px solid #ddd;
     word-wrap: break-word; /* 防止文字超出容器寬度 */
@@ -120,31 +116,39 @@
 .container-a-3-long-content {
     max-height: 400px; /* 可選：最大高度，超過此高度後可滾動 */
     overflow-y: auto;
+    font-size: 16px;
+    /*margin: 0px 5px;*/
+    padding: 18px;
 }
 
 /* 書封下面按鈕 */
 .container-a-1-buttons {
-    width: 80%;
+    width: 91%;
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    margin: 10px auto 0; /* 使用 auto 左右边距实现水平居中 */
+    margin: 10px auto 28px; /* 使用 auto 左右边距实现水平居中 */
+}
+
+.top-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px; /* 調整兩個按鈕之間的間距 */
+    margin-bottom: 10px; /* 與下方 library-dropdown 的間距 */
 }
 
 .action-button {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    /*justify-content: flex-start;*/
     padding: 10px;
     background-color: #f0f0f0;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     font-size: 14px;
-    margin-bottom: 5px;
-    width: 100%; /* 确保按钮填满容器宽度 */
-    position: relative; /* 为绝对定位的子元素提供参考 */
+    flex: 1; /* 讓上方兩個按鈕平均分配寬度 */
 }
 
 .action-button .btn-icon {
@@ -153,37 +157,61 @@
     margin-right: 5px;
 }
 
+.btn-icon {
+    width: 24px;
+    height: 24px;
+    position: relative; /* 為 count-display 提供定位參考 */
+}
+
 .action-button span {
     white-space: nowrap;
 }
 
 .action-button.active {
-    background-color: #50A57D; /* 選中時的背景色 */
+    background-color: #DFCB8E; /* 選中時的背景色 */
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* 輕微陰影效果 */
     /*color: #041723; !* 可以設置一個對比色,使文字更清晰 *!*/
 }
 
+/*.count-display {*/
+/*    position: absolute;*/
+/*    right: 10px;*/
+/*    background-color: #da1c1c;*/
+/*    padding: 2px 6px;*/
+/*    border-radius: 10px;*/
+/*    font-size: 14px;*/
+/*    color: #e3dbdb;*/
+/*}*/
+
 .count-display {
     position: absolute;
-    right: 10px;
-    background-color: #e0e0e0;
+    top: -5px; /* 調整此值以上下移動 */
+    right: -10px; /* 調整此值以左右移動 */
+    background-color: #F2E9CF;
     padding: 2px 6px;
     border-radius: 10px;
-    font-size: 14px;
-    color: #333;
+    font-size: 14px; /* 稍微減小字體大小 */
+    color: #000000;
+    min-width: 40px; /* 確保單個數字也能保持圓形 */
+    height: 20px; /* 設置固定高度 */
+    display: flex;
+    /*display: none; !* 初始狀態隱藏 *!*/
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2); /* 添加輕微陰影以提高可讀性 */
 }
 
-/*!* 可以为不同的按钮添加不同的颜色 *!*/
-/*#like-button .count-display {*/
-/*    background-color: #ffcccb; !* 浅红色 *!*/
-/*}*/
-
-/*#collect-button .count-display {*/
-/*    background-color: #c2f0c2; !* 浅绿色 *!*/
-/*}*/
+.action-button .material-symbols-outlined {
+    font-size: 24px; /* 調整大小以匹配原SVG */
+    width: 20px;
+    height: auto;
+    fill: currentColor; /* 使用當前文字顏色 */
+}
 
 .library-dropdown .action-button {
+    width: 100%; /* 保持 library-dropdown 按鈕全寬 */
     justify-content: center;
+    margin-bottom: 5px;
 }
 
 .library-dropdown-content {
@@ -202,26 +230,12 @@
 }
 
 /* b 大容器樣式 */
-/*.container-b {*/
-/*    width: 70%;*/
-/*    margin: 10px auto;*/
-/*    display: flex;*/
-/*    flex-direction: column;*/
-/*    max-height: 600px; !* 設置最大高度，超過此高度時出現滾動條 *!*/
-/*    overflow-y: auto; !* 允許垂直滾動 *!*/
-/*    padding: 10px 20px;*/
-/*    !*border: 2px solid #ccc;*!*/
-/*    border-radius: 10px;*/
-/*    background-color: #ffffff;*/
-/*    box-shadow: 0 2px 4px rgba(0,0,0,0.1); !* 添加阴影以区分内容 *!*/
-/*}*/
-
 .container-b {
     width: 70%;
-    margin: 10px auto;
+    margin: 10px auto 30px;
     display: flex;
     flex-direction: column;
-    min-height: 600px; /* 設置最小高度 */
+    min-height: 174px; /* 設置最小高度 */
     max-height: 600px; /* 設置最大高度，超過此高度時出現滾動條 */
     overflow-y: auto; /* 允許垂直滾動 */
     padding: 10px 20px;

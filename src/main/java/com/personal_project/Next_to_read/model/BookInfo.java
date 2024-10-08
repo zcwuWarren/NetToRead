@@ -45,9 +45,9 @@ public class BookInfo {
     @Column(name = "collect")
     private Integer collect;
 
-    @Column(name = "content", nullable = false)
+    @Column(name = "content", columnDefinition = "TEXT", nullable = false)
     private String content;
 
-    @Column(name = "description", nullable = false)
+    @Column(name = "description", columnDefinition = "TEXT", nullable = false)
     private String description;
 }

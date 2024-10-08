@@ -43,17 +43,21 @@
     justify-content: center;
     align-items: center;
     background-color: rgba(255, 255, 255, 0.8);
-    z-index: 10;
+    /*z-index: 10;*/
+    z-index: 20;
+    /*backdrop-filter: blur(5px); !* 添加背景模糊效果 *!*/
 }
 
 .loading-gif {
     width: var(--loading-gif-size, 100px); /* 默認大小為 100px，可通過 CSS 變量調整 */
     height: auto;
+    opacity: 0.3; /* 調整 gif 本身的透明度 */
 }
 
 .loading-gif-b {
     width: var(--loading-gif-size, 150px); /* 默認大小為 100px，可通過 CSS 變量調整 */
     height: auto;
+    opacity: 0.3; /* 調整 gif 本身的透明度 */
 }
 
 .latest-likes-container {

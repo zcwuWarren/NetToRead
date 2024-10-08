@@ -5,15 +5,57 @@
     box-sizing: border-box;
 }
 
+/*@font-face {*/
+/*    font-family: 'Source Han Serif TW';*/
+/*    src: url('../fonts/SourceHanSerifTC-VF.otf.woff') format('woff2-variations');*/
+/*    font-weight: 200 900;*/
+/*    font-style: normal;*/
+/*    font-display: swap;*/
+/*}*/
+
+/*!* 定義各種字重的類 *!*/
+/*.font-extralight {*/
+/*    font-weight: 200;*/
+/*}*/
+
+/*.font-light {*/
+/*    font-weight: 300;*/
+/*}*/
+
+/*.font-regular {*/
+/*    font-weight: 400;*/
+/*}*/
+
+/*.font-medium {*/
+/*    font-weight: 500;*/
+/*}*/
+
+/*.font-semibold {*/
+/*    font-weight: 600;*/
+/*}*/
+
+/*.font-bold {*/
+/*    font-weight: 700;*/
+/*}*/
+
+/*.font-heavy {*/
+/*    font-weight: 900;*/
+/*}*/
+
+/*body, p, div, span, h1, h2, h3, h4, h5, h6 {*/
+/*    font-weight: 600;*/
+/*}*/
+
 body {
     font-family: Arial, sans-serif;
+    /*font-family: 'Source Han Serif TW', serif;*/
+    /*font-variation-settings: 'wght' 600;*/
     display: flex;
     flex-direction: column;
     /*height: 100vh;*/
     min-height: 100vh; /* 改为 min-height 以允许内容增长 */
     /*background-color: #F0F8FA;*/
     background-color: rgb(249, 248, 245);
-
 }
 
 .container-header {
