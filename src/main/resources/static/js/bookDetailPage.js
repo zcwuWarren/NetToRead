@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", async function() {
             bookCover.src = book.bookCover;
             containerA1.appendChild(bookCover);
 
-            // 更新点赞和收藏按钮的数字
+            // 更新点赞和收藏按钮的裡面的数字
             document.getElementById('like-count').textContent = book.like;
             document.getElementById('collect-count').textContent = book.collect;
 
@@ -87,18 +87,31 @@ document.addEventListener("DOMContentLoaded", async function() {
                     const result = await response.json();
                     if (response.ok) {
                         alert(result.message);
-                        // 立即更新按钮状态
+                        // 切換按鈕狀態
                         likeButton.classList.toggle('active');
-                        // 更新点赞数
-                        const likeCountElement = document.getElementById('like-count');
-                        let currentLikes = parseInt(likeCountElement.textContent);
-                        likeCountElement.textContent = likeButton.classList.contains('active') ? currentLikes + 1 : currentLikes - 1;
                     } else {
                         alert(result.message);
+                        // 切換按鈕狀態
                         likeButton.classList.remove('active');
                     }
+
+                    // 無論是點讚還是取消點讚，都重新獲取書籍信息
+                    const bookInfoResponse = await fetch(`/api/bookPage/getBookInfo?bookId=${bookId}`);
+                    const updatedBook = await bookInfoResponse.json();
+
+                    // 更新點讚數
+                    const likeCountElement = document.getElementById('like-count');
+                    likeCountElement.textContent = updatedBook.like;
+
+                    // 更新其他可能變化的信息
+                    document.getElementById('likes').innerHTML = `<strong>點讚數：</strong> <span>${updatedBook.like}</span>`;
+                    // document.getElementById('collects').innerHTML = `<strong>收藏數：</strong> <span>${updatedBook.collect}</span>`;
+
+                    // 更新全局的 book 對象
+                    book = updatedBook;
+
                 } catch (error) {
-                    console.error("Error liking the book:", error);
+                    console.error("Error updating book like status:", error);
                 }
             });
 
@@ -122,18 +135,30 @@ document.addEventListener("DOMContentLoaded", async function() {
                     const result = await response.json();
                     if (response.ok) {
                         alert(result.message);
-                        // 立即更新按钮状态
+                        // 切換按鈕狀態
                         collectButton.classList.toggle('active');
-                        // 更新收藏数
-                        const collectCountElement = document.getElementById('collect-count');
-                        let currentCollects = parseInt(collectCountElement.textContent);
-                        collectCountElement.textContent = collectButton.classList.contains('active') ? currentCollects + 1 : currentCollects - 1;
                     } else {
                         alert(result.message);
+                        // 切換按鈕狀態
                         collectButton.classList.remove('active');
                     }
+
+                    // 無論是收藏還是取消收藏，都重新獲取書籍信息
+                    const bookInfoResponse = await fetch(`/api/bookPage/getBookInfo?bookId=${bookId}`);
+                    const updatedBook = await bookInfoResponse.json();
+
+                    // 更新收藏數
+                    const collectCountElement = document.getElementById('collect-count');
+                    collectCountElement.textContent = updatedBook.collect;
+
+                    // 更新其他可能變化的信息
+                    document.getElementById('collects').innerHTML = `<strong>收藏數：</strong> <span>${updatedBook.collect}</span>`;
+
+                    // 更新全局的 book 對象
+                    book = updatedBook;
+
                 } catch (error) {
-                    console.error("Error collecting the book:", error);
+                    console.error("Error updating book collect status:", error);
                 }
             });
 
@@ -144,6 +169,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         console.error("缺少 bookId");
     }
 
+    // 確認 user 是否已經對書按讚或收藏
     async function checkUserInteraction(bookId) {
         const token = localStorage.getItem('jwtToken');
         if (!token) {
@@ -171,6 +197,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         }
     }
 
+    // 若 user 已按讚或收藏，更新按鈕變色狀態
     function updateButtonStates(interaction) {
         const likeButton = document.getElementById('like-button');
         const collectButton = document.getElementById('collect-button');
