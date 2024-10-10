@@ -50,7 +50,6 @@ document.addEventListener("DOMContentLoaded", function() {
 document.addEventListener('DOMContentLoaded', function() {
     const suggestionBox = document.getElementById('suggestion-box');
     suggestionBox.style.display = 'none';  // 初始化时隐藏建议框
-    console.log('Suggestion box initially hidden');
 });
 
 document.getElementById('search-input').addEventListener('input', function() {
