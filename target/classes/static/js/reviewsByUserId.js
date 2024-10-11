@@ -159,15 +159,6 @@ document.addEventListener("DOMContentLoaded", async function() {
             });
         }
     }
-    //         // 添加 keydown 事件監聽器
-    //         textElement.addEventListener('keydown', function(event) {
-    //             if (event.key === 'Enter' && !event.shiftKey) {
-    //                 event.preventDefault();
-    //                 saveEdit(textElement, editButton, id, type);
-    //             }
-    //         });
-    //     }
-    // }
 
     function saveEdit(textElement, editButton, id, type) {
         const newText = textElement.textContent.trim();
@@ -191,14 +182,6 @@ document.addEventListener("DOMContentLoaded", async function() {
         textElement.removeEventListener('keydown', () => {});
         textElement.removeEventListener('blur', () => {});
     }
-    //     // 移除 keydown 事件監聽器
-    //     textElement.removeEventListener('keydown', function(event) {
-    //         if (event.key === 'Enter' && !event.shiftKey) {
-    //             event.preventDefault();
-    //             saveEdit(textElement, editButton, id, type);
-    //         }
-    //     });
-    // }
 
     // 編輯評論 支援 container 內編輯
     function saveEditedComment(commentId, newComment, commentTextElement) {

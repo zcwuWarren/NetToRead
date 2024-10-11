@@ -21,27 +21,6 @@ async function fetchSearchResults(keyword, page, size) {
     }
 }
 
-// function renderSearchResults(books) {
-//     const container = document.getElementById('books-container');
-//     container.innerHTML = '';
-//
-//     books.forEach(book => {
-//         const bookElement = document.createElement('div');
-//         bookElement.className = 'book-item';
-//         bookElement.innerHTML = `
-//             <div class="book-cover">
-//                 <img src="${book.bookCover}" alt="${book.bookName}">
-//             </div>
-//             <div class="book-name">${book.bookName}</div>
-//             <div class="book-author">${book.author}</div>
-//         `;
-//         bookElement.addEventListener('click', () => {
-//             window.location.href = `/bookDetail.html?bookId=${book.bookId}`;
-//         });
-//         container.appendChild(bookElement);
-//     });
-// }
-
 function renderPagination(totalPages, currentPage) {
     const paginationContainer = document.getElementById('pagination');
     paginationContainer.innerHTML = '';
