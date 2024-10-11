@@ -97,4 +97,12 @@ public interface UserBookshelfSqlRepository extends JpaRepository<UserBookshelfS
             "ORDER BY ubs.timestampCollect DESC")
     Page<UserBookshelfSql> findCollectedBooksByUserId(@Param("userId") Long userId, Pageable pageable
     );
+
+    @Query("SELECT ubs.likes FROM UserBookshelfSql ubs " +
+            "WHERE ubs.userId.userId = :userId AND ubs.bookId.bookId = :bookId")
+    Boolean findLikeStatusByUserIdAndBookId(@Param("userId") Long userId, @Param("bookId") Long bookId);
+
+    @Query("SELECT ubs.collect FROM UserBookshelfSql ubs " +
+            "WHERE ubs.userId.userId = :userId AND ubs.bookId.bookId = :bookId")
+    Boolean findCollectStatusByUserIdAndBookId(@Param("userId") Long userId, @Param("bookId") Long bookId);
 }

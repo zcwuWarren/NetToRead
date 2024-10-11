@@ -1,27 +1,20 @@
 // accountPage.js
 document.addEventListener("DOMContentLoaded", function() {
-    const switchLoginButton = document.getElementById('switch-login');
-    const switchRegisterButton = document.getElementById('switch-register');
-    const loginContainer = document.getElementById('a-login');
-    const registerContainer = document.getElementById('a-register');
-
+    const loginContainer = document.getElementById('container-a-login-1');
+    const registerContainer = document.getElementById('container-a-login-2');
+    const createAccountButton = document.getElementById('create-account');
     const loginSubmitButton = document.getElementById('submit-login');
     const registerSubmitButton = document.getElementById('submit-register');
 
-    // 取得上一頁的 URL，如果沒有上一頁，則預設為 'index.html'
     const previousPage = document.referrer || 'index.html';
-
     const token = localStorage.getItem('jwtToken');
 
     if (token && !isTokenExpired(token)) {
-        // Token 存在且未過期，跳轉到 profile 頁面
         window.location.href = '/profile.html';
     } else {
-        // 如果 token 過期或不存在，顯示頁面
         document.body.style.display = "block";
     }
 
-    // 檢查 JWT Token 是否過期
     function isTokenExpired(token) {
         const tokenParts = token.split('.');
         if (tokenParts.length !== 3) {
@@ -35,19 +28,19 @@ document.addEventListener("DOMContentLoaded", function() {
         return expirationDate < now;  // 如果當前時間大於過期時間，token 已過期
     }
 
-    // 切換至 Login
-    switchLoginButton.addEventListener('click', () => {
+    function switchToLogin() {
         loginContainer.style.display = 'block';
         registerContainer.style.display = 'none';
-    });
+    }
 
-    // 切換至 Register
-    switchRegisterButton.addEventListener('click', () => {
+    function switchToRegister() {
         loginContainer.style.display = 'none';
         registerContainer.style.display = 'block';
-    });
+    }
 
-    // Login 提交
+    // 添加事件监听器
+    createAccountButton.addEventListener('click', switchToRegister);
+
     loginSubmitButton.addEventListener('click', async () => {
         const email = document.getElementById('login-email').value;
         const password = document.getElementById('login-password').value;
@@ -71,9 +64,9 @@ document.addEventListener("DOMContentLoaded", function() {
             const result = await response.json();
 
             if (response.ok) {
-                localStorage.setItem('jwtToken', result.data.token); // 儲存 JWT token
+                localStorage.setItem('jwtToken', result.data.token);
                 alert("Login successful!");
-                window.location.href = previousPage; // 成功後跳轉至上一頁
+                window.location.href = previousPage;
             } else {
                 alert(result.message);
             }
@@ -83,7 +76,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    // Register 提交
     registerSubmitButton.addEventListener('click', async () => {
         const userName = document.getElementById('register-username').value;
         const email = document.getElementById('register-email').value;
@@ -107,9 +99,17 @@ document.addEventListener("DOMContentLoaded", function() {
 
             const result = await response.json();
 
+            if (!result.message) {
+                if (result.password)
+                    alert(result.password)
+                if (result.email)
+                    alert(result.email)
+                return;
+            }
+
             if (response.ok) {
                 alert(result.message);
-                window.location.href = 'index.html'; // 註冊成功後跳轉至首頁
+                switchToLogin(); // 注册成功后切换到登录界面
             } else {
                 alert(result.message);
             }

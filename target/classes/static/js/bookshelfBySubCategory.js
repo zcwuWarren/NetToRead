@@ -8,6 +8,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const likesButton = document.getElementById('switch-likes');
     const collectsButton = document.getElementById('switch-collects');
     const containerCategory = document.getElementById('container-category');
+    const loadingContainer = document.querySelector('.loading-container');
+    const bookshelfReviewTitleLikeCollect = document.getElementById('bookshelfReviewTitleLikeCollect').querySelector('h2');
     let isLoading = false;
     let currentApi = `/api/bookPage/latest-likes-by-subCategory?subCategory=${encodeURIComponent(subCategory)}`;
     let offset = 0;
@@ -19,18 +21,51 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
     }
 
+    // 設置初始 active 狀態
+    setActiveState(likesButton);
+    updateBookshelfTitle('likes');
+
     // 預設顯示 likes 書籍
     loadMoreBooks();
 
     // 點擊 "Likes" 按鈕時，重置並載入最新的 likes 書籍
     likesButton.addEventListener('click', () => {
         resetBookshelf(`/api/bookPage/latest-likes-by-subCategory?subCategory=${encodeURIComponent(subCategory)}`);
+        setActiveState(likesButton);
+        removeActiveState(collectsButton);
+        updateBookshelfTitle('likes');
     });
 
     // 點擊 "Collects" 按鈕時，重置並載入最新的 collects 書籍
     collectsButton.addEventListener('click', () => {
         resetBookshelf(`/api/bookPage/latest-collect-by-subCategory?subCategory=${encodeURIComponent(subCategory)}`);
+        setActiveState(collectsButton);
+        removeActiveState(likesButton);
+        updateBookshelfTitle('collects');
     });
+
+    // 設置 active 狀態
+    function setActiveState(button) {
+        button.classList.add('active');
+        button.style.backgroundColor = '#B6ADA5';
+        button.style.color = '#041723';
+    }
+
+    // 移除 active 狀態
+    function removeActiveState(button) {
+        button.classList.remove('active');
+        button.style.backgroundColor = '';
+        button.style.color = '';
+    }
+
+    // 更新書架標題
+    function updateBookshelfTitle(type) {
+        if (type === 'likes') {
+            bookshelfReviewTitleLikeCollect.textContent = '最新按讚';
+        } else if (type === 'collects') {
+            bookshelfReviewTitleLikeCollect.textContent = '最新收藏';
+        }
+    }
 
     // 監聽滾動事件
     containerCategory.addEventListener('scroll', () => {
@@ -45,13 +80,27 @@ document.addEventListener("DOMContentLoaded", function () {
         offset = 0;
         isEndOfData = false;
         containerCategory.innerHTML = '';
+        showLoading();
         loadMoreBooks();
+    }
+
+    // 顯示加載動畫
+    function showLoading() {
+        loadingContainer.style.display = 'flex';
+        containerCategory.classList.remove('loaded');
+    }
+
+    // 隱藏加載動畫
+    function hideLoading() {
+        loadingContainer.style.display = 'none';
+        containerCategory.classList.add('loaded');
     }
 
     // 加載更多書籍
     function loadMoreBooks() {
         if (isLoading || isEndOfData) return;
         isLoading = true;
+        showLoading();
 
         fetch(`${currentApi}&offset=${offset}&limit=${limit}`)
             .then(response => {
@@ -73,30 +122,14 @@ document.addEventListener("DOMContentLoaded", function () {
                     isEndOfData = true;
                     isLoading = false;
                 }
+                hideLoading();
             })
             .catch(error => {
                 console.error("Error fetching books:", error);
                 isLoading = false;
+                hideLoading();
             });
     }
-
-    // // 渲染書籍
-    // function renderBooks(books) {
-    //     books.forEach(book => {
-    //         const bookDiv = document.createElement('div');
-    //         bookDiv.classList.add('book-container');
-    //
-    //         bookDiv.addEventListener('click', function () {
-    //             window.location.href = `/bookDetail.html?bookId=${book.bookId}`;
-    //         });
-    //
-    //         bookDiv.innerHTML = `
-    //             <img src="${book.bookCover}" alt="${book.bookName}" class="book-cover">
-    //             <div class="book-name">${book.bookName}</div>
-    //         `;
-    //         containerCategory.appendChild(bookDiv);
-    //     });
-    // }
 
     // 渲染書籍 enlarge
     function renderBooks(books) {

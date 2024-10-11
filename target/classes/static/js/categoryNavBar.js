@@ -50,7 +50,6 @@ document.addEventListener("DOMContentLoaded", function() {
 document.addEventListener('DOMContentLoaded', function() {
     const suggestionBox = document.getElementById('suggestion-box');
     suggestionBox.style.display = 'none';  // 初始化时隐藏建议框
-    console.log('Suggestion box initially hidden');
 });
 
 document.getElementById('search-input').addEventListener('input', function() {
@@ -126,3 +125,18 @@ document.addEventListener('click', function(event) {
     }
 });
 
+// search book
+document.getElementById('search-input').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        performSearch();
+    }
+});
+
+document.querySelector('.search-icon').addEventListener('click', performSearch);
+
+function performSearch() {
+    const keyword = document.getElementById('search-input').value.trim();
+    if (keyword) {
+        window.location.href = `/searchResult.html?keyword=${encodeURIComponent(keyword)}`;
+    }
+}

@@ -1,10 +1,21 @@
 /* bookDetail.css */
 /* 容器 a 的樣式 */
 .container-a {
-    width: 60%;
-    margin: 20px auto;
-    display: flex;
-    flex-direction: column;
+    width: 70%;
+    margin: 10px auto;
+    /*border: 2px solid #ccc;*/
+    border-radius: 10px;
+    padding: 20px 20px 30px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* 添加阴影以区分内容 */
+    /* loading gif */
+    min-height: 584.234px; /* 使用最小高度確保有足夠空間顯示 loading */
+    /*min-height: 1045.23px; !* 使用最小高度確保有足夠空間顯示 loading *!*/
+    overflow: visible;
+    --loading-gif-size: 150px;
+    /* flicker */
+    /* 保持原有樣式 */
+    position: relative;
 }
 
 .container-a-top {
@@ -13,28 +24,90 @@
     justify-content: space-between;
 }
 
+.container-a-left {
+    width: 30%; /* 匹配原来 container-a-1 的宽度 */
+    display: flex;
+    flex-direction: column;
+}
+
 .container-a-1 {
-    width: 30%; /* a-1 的寬度較小 */
-    padding-right: 20px;
+    width: 100%;
+    /*padding-right: 20px;*/
+    /* flicker */
+    position: relative;
+    background-color: #ffffff; /* 佔位符顏色 */
+    aspect-ratio: 341 / 440; /* 假設書籍封面的比例為 2:3，請根據實際情況調整 */
 }
 
 .container-a-1 img {
     width: 100%;
     height: auto;
+    /* flicker */
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.container-a-1 img.loaded {
+    opacity: 1;
 }
 
 .container-a-2 {
     width: 70%; /* a-2 的寬度較大 */
     word-wrap: break-word; /* 防止文字超出容器寬度 */
+    padding: 0 10px;
 }
 
 .container-a-2 div {
-    margin-bottom: 10px;
+    /*margin-bottom: 10px;*/
+    padding: 0px 10px;
+}
+
+.book-info-item {
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.book-info-item strong {
+    display: inline-block;
+    width: 100px; /* 调整标签宽度 */
+    font-weight: bold;
+    color: #666666;
+}
+
+.book-info-item span {
+    color: #000000;
+}
+
+/* 可以为特定的信息项添加自定义样式 */
+#bookName strong, #bookName span {
+    font-size: 36px;
+    color: #000;
+    font-weight: bold;
+}
+
+#author strong, #author span {
+    font-style: italic;
+    font-size: 20px;
+}
+
+#publisher, #publishDate, #isbn {
+    font-size: 14px;
+}
+
+#content {
+    font-size: 16px;
+    max-height: 278px;
+    overflow-y: auto; /* 內容超過 max-height 時顯示垂直滾動條 */
+    padding-right: 10px; /* 為滾動條預留空間 */
 }
 
 .container-a-3 {
     width: 100%; /* a-3 寬度與 a-1, a-2 的總和一致 */
-    margin-top: 20px;
+    /*margin-top: 10px;*/
     padding-top: 10px;
     border-top: 1px solid #ddd;
     word-wrap: break-word; /* 防止文字超出容器寬度 */
@@ -43,62 +116,156 @@
 .container-a-3-long-content {
     max-height: 400px; /* 可選：最大高度，超過此高度後可滾動 */
     overflow-y: auto;
+    font-size: 16px;
+    /*margin: 0px 5px;*/
+    padding: 18px;
 }
 
-.like-button, .collect-button {
-    padding: 10px 20px;
-    background-color: #f0f0f0;
-    cursor: pointer;
-    margin-top: 10px;
-    border: 1px solid #ccc;
-    display: inline-block;
-    margin-right: 10px;
-}
-
-.like-collect-container {
+/* 書封下面按鈕 */
+.container-a-1-buttons {
+    width: 91%;
     display: flex;
-    /*flex-direction: column;*/
-    margin-right: 20px;
+    flex-direction: column;
+    align-items: stretch;
+    margin: 10px auto 28px; /* 使用 auto 左右边距实现水平居中 */
 }
 
-
-.like-button:hover, .collect-button:hover {
-    background-color: #ddd;
+.top-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px; /* 調整兩個按鈕之間的間距 */
+    margin-bottom: 10px; /* 與下方 library-dropdown 的間距 */
 }
 
-#A-2-like, #A-2-collect {
-    background-color: lightblue; /* 調試時用來確認按鈕是否渲染 */
-    display: block; /* 確保它們顯示為 block 元素，避免 inline-block 帶來的問題 */
-    width: auto; /* 確保寬度自動適應內容 */
+.action-button {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding: 10px;
-    margin: 10px 0; /* 添加一些外邊距，讓它們在視覺上更分明 */
-    border-radius: 5px; /* 添加圓角效果 */
-}
-
-#A-2-like:hover, #A-2-collect:hover {
-    background-color: lightgreen; /* 調試時 hover 顯示的效果 */
-}
-
-.search-library-button {
-    background-color: lightgreen;
-    display: block;
-    width: auto;
-    padding: 10px;
-    margin: 10px 0;
+    background-color: #f0f0f0;
+    border: none;
     border-radius: 5px;
     cursor: pointer;
-    text-align: center;
+    font-size: 14px;
+    flex: 1; /* 讓上方兩個按鈕平均分配寬度 */
+}
+
+.action-button .btn-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+}
+
+.btn-icon {
+    width: 24px;
+    height: 24px;
+    position: relative; /* 為 count-display 提供定位參考 */
+}
+
+.action-button span {
+    white-space: nowrap;
+}
+
+.action-button.active {
+    background-color: #DFCB8E; /* 選中時的背景色 */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* 輕微陰影效果 */
+    /*color: #041723; !* 可以設置一個對比色,使文字更清晰 *!*/
+}
+
+/*.count-display {*/
+/*    position: absolute;*/
+/*    right: 10px;*/
+/*    background-color: #da1c1c;*/
+/*    padding: 2px 6px;*/
+/*    border-radius: 10px;*/
+/*    font-size: 14px;*/
+/*    color: #e3dbdb;*/
+/*}*/
+
+.count-display {
+    position: absolute;
+    top: -5px; /* 調整此值以上下移動 */
+    right: -10px; /* 調整此值以左右移動 */
+    background-color: #F2E9CF;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 14px; /* 稍微減小字體大小 */
+    color: #000000;
+    min-width: 40px; /* 確保單個數字也能保持圓形 */
+    height: 20px; /* 設置固定高度 */
+    display: flex;
+    /*display: none; !* 初始狀態隱藏 *!*/
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2); /* 添加輕微陰影以提高可讀性 */
+}
+
+.action-button .material-symbols-outlined {
+    font-size: 24px; /* 調整大小以匹配原SVG */
+    width: 20px;
+    height: auto;
+    fill: currentColor; /* 使用當前文字顏色 */
+}
+
+.library-dropdown .action-button {
+    width: 100%; /* 保持 library-dropdown 按鈕全寬 */
+    justify-content: center;
+    margin-bottom: 5px;
+}
+
+.library-dropdown-content {
+    width: 100%; /* 使下拉内容与按钮等宽 */
+    box-sizing: border-box; /* 确保内边距不会增加总宽度 */
+}
+
+.library-dropdown:hover .library-dropdown-content {
+    display: block;
+}
+
+#library-select {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
 }
 
 /* b 大容器樣式 */
 .container-b {
-    width: 60%;
-    margin: 20px auto;
+    width: 70%;
+    margin: 10px auto 30px;
     display: flex;
     flex-direction: column;
+    min-height: 174px; /* 設置最小高度 */
     max-height: 600px; /* 設置最大高度，超過此高度時出現滾動條 */
     overflow-y: auto; /* 允許垂直滾動 */
-    padding: 0 20px;
+    padding: 10px 20px;
+    border-radius: 10px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: relative; /* 為絕對定位的子元素提供參考 */
+}
+
+.loading-container-b {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.8);
+    z-index: 10;
+}
+
+/* 新增用於控制內容可見性的樣式 */
+.container-b-content {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.container-b-content.loaded {
+    opacity: 1;
 }
 
 .comment-container, .quote-container {

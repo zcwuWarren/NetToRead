@@ -10,6 +10,10 @@ document.addEventListener("DOMContentLoaded", async function() {
     const containerB = document.getElementById('containerB');
     const bLeftButton = document.getElementById('b-left');
     const bRightButton = document.getElementById('b-right');
+    const loadingContainer = document.querySelector('.loading-container-b');
+    const bookshelfReviewTitleCommentQuote = document.getElementById('bookshelfReviewTitleCommentQuote').querySelector('h2');
+
+
     let currentLoadFunction = loadComments;
 
     // 提取 localStorage 中的 jwtToken
@@ -37,9 +41,26 @@ document.addEventListener("DOMContentLoaded", async function() {
         return JSON.parse(jsonPayload);
     }
 
+    // 設置初始 active 狀態
+    setActiveState(bLeftButton);
+    updateBookshelfTitle('comments');
+
+    // 顯示載入動畫
+    function showLoading() {
+        loadingContainer.style.display = 'flex';
+        containerB.classList.remove('loaded');
+    }
+
+    // 隱藏載入動畫
+    function hideLoading() {
+        loadingContainer.style.display = 'none';
+        containerB.classList.add('loaded');
+    }
+
     async function loadComments() {
         if (isLoading || !hasMoreComments) return;
         isLoading = true;
+        showLoading();
 
         try {
             const response = await fetch(`/api/userPage/myComment?offset=${commentOffset}&limit=${limit}`, {
@@ -64,12 +85,14 @@ document.addEventListener("DOMContentLoaded", async function() {
             console.error("無法載入評論：", error);
         } finally {
             isLoading = false;
+            hideLoading();
         }
     }
 
     async function loadQuotes() {
         if (isLoading || !hasMoreQuotes) return;
         isLoading = true;
+        showLoading();
 
         try {
             const response = await fetch(`/api/userPage/myQuote?offset=${quoteOffset}&limit=${limit}`, {
@@ -94,6 +117,7 @@ document.addEventListener("DOMContentLoaded", async function() {
             console.error("無法載入引用：", error);
         } finally {
             isLoading = false;
+            hideLoading();
         }
     }
 
@@ -112,10 +136,24 @@ document.addEventListener("DOMContentLoaded", async function() {
             </svg>
         `;
 
-            // 添加 keydown 事件監聽器
+            // 添加編輯相關的事件監聽器
+            textElement.addEventListener('compositionstart', () => {
+                isComposing = true;
+            });
+
+            textElement.addEventListener('compositionend', () => {
+                isComposing = false;
+            });
+
             textElement.addEventListener('keydown', function(event) {
-                if (event.key === 'Enter' && !event.shiftKey) {
+                if (event.key === 'Enter' && !event.shiftKey && !isComposing) {
                     event.preventDefault();
+                    saveEdit(textElement, editButton, id, type);
+                }
+            });
+
+            textElement.addEventListener('blur', function() {
+                if (!isComposing) {
                     saveEdit(textElement, editButton, id, type);
                 }
             });
@@ -138,13 +176,11 @@ document.addEventListener("DOMContentLoaded", async function() {
         </svg>
     `;
 
-        // 移除 keydown 事件監聽器
-        textElement.removeEventListener('keydown', function(event) {
-            if (event.key === 'Enter' && !event.shiftKey) {
-                event.preventDefault();
-                saveEdit(textElement, editButton, id, type);
-            }
-        });
+        // 移除所有添加的事件監聽器
+        textElement.removeEventListener('compositionstart', () => {});
+        textElement.removeEventListener('compositionend', () => {});
+        textElement.removeEventListener('keydown', () => {});
+        textElement.removeEventListener('blur', () => {});
     }
 
     // 編輯評論 支援 container 內編輯
@@ -268,6 +304,10 @@ document.addEventListener("DOMContentLoaded", async function() {
             const commentDiv = document.createElement('div');
             commentDiv.classList.add('comment-container');
 
+            commentDiv.addEventListener('click', function() {
+                window.location.href = `/bookDetail.html?bookId=${comment.bookId}`;
+            });
+
             const contentDiv = document.createElement('div');
             contentDiv.classList.add('comment-content');
 
@@ -276,12 +316,12 @@ document.addEventListener("DOMContentLoaded", async function() {
             commentText.textContent = comment.comment;  // 顯示評論文字
             commentText.setAttribute('contenteditable', 'false');
 
-            const userNameDiv = document.createElement('div');
-            userNameDiv.classList.add('comment-user-name');
-            userNameDiv.textContent = comment.userName;  // 顯示 userName
+            const bookName = document.createElement('div');
+            bookName.classList.add('comment-book-name');
+            bookName.textContent = comment.bookName;  // 顯示 userName
 
             contentDiv.appendChild(commentText);
-            contentDiv.appendChild(userNameDiv);
+            contentDiv.appendChild(bookName);
 
             commentDiv.appendChild(contentDiv);
 
@@ -332,6 +372,10 @@ document.addEventListener("DOMContentLoaded", async function() {
             const quoteDiv = document.createElement('div');
             quoteDiv.classList.add('quote-container');
 
+            quoteDiv.addEventListener('click', function() {
+                window.location.href = `/bookDetail.html?bookId=${quote.bookId}`;
+            });
+
             const contentDiv = document.createElement('div');
             contentDiv.classList.add('quote-content');
 
@@ -340,12 +384,12 @@ document.addEventListener("DOMContentLoaded", async function() {
             quoteText.textContent = quote.quote;  // 顯示引用文字
             quoteText.setAttribute('contenteditable', 'false');
 
-            const userNameDiv = document.createElement('div');
-            userNameDiv.classList.add('quote-user-name');
-            userNameDiv.textContent = quote.userName;  // 顯示 userName
+            const bookName = document.createElement('div');
+            bookName.classList.add('quote-book-name');
+            bookName.textContent = quote.bookName;  // 顯示 userName
 
             contentDiv.appendChild(quoteText);
-            contentDiv.appendChild(userNameDiv);
+            contentDiv.appendChild(bookName);
 
             quoteDiv.appendChild(contentDiv);
 
@@ -407,6 +451,9 @@ document.addEventListener("DOMContentLoaded", async function() {
         commentOffset = 0;
         hasMoreComments = true;
         currentLoadFunction = loadComments;
+        setActiveState(bLeftButton);
+        removeActiveState(bRightButton);
+        updateBookshelfTitle('comments');
         loadComments();
     });
 
@@ -416,6 +463,32 @@ document.addEventListener("DOMContentLoaded", async function() {
         quoteOffset = 0;
         hasMoreQuotes = true;
         currentLoadFunction = loadQuotes;
+        setActiveState(bRightButton);
+        removeActiveState(bLeftButton);
+        updateBookshelfTitle('quotes');
         loadQuotes();
     });
+
+    // 設置 active 狀態
+    function setActiveState(button) {
+        button.classList.add('active');
+        button.style.backgroundColor = '#B6ADA5';
+        button.style.color = '#041723';
+    }
+
+    // 移除 active 狀態
+    function removeActiveState(button) {
+        button.classList.remove('active');
+        button.style.backgroundColor = '';
+        button.style.color = '';
+    }
+
+    // 更新書架標題
+    function updateBookshelfTitle(type) {
+        if (type === 'comments') {
+            bookshelfReviewTitleCommentQuote.textContent = '我的評論';
+        } else if (type === 'quotes') {
+            bookshelfReviewTitleCommentQuote.textContent = '我的引言';
+        }
+    }
 });

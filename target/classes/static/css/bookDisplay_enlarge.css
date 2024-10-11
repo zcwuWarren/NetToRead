@@ -1,26 +1,82 @@
 /*bookDisplay.css*/
-/* 最新按讚書籍的容器 */
-/* 最新按讚書籍的容器 */
-/*.latest-likes-container {*/
-/*    display: flex;*/
-/*    justify-content: flex-start;*/
-/*    width: 60%;*/
-/*    margin: 0 auto;*/
-/*    padding-top: 20px;*/
-/*    overflow-x: auto;*/
-/*    scroll-behavior: smooth;*/
-/*    -webkit-overflow-scrolling: touch;*/
-/*}*/
-/* 需要添加的 CSS for infinite scroll*/
+/* 文字容器的通用样式 */
+.section-title-container {
+    width: 70%; /* 与 likes-and-bookname-wrapper 保持一致的宽度 */
+    margin: auto; /* 上下间距和水平居中 */
+    padding: 10px 10px; /* 内部填充 */
+    /*background-color: #f8f8f8; !* 轻微的背景色 *!*/
+    /*border-radius: 8px; !* 圆角 *!*/
+    /*box-shadow: 0 2px 4px rgba(0,0,0,0.1); !* 轻微的阴影效果 *!*/
+    text-align: center; /* 文字居中 */
+}
+
+/* 文字样式 */
+.section-title-container h2 {
+    font-size: 1.5rem;
+    color: #333;
+    /*margin-bottom: 10px;*/
+}
+
+
+/* 新的包装容器样式 */
+.likes-and-bookname-wrapper {
+    width: 70%;
+    margin: 10px auto;
+    border-radius: 10px;
+    padding: 20px 20px 30px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* 添加阴影以区分内容 */
+    --loading-gif-size: 150px; /* Adjust this value to change the GIF size */
+    min-height: 434.32px; /* 使用最小高度而不是固定高度 */
+    overflow: visible; /* 允許內容溢出 */
+    position: relative;
+}
+
+/* loading gif */
+.loading-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.8);
+    /*z-index: 10;*/
+    z-index: 20;
+    /*backdrop-filter: blur(5px); !* 添加背景模糊效果 *!*/
+}
+
+.loading-gif {
+    width: var(--loading-gif-size, 100px); /* 默認大小為 100px，可通過 CSS 變量調整 */
+    height: auto;
+    opacity: 0.3; /* 調整 gif 本身的透明度 */
+}
+
+.loading-gif-b {
+    width: var(--loading-gif-size, 150px); /* 默認大小為 100px，可通過 CSS 變量調整 */
+    height: auto;
+    opacity: 0.3; /* 調整 gif 本身的透明度 */
+}
+
+.latest-likes-container {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.latest-likes-container.loaded {
+    opacity: 1;
+}
 
 #latestLikesContainer {
     display: flex;
     overflow-x: auto;
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
-    padding: 25px;
+    padding: 25px 0; /* 移除左右内边距，因为外部容器已有内边距 */
     justify-content: flex-start;
-    width: 60%;
+    width: 100%; /* 占满包装容器的宽度 */
     margin: 0 auto;
 }
 
@@ -44,76 +100,32 @@
     display: none;
 }
 
-/* 新的書名顯示容器樣式 */
 #bookNameDisplay {
-    width: 60%;
-    margin: 10px auto;
+    width: 100%; /* 占满包装容器的宽度 */
+    margin: 10px auto 0; /* 调整上边距，移除下边距 */
     text-align: center;
     font-size: 20px;
     font-weight: bold;
-    height: 30px; /* 固定高度，避免佈局跳動 */
+    height: 30px;
     opacity: 0;
     transition: opacity 0.3s ease;
 }
 
-/*!* 新的書名容器樣式 *!*/
-/*.book-name-container {*/
-/*    position: absolute;*/
-/*    bottom: -30px; !* 調整位置，使其顯示在書籍下方 *!*/
-/*    left: 0;*/
-/*    width: 100%;*/
-/*    background-color: rgba(0, 0, 0, 0.7);*/
-/*    color: white;*/
-/*    padding: 5px;*/
-/*    text-align: center;*/
-/*    opacity: 0; !* 初始時隱藏 *!*/
-/*    transition: opacity 0.3s ease; !* 添加過渡效果 *!*/
-/*    z-index: 10; !* 確保顯示在其他元素之上 *!*/
-/*}*/
 
 /* 當鼠標懸停在 book-container 上時的效果 */
 .book-container:hover {
     transform: scale(1.18);
 }
 
-/*.book-container {*/
-/*    text-align: center;*/
-/*    flex: 1 1 calc(16.66% - 10px); !* 每個 .book-container 寬度占 16.66% 減去 margin *!*/
-/*    margin: 5px;*/
-/*}*/
-
-/*.book-cover {*/
-/*    !*width: 170.5px;*!*/
-/*    width: 100%;*/
-/*    !*height: 220px;*!*/
-/*    aspect-ratio: 31 / 40;  !* 設定圖片的寬高比 3:4 *!*/
-/*    !*width: 310px;*!*/
-/*    !*height: 400px;*!*/
-/*    object-fit: cover;*/
-/*}*/
-
-/*.book-name {*/
-/*    margin-top: 10px;*/
-/*    text-align: center;*/
-/*}*/
-
-/* 更新為 infinite scroll */
-/*.container-category  {*/
-/*    display: flex;*/
-/*    justify-content: space-between;*/
-/*    width: 60%;*/
-/*    margin: 0 auto;*/
-/*    padding-top: 20px;*/
-/*}*/
 
 #container-category {
     display: flex;
     overflow-x: auto;
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
-    padding: 25px;
+    padding: 25px 0; /* 移除左右内边距，因为外部容器已有内边距 */
     justify-content: flex-start;
-    width: 60%;
+    width: 100%; /* 占满包装容器的宽度 */
     margin: 0 auto;
 }
 
@@ -223,6 +235,89 @@
     padding: 12px 16px;
 }
 
+/* floating sidebar */
+
+/* 目前沒作用 */
+/*.floating-sidebar {*/
+/*    z-index: 1000; !* 确保与 .likes-and-bookname-wrapper 的 z-index 一致或更高 *!*/
+/*}*/
+
+.floating-sidebar {
+    z-index: 20; /* 确保侧边栏在其他元素之上 */
+    position: fixed; /* 固定位置 */
+    top: 50%; /* 垂直居中 */
+    left: 1.5rem; /* 距离左边的距离 */
+    transform: translateY(-50%); /* 精确垂直居中 */
+    display: flex;
+    flex-direction: column; /* 垂直排列按钮 */
+    justify-content: space-around;
+    gap: 1rem; /* 按钮之间的间距 */
+    padding: 0.625rem; /* 内边距 */
+    background-color: rgba(255, 255, 255, 0.5); /* 半透明白色背景 */
+    backdrop-filter: blur(16px); /* 背景模糊效果 */
+    border-radius: 0.5rem; /* 圆角 */
+    border: 1px solid rgba(229, 231, 235, 1); /* 边框 */
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* 阴影效果 */
+}
+
+/* 增加按钮大小和内边距 */
+.sidebar-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 80px;  /* 增加宽度 */
+    height: 80px; /* 增加高度 */
+    padding: 10px; /* 添加内边距 */
+    border-radius: 12px; /* 增加圆角以匹配更大的尺寸 */
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease; /* 添加transform过渡效果 */
+    color: rgb(102, 102, 102);
+    text-decoration: none;
+    position: relative; /* 为伪元素定位 */
+}
+
+/* 使用伪元素扩大可点击区域 */
+.sidebar-btn::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    border-radius: 16px; /* 稍大于按钮的圆角 */
+    z-index: -1; /* 确保在按钮下方 */
+}
+
+/* 悬停效果 */
+.sidebar-btn:hover {
+    background-color: #B6ADA5;
+    color: #041723;
+    transform: scale(1.05); /* 轻微放大效果 */
+}
+
+.sidebar-btn svg {
+    width: 36px;
+    height: 36px;
+    fill: currentColor; /* 使用当前文本颜色填充SVG */
+}
+
+/* 调整文字大小和位置 */
+.sidebar-text {
+    font-size: 14px;
+    text-align: center;
+    margin-top: 8px;
+    font-weight: 500;
+}
+
+/* 调整分隔线 */
+.sidebar-divider {
+    width: 90%;
+    margin: 10px auto;
+    border: none;
+    border-top: 1px solid #cccccc;
+}
+
+
 /* 響應式設計：在小屏幕上調整佈局 */
 @media (max-width: 600px) {
     .toggle-container {
@@ -230,5 +325,18 @@
     }
     .toggle-btn {
         flex-basis: 50%; /* 在小屏幕上每行兩個按鈕 */
+    }
+
+    .section-title-container {
+        width: 90%; /* 在小屏幕上增加宽度 */
+        padding: 10px;
+    }
+
+    .section-title-container h2 {
+        font-size: 1.2em;
+    }
+
+    .section-title-container p {
+        font-size: 0.9em;
     }
 }

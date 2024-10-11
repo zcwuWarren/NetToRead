@@ -9,10 +9,13 @@ import com.personal_project.Next_to_read.service.BookPageService;
 import com.personal_project.Next_to_read.service.QuoteService;
 import com.personal_project.Next_to_read.service.UserBookshelfSqlService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/userPage")
@@ -70,4 +73,20 @@ public class UserPageController {
         return ResponseEntity.ok(likes);
     }
 
+    @PostMapping("/userInteraction")
+    public ResponseEntity<?> getUserBookInteraction(@RequestParam Long bookId, @RequestBody TokenDto tokenDto) {
+        try {
+            String token = tokenDto.getToken();
+            boolean isLiked = userBookshelfSqlService.isBookLikedByUser(bookId, token);
+            boolean isCollected = userBookshelfSqlService.isBookCollectedByUser(bookId, token);
+
+            Map<String, Boolean> result = new HashMap<>();
+            result.put("liked", isLiked);
+            result.put("collected", isCollected);
+
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error checking user interaction");
+        }
+    }
 }

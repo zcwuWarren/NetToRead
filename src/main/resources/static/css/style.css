@@ -5,23 +5,68 @@
     box-sizing: border-box;
 }
 
+@font-face {
+    font-family: 'LXGW WenKai Mono TC';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url(https://fonts.gstatic.com/s/lxgwwenkaimonotc/v5/pxiVyos4iPVgyWx9WtufHnsIf5nkaB0HstKthvdli3mpgz50y8Xm4hwb0U1i1EaZnkpPt4i8OGF8UbVwW5aE5vAR.0.woff2) format('woff2');
+}
+
+.lxgw-wenkai-mono-tc-light {
+    font-family: "LXGW WenKai Mono TC", monospace;
+    font-weight: 300;
+    font-style: normal;
+}
+
+.lxgw-wenkai-mono-tc-regular {
+    font-family: "LXGW WenKai Mono TC", monospace;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.lxgw-wenkai-mono-tc-bold {
+    font-family: "LXGW WenKai Mono TC", monospace;
+    font-weight: 700;
+    font-style: normal;
+}
+
+#header-1 a {
+    font-family: 'LXGW WenKai Mono TC', monospace;
+    font-weight: 700; /* 您可以根據需要調整粗細 */
+}
+
+#header-1 a {
+    font-size: 2.5em; /* 調整大小 */
+    letter-spacing: 0.05em; /* 調整字母間距 */
+    /* 其他樣式... */
+}
+
 body {
     font-family: Arial, sans-serif;
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    min-height: 100vh; /* 改为 min-height 以允许内容增长 */
+    background-color: rgb(249, 248, 245);
 }
 
 .container-header {
     width: 100%;
-    background-color: #f1f1f1;
+    /*background-color: #f1f1f1;*/
+    background-color: #E6E0DB;
     padding: 10px 0;
     display: flex;
     justify-content: center;
+    position: sticky; /* 添加sticky定位 */
+    top: 0; /* 固定在顶部 */
+    z-index: 1000; /* 确保header在其他元素之上 */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* 添加阴影以区分内容 */
+    /*box-shadow: 0 2px 4px #cccccc; !* 添加阴影以区分内容 *!*/
+
 }
 
 .middle-container {
-    width: 60%;
+    width: 70%;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -37,7 +82,7 @@ body {
 .header-item a {
     text-decoration: none;
     color: black;
-    font-size: 18px;
+    font-size: 16px;
 }
 
 .header-item:hover a {
@@ -54,6 +99,7 @@ body {
     z-index: 1000;
     padding: 10px;
     min-width: 200px;
+    border-radius: 4px;
 }
 
 .header-item:hover .dropdown-content {
@@ -96,18 +142,6 @@ body {
     border: 0;
 }
 
-/* 建議框的樣式 */
-/*#suggestion-box {*/
-/*    position: absolute;*/
-/*    background-color: white;*/
-/*    border: 1px solid #ccc;*/
-/*    max-height: 200px;*/
-/*    overflow-y: auto;*/
-/*    width: 100%;*/
-/*    z-index: 1000;*/
-/*    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);*/
-/*    margin-top: 5px;*/
-/*}*/
 #suggestion-box {
     position: absolute;
     top: 100%; /* 保證 suggestion-box 顯示在輸入框下方 */
@@ -137,27 +171,25 @@ body {
     background-color: #f0f0f0;
 }
 
-
-/* 主分類與次分類樣式 */
 .category-item {
     padding: 10px;
-    background-color: #f9f9f9;
-    border: 1px solid #ccc;
-    margin: 5px 0;
     cursor: pointer;
     position: relative;
+    color: black;
+    transition: background-color 0.3s;
 }
 
 .sub-category-container {
     display: none;
     position: absolute;
     top: 0;
-    left: 100%; /* 次分類顯示在主分類的右側 */
+    left: 100%;
     background-color: white;
     box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
+    z-index: 1001;
     padding: 10px;
     min-width: 150px;
+    border-radius: 4px;
 }
 
 .category-item:hover .sub-category-container {
@@ -166,28 +198,88 @@ body {
 
 .sub-category-item {
     padding: 8px;
-    background-color: #e0e0e0;
-    margin: 2px 0;
-    white-space: nowrap;
     cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.3s;
+}
+
+.category-item:hover {
+    background-color: #f0f0f0;
 }
 
 .sub-category-item:hover {
-    background-color: #ddd;
+    background-color: #f0f0f0;
 }
 
-/* Profile */
+.category-item, .sub-category-item {
+    background-color: transparent;
+    border: none;
+    margin: 0;
+}
+
+.profile-box {
+    padding: 5px 0;
+}
+
 .profile-item {
     padding: 8px;
-    margin: 5px 0;
     cursor: pointer;
+    transition: background-color 0.3s;
 }
 
 .profile-item a {
     text-decoration: none;
     color: black;
+    display: block;
 }
 
 .profile-item:hover {
-    background-color: #ddd;
+    background-color: #f0f0f0;
+}
+
+/* navigator bar svg icon*/
+.material-symbols-outlined {
+    font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24;
+    color: #041723; /* 设置图标颜色为 #041723 */
+    margin-right: 8px; /* 在图标和文字之间添加一些间距 */
+}
+
+.search-icon {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #041723; /* 与 Category 图标相同的颜色 */
+    cursor: pointer;
+}
+
+.account-icon {
+    font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24;
+    color: #041723; /* 与其他图标相同的颜色 */
+    margin-right: 8px; /* 在图标和文字之间添加一些间距 */
+    font-size: 24px; /* 或者与其他图标相同的大小 */
+}
+
+.home-icon {
+    font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24;
+    color: #041723; /* 与其他图标相同的颜色 */
+    margin-right: 8px; /* 在图标和文字之间添加一些间距 */
+    font-size: 24px; /* 或者与其他图标相同的大小 */
+}
+
+#header-1, #header-2, #header-3 {
+    display: flex;
+    align-items: center;
 }

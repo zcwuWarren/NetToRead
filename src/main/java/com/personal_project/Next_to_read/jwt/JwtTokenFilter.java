@@ -40,6 +40,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        log.info("JWT Token Filter");
         try {
             String jwtToken = retrieveToken(request);
             if (jwtToken == null || !jwtTokenUtil.validateToken(jwtToken)) {

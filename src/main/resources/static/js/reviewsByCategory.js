@@ -10,15 +10,35 @@ document.addEventListener("DOMContentLoaded", async function() {
     const containerB = document.getElementById('containerB');
     const bLeftButton = document.getElementById('b-left');
     const bRightButton = document.getElementById('b-right');
+    const loadingContainer = document.querySelector('.loading-container-b');
+    const bookshelfReviewTitleCommentQuote = document.getElementById('bookshelfReviewTitleCommentQuote').querySelector('h2');
+
     let currentLoadFunction = loadComments;
+
+    // 設置初始 active 狀態
+    setActiveState(bLeftButton);
+    updateBookshelfTitle('comments');
 
     const urlParams = new URLSearchParams(window.location.search);
     const subCategory = urlParams.get('subCategory');
+
+    // 顯示載入動畫
+    function showLoading() {
+        loadingContainer.style.display = 'flex';
+        containerB.classList.remove('loaded');
+    }
+
+    // 隱藏載入動畫
+    function hideLoading() {
+        loadingContainer.style.display = 'none';
+        containerB.classList.add('loaded');
+    }
 
     // 加載評論
     async function loadComments() {
         if (isLoading || !hasMoreComments) return;
         isLoading = true;
+        showLoading();
 
         try {
             const response = await fetch(`/api/bookPage/latest-comments-by-subCategory?subCategory=${subCategory}&offset=${commentOffset}&limit=${limit}`);
@@ -37,6 +57,7 @@ document.addEventListener("DOMContentLoaded", async function() {
             console.error("無法載入評論：", error);
         } finally {
             isLoading = false;
+            hideLoading();
         }
     }
 
@@ -44,6 +65,7 @@ document.addEventListener("DOMContentLoaded", async function() {
     async function loadQuotes() {
         if (isLoading || !hasMoreQuotes) return;
         isLoading = true;
+        showLoading();
 
         try {
             const response = await fetch(`/api/bookPage/latest-quotes-by-subCategory?subCategory=${subCategory}&offset=${quoteOffset}&limit=${limit}`);
@@ -62,6 +84,7 @@ document.addEventListener("DOMContentLoaded", async function() {
             console.error("無法載入引用：", error);
         } finally {
             isLoading = false;
+            hideLoading();
         }
     }
 
@@ -133,6 +156,9 @@ document.addEventListener("DOMContentLoaded", async function() {
         commentOffset = 0;
         hasMoreComments = true;
         currentLoadFunction = loadComments;
+        setActiveState(bLeftButton);
+        removeActiveState(bRightButton);
+        updateBookshelfTitle('comments');
         loadComments();
     });
 
@@ -142,6 +168,32 @@ document.addEventListener("DOMContentLoaded", async function() {
         quoteOffset = 0;
         hasMoreQuotes = true;
         currentLoadFunction = loadQuotes;
+        setActiveState(bRightButton);
+        removeActiveState(bLeftButton);
+        updateBookshelfTitle('quotes');
         loadQuotes();
     });
+
+    // 設置 active 狀態
+    function setActiveState(button) {
+        button.classList.add('active');
+        button.style.backgroundColor = '#B6ADA5';
+        button.style.color = '#041723';
+    }
+
+    // 移除 active 狀態
+    function removeActiveState(button) {
+        button.classList.remove('active');
+        button.style.backgroundColor = '';
+        button.style.color = '';
+    }
+
+    // 更新書架標題
+    function updateBookshelfTitle(type) {
+        if (type === 'comments') {
+            bookshelfReviewTitleCommentQuote.textContent = '最新評論';
+        } else if (type === 'quotes') {
+            bookshelfReviewTitleCommentQuote.textContent = '最新引言';
+        }
+    }
 });
