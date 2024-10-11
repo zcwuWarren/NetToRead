@@ -89,7 +89,6 @@ document.addEventListener("DOMContentLoaded", function() {
         const registerForm = { userName, email, password };
 
         try {
-            console.log("test1")
             const response = await fetch('/api/auth/register', {
                 method: 'POST',
                 headers: {
@@ -97,35 +96,26 @@ document.addEventListener("DOMContentLoaded", function() {
                 },
                 body: JSON.stringify(registerForm)
             });
-            console.log(response);
 
             const result = await response.json();
-            console.log(result);
 
             if (!result.message) {
                 if (result.password)
                     alert(result.password)
                 if (result.email)
                     alert(result.email)
-                //alert("Please check input. ");
                 return;
             }
 
             if (response.ok) {
                 alert(result.message);
                 switchToLogin(); // 注册成功后切换到登录界面
-                console.log("test3")
-
             } else {
                 alert(result.message);
-                console.log("test4")
-
             }
         } catch (error) {
             console.error("Registration failed: ", error);
             alert("Registration failed. Please try again.");
-            console.log("test5")
-
         }
     });
 });

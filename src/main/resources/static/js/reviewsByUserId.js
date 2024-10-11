@@ -136,10 +136,24 @@ document.addEventListener("DOMContentLoaded", async function() {
             </svg>
         `;
 
-            // 添加 keydown 事件監聽器
+            // 添加編輯相關的事件監聽器
+            textElement.addEventListener('compositionstart', () => {
+                isComposing = true;
+            });
+
+            textElement.addEventListener('compositionend', () => {
+                isComposing = false;
+            });
+
             textElement.addEventListener('keydown', function(event) {
-                if (event.key === 'Enter' && !event.shiftKey) {
+                if (event.key === 'Enter' && !event.shiftKey && !isComposing) {
                     event.preventDefault();
+                    saveEdit(textElement, editButton, id, type);
+                }
+            });
+
+            textElement.addEventListener('blur', function() {
+                if (!isComposing) {
                     saveEdit(textElement, editButton, id, type);
                 }
             });
@@ -162,13 +176,11 @@ document.addEventListener("DOMContentLoaded", async function() {
         </svg>
     `;
 
-        // 移除 keydown 事件監聽器
-        textElement.removeEventListener('keydown', function(event) {
-            if (event.key === 'Enter' && !event.shiftKey) {
-                event.preventDefault();
-                saveEdit(textElement, editButton, id, type);
-            }
-        });
+        // 移除所有添加的事件監聽器
+        textElement.removeEventListener('compositionstart', () => {});
+        textElement.removeEventListener('compositionend', () => {});
+        textElement.removeEventListener('keydown', () => {});
+        textElement.removeEventListener('blur', () => {});
     }
 
     // 編輯評論 支援 container 內編輯

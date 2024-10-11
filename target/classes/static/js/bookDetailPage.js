@@ -265,7 +265,10 @@ document.addEventListener("DOMContentLoaded", async function() {
         let isLoading = false;
         let hasMoreComments = true;
         let hasMoreQuotes = true;
-        let currentMode = 'comment'; // 预设为 Comment 模式
+        let currentMode = 'comment'; // default  is Comment mode
+        let isComposing = false; // prevent select word by pressing enter cause accidentally submit
+        let isSubmitting = false; // for debounce
+
 
         const commentsContainer = document.getElementById('containerB');
         const bLeftButton = document.getElementById('b-left');
@@ -406,15 +409,39 @@ document.addEventListener("DOMContentLoaded", async function() {
             </svg>
         `;
 
-                // 添加 keydown 事件監聽器
+                // 添加編輯相關的事件監聽器
+                textElement.addEventListener('compositionstart', () => {
+                    isComposing = true;
+                });
+
+                textElement.addEventListener('compositionend', () => {
+                    isComposing = false;
+                });
+
                 textElement.addEventListener('keydown', function(event) {
-                    if (event.key === 'Enter' && !event.shiftKey) {
+                    if (event.key === 'Enter' && !event.shiftKey && !isComposing) {
                         event.preventDefault();
+                        saveEdit(textElement, editButton, id, type);
+                    }
+                });
+
+                textElement.addEventListener('blur', function() {
+                    if (!isComposing) {
                         saveEdit(textElement, editButton, id, type);
                     }
                 });
             }
         }
+
+        //         // 添加 keydown 事件監聽器
+        //         textElement.addEventListener('keydown', function(event) {
+        //             if (event.key === 'Enter' && !event.shiftKey) {
+        //                 event.preventDefault();
+        //                 saveEdit(textElement, editButton, id, type);
+        //             }
+        //         });
+        //     }
+        // }
 
         function saveEdit(textElement, editButton, id, type) {
             const newText = textElement.textContent.trim();
@@ -432,14 +459,21 @@ document.addEventListener("DOMContentLoaded", async function() {
         </svg>
     `;
 
-            // 移除 keydown 事件監聽器
-            textElement.removeEventListener('keydown', function(event) {
-                if (event.key === 'Enter' && !event.shiftKey) {
-                    event.preventDefault();
-                    saveEdit(textElement, editButton, id, type);
-                }
-            });
+            // 移除所有添加的事件監聽器
+            textElement.removeEventListener('compositionstart', () => {});
+            textElement.removeEventListener('compositionend', () => {});
+            textElement.removeEventListener('keydown', () => {});
+            textElement.removeEventListener('blur', () => {});
         }
+
+        //     // 移除 keydown 事件監聽器
+        //     textElement.removeEventListener('keydown', function(event) {
+        //         if (event.key === 'Enter' && !event.shiftKey) {
+        //             event.preventDefault();
+        //             saveEdit(textElement, editButton, id, type);
+        //         }
+        //     });
+        // }
 
         // 編輯評論 支援 container 內編輯
         function saveEditedComment(commentId, newComment, commentTextElement) {
@@ -686,9 +720,9 @@ document.addEventListener("DOMContentLoaded", async function() {
 
         function updateUIForMode(mode) {
             if (mode === 'comment') {
-                inputBox.placeholder = "Write a Comment";
+                inputBox.placeholder = "Please login to write a Comment";
             } else {
-                inputBox.placeholder = "Write a Quote";
+                inputBox.placeholder = "Please login to write a Quote";
             }
         }
 
@@ -723,18 +757,36 @@ document.addEventListener("DOMContentLoaded", async function() {
             loadQuotes();
         });
 
-        // 提交评论或引用
-        async function handleSubmit() {
+        // debounce function
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // submit with debounce
+        const debouncedHandleSubmit = debounce(async () => {
+            if (isSubmitting) return;
+            isSubmitting = true;
+
             const commentOrQuote = inputBox.value.trim();
 
             if (!token) {
                 alert("Please log in to submit.");
                 window.location.href = "account.html";
+                isSubmitting = false;
                 return;
             }
 
             if (commentOrQuote === "") {
                 alert("Input cannot be empty.");
+                isSubmitting = false;
                 return;
             }
 
@@ -782,19 +834,122 @@ document.addEventListener("DOMContentLoaded", async function() {
             } catch (error) {
                 console.error("Error submitting data:", error);
                 alert("Failed to submit. Please try again.");
+            } finally {
+                isSubmitting = false;
             }
-        }
+        }, 300); // 300毫秒的延遲
 
-        // 点击提交按钮
-        submitButton.addEventListener('click', handleSubmit);
+        inputBox.addEventListener('compositionstart', () => {
+            isComposing = true;
+        });
 
-        // 监听输入框的 keydown 事件
-        inputBox.addEventListener('keydown', async (event) => {
-            if (event.key === 'Enter' && !event.shiftKey) {
-                event.preventDefault(); // 阻止默认的换行行为
-                await handleSubmit();
+        inputBox.addEventListener('compositionend', () => {
+            isComposing = false;
+        });
+
+        inputBox.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' && !event.shiftKey && !isComposing) {
+                event.preventDefault();
+                debouncedHandleSubmit();
             }
         });
+
+        submitButton.addEventListener('click', (event) => {
+            event.preventDefault();
+            debouncedHandleSubmit();
+        });
+
+        // 提交评论或引用
+        // async function handleSubmit() {
+        //     const commentOrQuote = inputBox.value.trim();
+        //
+        //     if (!token) {
+        //         alert("Please log in to submit.");
+        //         window.location.href = "account.html";
+        //         return;
+        //     }
+        //
+        //     if (commentOrQuote === "") {
+        //         alert("Input cannot be empty.");
+        //         return;
+        //     }
+        //
+        //     try {
+        //         let apiUrl;
+        //         let requestBody;
+        //
+        //         if (currentMode === 'comment') {
+        //             apiUrl = `/api/book/addComment`;
+        //             requestBody = { comment: commentOrQuote, token: token };
+        //         } else {
+        //             apiUrl = `/api/book/addQuote`;
+        //             requestBody = { quote: commentOrQuote, token: token };
+        //         }
+        //
+        //         const response = await fetch(`${apiUrl}?bookId=${bookId}`, {
+        //             method: 'POST',
+        //             headers: {
+        //                 'Content-Type': 'application/json'
+        //             },
+        //             body: JSON.stringify(requestBody)
+        //         });
+        //
+        //         const result = await response.json();
+        //
+        //         if (response.ok) {
+        //             inputBox.value = ""; // 清空输入框
+        //
+        //             // 重新加载评论或引用
+        //             commentsContainer.innerHTML = ''; // 清空容器
+        //             if (currentMode === 'comment') {
+        //                 commentOffset = 0;
+        //                 hasMoreComments = true;
+        //                 await loadComments(1);
+        //             } else {
+        //                 quoteOffset = 0;
+        //                 hasMoreQuotes = true;
+        //                 await loadQuotes(1);
+        //             }
+        //             // 滾動到容器頂部以顯示新添加的內容
+        //             commentsContainer.scrollTop = 0;
+        //         } else {
+        //             alert(result.message || "Failed to submit.");
+        //         }
+        //     } catch (error) {
+        //         console.error("Error submitting data:", error);
+        //         alert("Failed to submit. Please try again.");
+        //     }
+        // }
+        //
+        // // 添加 compositionstart 和 compositionend 事件監聽器
+        // inputBox.addEventListener('compositionstart', () => {
+        //     isComposing = true;
+        // });
+        //
+        // inputBox.addEventListener('compositionend', () => {
+        //     isComposing = false;
+        // });
+        //
+        // // 点击提交按钮
+        // submitButton.addEventListener('click', handleSubmit);
+        //
+        // // // 监听输入框的 keydown 事件
+        // // inputBox.addEventListener('keydown', async (event) => {
+        // //     if (event.key === 'Enter' && !event.shiftKey) {
+        // //         event.preventDefault(); // 阻止默认的换行行为
+        // //         await handleSubmit();
+        // //     }
+        // // });
+        //
+        // // 修改 keydown 事件監聽器
+        // inputBox.addEventListener('keydown', async (event) => {
+        //     if (event.key === 'Enter' && !event.shiftKey) {
+        //         if (!isComposing) {
+        //             event.preventDefault(); // 阻止默認的換行行為
+        //             await handleSubmit();
+        //         }
+        //     }
+        // });
 
         // 初始加载评论
         loadComments();
