@@ -28,13 +28,15 @@ public class BookCommentSqlService {
     private final JwtTokenUtil jwtTokenUtil;
     private final BookInfoRepository bookinfoRepository;
     private final QuoteRepository quoteRepository;
+    private final QuoteService quoteService;
 
-    public BookCommentSqlService(BookCommentSqlRepository bookCommentSqlRepository, JwtTokenUtil jwtTokenUtil, BookInfoRepository bookInfoRepository, QuoteRepository quoteRepository, UserBookshelfSqlRepository userBookshelfSqlRepository) {
+    public BookCommentSqlService(BookCommentSqlRepository bookCommentSqlRepository, JwtTokenUtil jwtTokenUtil, BookInfoRepository bookInfoRepository, QuoteRepository quoteRepository, UserBookshelfSqlRepository userBookshelfSqlRepository, QuoteService quoteService) {
         this.bookCommentSqlRepository = bookCommentSqlRepository;
         this.userBookshelfSqlRepository = userBookshelfSqlRepository;
         this.jwtTokenUtil = jwtTokenUtil;
         this.bookinfoRepository = bookInfoRepository;
         this.quoteRepository = quoteRepository;
+        this.quoteService = quoteService;
     }
 
     @Transactional
@@ -73,24 +75,7 @@ public class BookCommentSqlService {
     @Transactional
     public void addQuote(Long bookId, String token, QuoteForm quoteForm) {
 
-        // get user form token
-        User user = jwtTokenUtil.getUserFromToken(token);
-
-        // find BookInfo
-        BookInfo bookInfo = bookinfoRepository.findByBookId(bookId)
-                .orElseThrow(() -> new ResourceNotFoundException("Book not found with id: " + bookId));
-
-        // set quote
-        Quote quote = new Quote();
-        quote.setBookId(bookInfo);
-        quote.setUserId(user);
-        quote.setQuote(quoteForm.getQuote());
-        quote.setTimestamp(Timestamp.from(Instant.now()));
-        quote.setMainCategory(bookInfo.getMainCategory());
-        quote.setSubCategory(bookInfo.getSubCategory());
-
-        // save quote
-        quoteRepository.save(quote);
+        quoteService.addQuote(bookId, token, quoteForm);
     }
 
     @Transactional
