@@ -4,6 +4,7 @@ import com.personal_project.Next_to_read.data.dto.*;
 import com.personal_project.Next_to_read.data.form.CommentForm;
 import com.personal_project.Next_to_read.data.form.QuoteForm;
 import com.personal_project.Next_to_read.service.BookCommentSqlService;
+import com.personal_project.Next_to_read.service.BookPageService;
 import com.personal_project.Next_to_read.service.QuoteService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -18,10 +19,12 @@ public class BookCommentSqlController {
 
     private final BookCommentSqlService bookCommentSqlService;
     private final QuoteService quoteService;
+    private final BookPageService bookPageService;
 
-    public BookCommentSqlController(BookCommentSqlService bookCommentSqlService, QuoteService quoteService) {
+    public BookCommentSqlController(BookCommentSqlService bookCommentSqlService, QuoteService quoteService, BookPageService bookPageService) {
         this.bookCommentSqlService = bookCommentSqlService;
         this.quoteService = quoteService;
+        this.bookPageService = bookPageService;
     }
 
     @PostMapping("/addComment")
@@ -48,7 +51,7 @@ public class BookCommentSqlController {
 
     @PostMapping("/deleteComment")
     public ResponseEntity<?> deleteComment(@RequestBody DeleteCommentDto request) {
-        boolean isDeleted = bookCommentSqlService.deleteComment(request.getId(), request.getToken());
+        boolean isDeleted = bookPageService.deleteComment(request.getId(), request.getToken());
 
         if (isDeleted) {
             return ResponseEntity.ok(Map.of("message", "Comment deleted successfully"));

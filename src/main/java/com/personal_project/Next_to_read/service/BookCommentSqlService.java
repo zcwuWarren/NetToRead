@@ -1,5 +1,6 @@
 package com.personal_project.Next_to_read.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.personal_project.Next_to_read.data.dto.BookCommentDto;
 import com.personal_project.Next_to_read.data.form.CommentForm;
 import com.personal_project.Next_to_read.data.form.QuoteForm;
@@ -10,6 +11,11 @@ import com.personal_project.Next_to_read.repository.BookCommentSqlRepository;
 import com.personal_project.Next_to_read.repository.BookInfoRepository;
 import com.personal_project.Next_to_read.repository.QuoteRepository;
 import com.personal_project.Next_to_read.repository.UserBookshelfSqlRepository;
+import com.personal_project.Next_to_read.util.EntityToDtoConverter.BookCommentDtoConverter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,24 +29,35 @@ import java.util.stream.Collectors;
 @Service
 public class BookCommentSqlService {
 
+    private static final Logger logger = LoggerFactory.getLogger(BookCommentSqlService.class);
+    private static final String CACHE_KEY = "latest_comments";
+    private static final int CACHE_SIZE = 200;
+
     private final BookCommentSqlRepository bookCommentSqlRepository;
     private final UserBookshelfSqlRepository userBookshelfSqlRepository;
     private final JwtTokenUtil jwtTokenUtil;
     private final BookInfoRepository bookinfoRepository;
     private final QuoteRepository quoteRepository;
     private final QuoteService quoteService;
+    private final RedisTemplate<String, String> redisTemplate;
+    private final ObjectMapper objectMapper;
+    private final BookPageService bookPageService;
 
-    public BookCommentSqlService(BookCommentSqlRepository bookCommentSqlRepository, JwtTokenUtil jwtTokenUtil, BookInfoRepository bookInfoRepository, QuoteRepository quoteRepository, UserBookshelfSqlRepository userBookshelfSqlRepository, QuoteService quoteService) {
+    public BookCommentSqlService(BookCommentSqlRepository bookCommentSqlRepository, JwtTokenUtil jwtTokenUtil, BookInfoRepository bookInfoRepository, QuoteRepository quoteRepository, UserBookshelfSqlRepository userBookshelfSqlRepository, QuoteService quoteService, RedisTemplate<String, String> redisTemplate, ObjectMapper objectMapper, BookPageService bookPageService) {
         this.bookCommentSqlRepository = bookCommentSqlRepository;
         this.userBookshelfSqlRepository = userBookshelfSqlRepository;
         this.jwtTokenUtil = jwtTokenUtil;
         this.bookinfoRepository = bookInfoRepository;
         this.quoteRepository = quoteRepository;
         this.quoteService = quoteService;
+        this.redisTemplate = redisTemplate;
+        this.objectMapper = objectMapper;
+        this.bookPageService = bookPageService;
     }
 
     @Transactional
     public boolean addOrUpdateComment(Long bookId, String token, CommentForm commentForm) {
+        logger.info("Adding new comment for book ID: {}", bookId);
 
         // get user form token
         User user = jwtTokenUtil.getUserFromToken(token);
@@ -68,6 +85,10 @@ public class BookCommentSqlService {
 
         // save comment
         bookCommentSqlRepository.save(bookCommentSql);
+        logger.info("Comment saved to database with ID: {}", bookCommentSql.getId());
+
+        // update cache
+        bookPageService.updateCache(bookCommentSql);
         return true;
     }
 
@@ -242,31 +263,14 @@ public class BookCommentSqlService {
         return comments.stream().map(comment -> new BookCommentDto(comment)).collect(Collectors.toList());
     }
 
-    public boolean deleteComment(Long id, String token) {
-        User user = jwtTokenUtil.getUserFromToken(token);
-
-        // 查找該評論
-        Optional<BookCommentSql> commentOpt = bookCommentSqlRepository.findById(id);
-        if (commentOpt.isPresent()) {
-            BookCommentSql comment = commentOpt.get();
-
-            // 驗證該評論是否屬於當前用戶
-            if (comment.getUserId().getUserId().equals(user.getUserId())) {
-                bookCommentSqlRepository.delete(comment);
-                return true;  // 刪除成功
-            }
-        }
-        return false;  // 刪除失敗，因為評論不存在或者權限不足
-    }
-
     public boolean editComment(Long id, String token, String updatedComment) {
-        // 編輯評論的邏輯
+
         User user = jwtTokenUtil.getUserFromToken(token);
         Optional<BookCommentSql> comment = bookCommentSqlRepository.findById(id);
 
         if (comment.isPresent() && comment.get().getUserId().getUserId().equals(user.getUserId())) {
             BookCommentSql commentToUpdate = comment.get();
-            commentToUpdate.setComment(updatedComment); // 更新評論內容
+            commentToUpdate.setComment(updatedComment);
             bookCommentSqlRepository.save(commentToUpdate);
             return true;
         }

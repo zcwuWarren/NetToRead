@@ -111,7 +111,7 @@ public class QuoteService {
             logger.info("Successfully retrieved {} quotes from cache", cachedQuotes.size());
             return deserializeQuotes(new ArrayList<>(cachedQuotes));
         } else {
-            logger.warn("Cache retrieval failed or incomplete. Fetching from database.");
+            logger.warn("Quote Cache retrieval failed or incomplete. Fetching from database.");
             return getQuotesFromDatabase(offset, limit);
         }
     }
@@ -270,22 +270,6 @@ public class QuoteService {
         }
         return false;
     }
-
-        //        User user = jwtTokenUtil.getUserFromToken(token);
-//
-//        // 查找該評論
-//        Optional<Quote> quoteOpt = quoteRepository.findById(id);
-//        if (quoteOpt.isPresent()) {
-//            Quote quote = quoteOpt.get();
-//
-//            // 驗證該評論是否屬於當前用戶
-//            if (quote.getUserId().getUserId().equals(user.getUserId())) {
-//                quoteRepository.delete(quote);
-//                return true;  // 刪除成功
-//            }
-//        }
-//        return false;  // 刪除失敗，因為引言不存在或者權限不足
-//    }
 
     public boolean editQuote(Long id, String token, String updatedQuote) {
         User user = jwtTokenUtil.getUserFromToken(token);
