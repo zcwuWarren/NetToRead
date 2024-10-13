@@ -14,17 +14,20 @@ import com.personal_project.Next_to_read.repository.UserBookshelfSqlRepository;
 import com.personal_project.Next_to_read.util.EntityToDtoConverter.BookCommentDtoConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,9 +45,8 @@ public class BookCommentSqlService {
     private final QuoteService quoteService;
     private final RedisTemplate<String, String> redisTemplate;
     private final ObjectMapper objectMapper;
-    private final BookPageService bookPageService;
 
-    public BookCommentSqlService(BookCommentSqlRepository bookCommentSqlRepository, JwtTokenUtil jwtTokenUtil, BookInfoRepository bookInfoRepository, QuoteRepository quoteRepository, UserBookshelfSqlRepository userBookshelfSqlRepository, QuoteService quoteService, RedisTemplate<String, String> redisTemplate, ObjectMapper objectMapper, BookPageService bookPageService) {
+    public BookCommentSqlService(BookCommentSqlRepository bookCommentSqlRepository, JwtTokenUtil jwtTokenUtil, BookInfoRepository bookInfoRepository, QuoteRepository quoteRepository, UserBookshelfSqlRepository userBookshelfSqlRepository, QuoteService quoteService, RedisTemplate<String, String> redisTemplate, ObjectMapper objectMapper) {
         this.bookCommentSqlRepository = bookCommentSqlRepository;
         this.userBookshelfSqlRepository = userBookshelfSqlRepository;
         this.jwtTokenUtil = jwtTokenUtil;
@@ -53,7 +55,119 @@ public class BookCommentSqlService {
         this.quoteService = quoteService;
         this.redisTemplate = redisTemplate;
         this.objectMapper = objectMapper;
-        this.bookPageService = bookPageService;
+    }
+
+    public List<BookCommentDto> getLatestComments(int offset, int limit) {
+        ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
+        long totalCached = zSetOps.size(CACHE_KEY);
+
+        logger.info("Attempting to fetch comments from cache. Offset: {}, Limit: {}, Total cached: {}", offset, limit, totalCached);
+
+        if (totalCached < CACHE_SIZE || offset + limit > totalCached) {
+            logger.info("Cache miss or insufficient data. Updating cache from database.");
+            updateFullCache();
+        }
+
+        // 獲取緩存中的評論
+        Set<String> cachedComments = zSetOps.reverseRange(CACHE_KEY, offset, offset + limit - 1);
+
+        if (cachedComments != null && cachedComments.size() == limit) {
+            logger.info("Successfully retrieved {} comments from cache", cachedComments.size());
+            return deserializeComments(new ArrayList<>(cachedComments));
+        } else {
+            logger.warn("Comment Cache retrieval failed or incomplete. Fetching from database.");
+            return getCommentsFromDatabase(offset, limit);
+        }
+    }
+
+    private List<BookCommentDto> getCommentsFromDatabase(int offset, int limit) {
+        Pageable pageable = PageRequest.of(offset / limit, limit, Sort.by("timestamp").descending());
+        Page<BookCommentSql> commentPage = bookCommentSqlRepository.findAll(pageable);
+        return BookCommentDtoConverter.convertToDtoList(commentPage.getContent());
+    }
+
+    private void updateFullCache() {
+        logger.info("Updating full cache with latest comments");
+        ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
+        List<BookCommentSql> latestComments = bookCommentSqlRepository.findAll(
+                PageRequest.of(0, CACHE_SIZE, Sort.by("timestamp").descending())
+        ).getContent();
+
+        redisTemplate.delete(CACHE_KEY);
+        logger.info("Cleared existing cache");
+
+        for (BookCommentSql comment : latestComments) {
+            zSetOps.add(CACHE_KEY, serializeComment(comment), comment.getTimestamp().getTime());
+        }
+        logger.info("Added {} comments to cache", latestComments.size());
+    }
+
+    private String serializeComment(BookCommentSql comment) {
+        try {
+            return objectMapper.writeValueAsString(BookCommentDtoConverter.convertToDto(comment));
+        } catch (Exception e) {
+            logger.error("Error serializing comment", e);
+            throw new RuntimeException("Error serializing comment", e);
+        }
+    }
+
+    private List<BookCommentDto> deserializeComments(List<String> serializedComments) {
+        return serializedComments.stream()
+                .map(this::deserializeComment)
+                .collect(Collectors.toList());
+    }
+
+    private BookCommentDto deserializeComment(String serialized) {
+        try {
+            return objectMapper.readValue(serialized, BookCommentDto.class);
+        } catch (IOException e) {
+            logger.error("Error deserializing comment", e);
+            throw new RuntimeException("Error deserializing comment", e);
+        }
+    }
+
+    public void updateCache(BookCommentSql newComment) {
+        logger.info("Updating cache with new comment");
+        ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
+        long cacheSize = zSetOps.size(CACHE_KEY);
+
+        if (cacheSize < CACHE_SIZE) { // 假設我們想要緩存最新的 200 條評論
+            zSetOps.add(CACHE_KEY, serializeComment(newComment), newComment.getTimestamp().getTime());
+            logger.info("Added new comment to cache. Current cache size: {}", cacheSize + 1);
+        } else {
+            Double lowestScore = zSetOps.score(CACHE_KEY, zSetOps.range(CACHE_KEY, 0, 0).iterator().next());
+            if (newComment.getTimestamp().getTime() > lowestScore) {
+                zSetOps.removeRange(CACHE_KEY, 0, 0);
+                zSetOps.add(CACHE_KEY, serializeComment(newComment), newComment.getTimestamp().getTime());
+                logger.info("Replaced oldest comment in cache with new comment");
+            }
+            else {
+                logger.info("New comment is older than cached comments, not added to cache");
+            }
+        }
+    }
+
+    public boolean deleteComment(Long id, String token) {
+        User user = jwtTokenUtil.getUserFromToken(token);
+
+        // 查找該評論
+        Optional<BookCommentSql> commentOpt = bookCommentSqlRepository.findById(id);
+        if (commentOpt.isPresent()) {
+            BookCommentSql comment = commentOpt.get();
+
+            // 驗證該評論是否屬於當前用戶
+            if (comment.getUserId().getUserId().equals(user.getUserId())) {
+                bookCommentSqlRepository.delete(comment);
+
+                // 從緩存中刪除
+                ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
+                Long removed = zSetOps.remove(CACHE_KEY, serializeComment(comment));
+                logger.info("Removed {} entries from cache", removed);
+
+                return true;  // 刪除成功
+            }
+        }
+        return false;  // 刪除失敗，因為評論不存在或者權限不足
     }
 
     @Transactional
@@ -92,7 +206,7 @@ public class BookCommentSqlService {
 
             // update cache
             try {
-                bookPageService.updateCache(bookCommentSql);
+                updateCache(bookCommentSql);
                 logger.info("Cache updated successfully for comment ID: {}", bookCommentSql.getId());
             } catch (RedisConnectionFailureException e) {
                 logger.error("Failed to update Redis cache for comment ID: {}. Error: {}", bookCommentSql.getId(), e.getMessage());
@@ -280,7 +394,7 @@ public class BookCommentSqlService {
                 bookCommentSqlRepository.save(commentToUpdate);
 
                 // 更新緩存
-                bookPageService.updateCache(commentToUpdate);
+                updateCache(commentToUpdate);
 
                 logger.info("Comment updated successfully. ID: {}", id);
                 return true;

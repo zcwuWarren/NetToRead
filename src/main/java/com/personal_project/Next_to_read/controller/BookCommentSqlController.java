@@ -51,7 +51,7 @@ public class BookCommentSqlController {
 
     @PostMapping("/deleteComment")
     public ResponseEntity<?> deleteComment(@RequestBody DeleteCommentDto request) {
-        boolean isDeleted = bookPageService.deleteComment(request.getId(), request.getToken());
+        boolean isDeleted = bookCommentSqlService.deleteComment(request.getId(), request.getToken());
 
         if (isDeleted) {
             return ResponseEntity.ok(Map.of("message", "Comment deleted successfully"));
