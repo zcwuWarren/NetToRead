@@ -150,38 +150,11 @@ public class BookPageService {
         }
     }
 
-//    private String serializeComment(BookCommentSql comment) {
-//        try {
-//            ObjectNode node = objectMapper.createObjectNode()
-//                    .put("id", comment.getId())
-//                    .put("comment", comment.getComment())
-//                    .put("timestamp", comment.getTimestamp().getTime())
-//                    .put("mainCategory", comment.getMainCategory())
-//                    .put("subCategory", comment.getSubCategory())
-//                    .put("userId", comment.getUserId().getUserId())
-//                    .put("userName", comment.getUserId().getName())
-//                    .put("bookId", comment.getBookId().getBookId())
-//                    .put("bookName", comment.getBookId().getBookName());
-//
-//            return objectMapper.writeValueAsString(node);
-//        } catch (Exception e) {
-//            logger.error("Error serializing comment", e);
-//            throw new RuntimeException("Error serializing comment", e);
-//        }
-//    }
-
     private List<BookCommentDto> deserializeComments(List<String> serializedComments) {
         return serializedComments.stream()
                 .map(this::deserializeComment)
                 .collect(Collectors.toList());
     }
-
-//    private List<BookCommentDto> deserializeComments(List<String> serializedComments) {
-//        return serializedComments.stream()
-//                .map(this::deserializeComment)
-//                .map(this::convertToBookCommentDto)
-//                .collect(Collectors.toList());
-//    }
 
     private BookCommentDto deserializeComment(String serialized) {
         try {
@@ -191,46 +164,6 @@ public class BookPageService {
             throw new RuntimeException("Error deserializing comment", e);
         }
     }
-
-//    private BookCommentSql deserializeComment(String serialized) {
-//        try {
-//            ObjectNode node = (ObjectNode) objectMapper.readTree(serialized);
-//
-//            BookCommentSql comment = new BookCommentSql();
-//            comment.setId(node.get("id").asLong());
-//            comment.setComment(node.get("comment").asText());
-//            comment.setTimestamp(new Timestamp(node.get("timestamp").asLong()));
-//            comment.setMainCategory(node.get("mainCategory").asText());
-//            comment.setSubCategory(node.get("subCategory").asText());
-//
-//            User user = new User();
-//            user.setUserId(node.get("userId").asLong());
-//            user.setName(node.get("userName").asText());
-//            comment.setUserId(user);
-//
-//            BookInfo bookInfo = new BookInfo();
-//            bookInfo.setBookId(node.get("bookId").asLong());
-//            bookInfo.setBookName(node.get("bookName").asText());
-//            comment.setBookId(bookInfo);
-//
-//            return comment;
-//        } catch (IOException e) {
-//            logger.error("Error deserializing comment", e);
-//            throw new RuntimeException("Error deserializing comment", e);
-//        }
-//    }
-
-//    private BookCommentDto convertToBookCommentDto(BookCommentSql comment) {
-//        return new BookCommentDto(
-//                comment.getUserId().getUserId(),
-//                comment.getComment(),
-//                comment.getBookId().getBookName(),
-//                DateUtil.formatDate(comment.getTimestamp()),
-//                comment.getBookId().getBookId(),
-//                comment.getUserId().getName(),
-//                comment.getId()
-//        );
-//    }
 
     public void updateCache(BookCommentSql newComment) {
         logger.info("Updating cache with new comment");

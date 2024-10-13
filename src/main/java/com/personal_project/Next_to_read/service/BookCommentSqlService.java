@@ -56,43 +56,6 @@ public class BookCommentSqlService {
         this.bookPageService = bookPageService;
     }
 
-//    @Transactional
-//    public boolean addOrUpdateComment(Long bookId, String token, CommentForm commentForm) {
-//        logger.info("Adding new comment for book ID: {}", bookId);
-//
-//        // get user form token
-//        User user = jwtTokenUtil.getUserFromToken(token);
-//
-//        // find BookInfo
-//        BookInfo bookInfo = bookinfoRepository.findByBookId(bookId)
-//                .orElseThrow(() -> new ResourceNotFoundException("Book not found with id: " + bookId));
-//
-//        // check if user already commented to the book
-//        Optional<BookCommentSql> existingComment = bookCommentSqlRepository.findByUserId_UserIdAndBookId_BookId(user.getUserId(), bookInfo.getBookId());
-//
-//        // if already commented, return false
-//        if (existingComment.isPresent()) {
-//            return false;
-//        }
-//
-//        // if not yet comment, set bookComment
-//        BookCommentSql bookCommentSql = new BookCommentSql();
-//        bookCommentSql.setBookId(bookInfo);
-//        bookCommentSql.setUserId(user);
-//        bookCommentSql.setComment(commentForm.getComment());
-//        bookCommentSql.setTimestamp(Timestamp.from(Instant.now()));
-//        bookCommentSql.setMainCategory(bookInfo.getMainCategory());
-//        bookCommentSql.setSubCategory(bookInfo.getSubCategory());
-//
-//        // save comment
-//        bookCommentSqlRepository.save(bookCommentSql);
-//        logger.info("Comment saved to database with ID: {}", bookCommentSql.getId());
-//
-//        // update cache
-//        bookPageService.updateCache(bookCommentSql);
-//        return true;
-//    }
-
     @Transactional
     public boolean addOrUpdateComment(Long bookId, String token, CommentForm commentForm) {
         try {
@@ -304,33 +267,31 @@ public class BookCommentSqlService {
         }
     }
 
-    public List<BookCommentDto> getCommentsByBookId(Long bookId) {
-
-        List<BookCommentSql> comments = bookCommentSqlRepository.findByBookId_BookIdOrderByTimestampDesc(bookId);
-        return comments.stream().map(comment -> new BookCommentDto(comment)).collect(Collectors.toList());
-    }
-
-    public List<BookCommentDto> getCommentsByUserId(String token) {
-
-        User user = jwtTokenUtil.getUserFromToken(token);
-        Long userId = user.getUserId();
-
-        List<BookCommentSql> comments = bookCommentSqlRepository.findByUserId_UserIdOrderByTimestampDesc(userId);
-        return comments.stream().map(comment -> new BookCommentDto(comment)).collect(Collectors.toList());
-    }
-
     public boolean editComment(Long id, String token, String updatedComment) {
+        try {
+            User user = jwtTokenUtil.getUserFromToken(token);
+            Optional<BookCommentSql> commentOpt = bookCommentSqlRepository.findById(id);
 
-        User user = jwtTokenUtil.getUserFromToken(token);
-        Optional<BookCommentSql> comment = bookCommentSqlRepository.findById(id);
+            if (commentOpt.isPresent() && commentOpt.get().getUserId().getUserId().equals(user.getUserId())) {
+                BookCommentSql commentToUpdate = commentOpt.get();
+                commentToUpdate.setComment(updatedComment);
 
-        if (comment.isPresent() && comment.get().getUserId().getUserId().equals(user.getUserId())) {
-            BookCommentSql commentToUpdate = comment.get();
-            commentToUpdate.setComment(updatedComment);
-            bookCommentSqlRepository.save(commentToUpdate);
-            return true;
+                // 更新資料庫
+                bookCommentSqlRepository.save(commentToUpdate);
+
+                // 更新緩存
+                bookPageService.updateCache(commentToUpdate);
+
+                logger.info("Comment updated successfully. ID: {}", id);
+                return true;
+            } else {
+                logger.warn("Failed to edit comment. ID: {}. Comment not found or unauthorized.", id);
+                return false;
+            }
+        } catch (Exception e) {
+            logger.error("Error editing comment with ID: {}", id, e);
+            return false;
         }
-        return false;
     }
 }
 

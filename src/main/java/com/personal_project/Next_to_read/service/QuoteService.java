@@ -86,15 +86,6 @@ public class QuoteService {
                 .collect(Collectors.toList());
     }
 
-//    public List<QuoteDto> getQuotesWithoutCondition(int offset, int limit) {
-//        Pageable pageable = PageRequest.of(offset / limit, limit, Sort.by("timestamp").descending());
-//
-//        Page<Quote> quotesPage = quoteRepository.findAll(pageable);
-//        return quotesPage.getContent().stream()
-//                .map(QuoteDto::new)
-//                .collect(Collectors.toList());
-//    }
-
     public List<QuoteDto> getQuotesWithoutCondition(int offset, int limit) {
         try {
             ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
@@ -117,12 +108,12 @@ public class QuoteService {
                 return getQuotesFromDatabase(offset, limit);
             }
         } catch (RedisConnectionFailureException e) {
-                logger.error("Failed to connect to Redis. Falling back to database.", e);
-                return getQuotesFromDatabase(offset, limit);
-            } catch (Exception e) {
-                logger.error("Unexpected error when fetching quotes from cache", e);
-                return getQuotesFromDatabase(offset, limit);
-            }
+            logger.error("Failed to connect to Redis. Falling back to database.", e);
+            return getQuotesFromDatabase(offset, limit);
+        } catch (Exception e) {
+            logger.error("Unexpected error when fetching quotes from cache", e);
+            return getQuotesFromDatabase(offset, limit);
+        }
     }
 
     private List<QuoteDto> getQuotesFromDatabase(int offset, int limit) {
@@ -302,17 +293,41 @@ public class QuoteService {
         }
     }
 
-    public boolean editQuote(Long id, String token, String updatedQuote) {
-        User user = jwtTokenUtil.getUserFromToken(token);
-        Optional<Quote> quote = quoteRepository.findById(id);
+    //    public boolean editQuote(Long id, String token, String updatedQuote) {
+//        User user = jwtTokenUtil.getUserFromToken(token);
+//        Optional<Quote> quote = quoteRepository.findById(id);
+//
+//        if (quote.isPresent() && quote.get().getUserId().getUserId().equals(user.getUserId())) {
+//            Quote quoteToUpdate = quote.get();
+//            quoteToUpdate.setQuote(updatedQuote); // 更新引言內容
+//            quoteRepository.save(quoteToUpdate);
+//            return true;
+//        }
+//        return false;
+//    }
+    public boolean editQuote(Long id, String token, String updatedQuoteContent) {
+        try {
+            User user = jwtTokenUtil.getUserFromToken(token);
+            Optional<Quote> quoteOpt = quoteRepository.findById(id);
 
-        if (quote.isPresent() && quote.get().getUserId().getUserId().equals(user.getUserId())) {
-            Quote quoteToUpdate = quote.get();
-            quoteToUpdate.setQuote(updatedQuote); // 更新引言內容
-            quoteRepository.save(quoteToUpdate);
-            return true;
+            if (quoteOpt.isPresent() && quoteOpt.get().getUserId().getUserId().equals(user.getUserId())) {
+                Quote quoteToUpdate = quoteOpt.get();
+                quoteToUpdate.setQuote(updatedQuoteContent);
+                quoteRepository.save(quoteToUpdate);
+
+                // 更新緩存
+                updateCache(quoteToUpdate);
+
+                logger.info("Quote updated successfully. ID: {}", id);
+                return true;
+            } else {
+                logger.warn("Failed to edit quote. ID: {}. Quote not found or unauthorized.", id);
+                return false;
+            }
+        } catch (Exception e) {
+            logger.error("Error editing quote with ID: {}", id, e);
+            return false;
         }
-        return false;
     }
 }
 
