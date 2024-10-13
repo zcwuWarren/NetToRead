@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
@@ -95,25 +96,33 @@ public class QuoteService {
 //    }
 
     public List<QuoteDto> getQuotesWithoutCondition(int offset, int limit) {
-        ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
-        long totalCached = zSetOps.size(CACHE_KEY);
+        try {
+            ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
+            long totalCached = zSetOps.size(CACHE_KEY);
 
-        logger.info("Attempting to fetch quotes from cache. Offset: {}, Limit: {}, Total cached: {}", offset, limit, totalCached);
+            logger.info("Attempting to fetch quotes from cache. Offset: {}, Limit: {}, Total cached: {}", offset, limit, totalCached);
 
-        if (totalCached < CACHE_SIZE || offset + limit > totalCached) {
-            logger.info("Cache miss or insufficient data. Updating cache from database.");
-            updateFullCache();
-        }
+            if (totalCached < CACHE_SIZE || offset + limit > totalCached) {
+                logger.info("Cache miss or insufficient data. Updating cache from database.");
+                updateFullCache();
+            }
 
-        Set<String> cachedQuotes = zSetOps.reverseRange(CACHE_KEY, offset, offset + limit - 1);
+            Set<String> cachedQuotes = zSetOps.reverseRange(CACHE_KEY, offset, offset + limit - 1);
 
-        if (cachedQuotes != null && cachedQuotes.size() == limit) {
-            logger.info("Successfully retrieved {} quotes from cache", cachedQuotes.size());
-            return deserializeQuotes(new ArrayList<>(cachedQuotes));
-        } else {
-            logger.warn("Quote Cache retrieval failed or incomplete. Fetching from database.");
-            return getQuotesFromDatabase(offset, limit);
-        }
+            if (cachedQuotes != null && cachedQuotes.size() == limit) {
+                logger.info("Successfully retrieved {} quotes from cache", cachedQuotes.size());
+                return deserializeQuotes(new ArrayList<>(cachedQuotes));
+            } else {
+                logger.warn("Quote Cache retrieval failed or incomplete. Fetching from database.");
+                return getQuotesFromDatabase(offset, limit);
+            }
+        } catch (RedisConnectionFailureException e) {
+                logger.error("Failed to connect to Redis. Falling back to database.", e);
+                return getQuotesFromDatabase(offset, limit);
+            } catch (Exception e) {
+                logger.error("Unexpected error when fetching quotes from cache", e);
+                return getQuotesFromDatabase(offset, limit);
+            }
     }
 
     private List<QuoteDto> getQuotesFromDatabase(int offset, int limit) {
@@ -125,65 +134,82 @@ public class QuoteService {
     }
 
     private void updateFullCache() {
-        logger.info("Updating full cache with latest quotes");
-        ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
-        List<Quote> latestQuotes = quoteRepository.findAll(
-                PageRequest.of(0, CACHE_SIZE, Sort.by("timestamp").descending())
-        ).getContent();
+        try {
+            logger.info("Updating full cache with latest quotes");
+            ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
+            List<Quote> latestQuotes = quoteRepository.findAll(
+                    PageRequest.of(0, CACHE_SIZE, Sort.by("timestamp").descending())
+            ).getContent();
 
-        redisTemplate.delete(CACHE_KEY);
-        logger.info("Cleared existing cache");
+            redisTemplate.delete(CACHE_KEY);
+            logger.info("Cleared existing cache");
 
-        for (Quote quote : latestQuotes) {
-            zSetOps.add(CACHE_KEY, serializeQuote(quote), quote.getTimestamp().getTime());
+            for (Quote quote : latestQuotes) {
+                zSetOps.add(CACHE_KEY, serializeQuote(quote), quote.getTimestamp().getTime());
+            }
+            logger.info("Added {} quotes to cache", latestQuotes.size());
+        } catch (RedisConnectionFailureException e) {
+            logger.error("Failed to update full cache due to Redis connection issue", e);
+        } catch (Exception e) {
+            logger.error("Unexpected error when updating full cache", e);
         }
-        logger.info("Added {} quotes to cache", latestQuotes.size());
     }
 
     @Transactional
     public void addQuote(Long bookId, String token, QuoteForm quoteForm) {
-        logger.info("Adding new quote for book ID: {}", bookId);
+        try {
+            logger.info("Adding new quote for book ID: {}", bookId);
 
-        // get user form token
-        User user = jwtTokenUtil.getUserFromToken(token);
+            // get user form token
+            User user = jwtTokenUtil.getUserFromToken(token);
 
-        // find BookInfo
-        BookInfo bookInfo = bookInfoRepository.findByBookId(bookId)
-                .orElseThrow(() -> new ResourceNotFoundException("Book not found with id: " + bookId));
+            // find BookInfo
+            BookInfo bookInfo = bookInfoRepository.findByBookId(bookId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Book not found with id: " + bookId));
 
-        // set quote
-        Quote quote = new Quote();
-        quote.setBookId(bookInfo);
-        quote.setUserId(user);
-        quote.setQuote(quoteForm.getQuote());
-        quote.setTimestamp(Timestamp.from(Instant.now()));
-        quote.setMainCategory(bookInfo.getMainCategory());
-        quote.setSubCategory(bookInfo.getSubCategory());
+            // set quote
+            Quote quote = new Quote();
+            quote.setBookId(bookInfo);
+            quote.setUserId(user);
+            quote.setQuote(quoteForm.getQuote());
+            quote.setTimestamp(Timestamp.from(Instant.now()));
+            quote.setMainCategory(bookInfo.getMainCategory());
+            quote.setSubCategory(bookInfo.getSubCategory());
 
-        quoteRepository.save(quote);
-        logger.info("Quote saved to database with ID: {}", quote.getId());
+            quoteRepository.save(quote);
+            logger.info("Quote saved to database with ID: {}", quote.getId());
 
-        // 更新緩存
-        updateCache(quote);
+            // 更新緩存
+            updateCache(quote);
+        } catch (Exception e) {
+            logger.error("Error adding new quote", e);
+            throw new RuntimeException("Failed to add new quote", e);
+        }
     }
 
     private void updateCache(Quote newQuote) {
-        logger.info("Updating cache with new quote");
-        ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
-        long cacheSize = zSetOps.size(CACHE_KEY);
+        try {
+            logger.info("Updating cache with new quote");
+            ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
+            long cacheSize = zSetOps.size(CACHE_KEY);
 
-        if (cacheSize < CACHE_SIZE) {
-            zSetOps.add(CACHE_KEY, serializeQuote(newQuote), newQuote.getTimestamp().getTime());
-            logger.info("Added new quote to cache. Current cache size: {}", cacheSize + 1);
-        } else {
-            Double lowestScore = zSetOps.score(CACHE_KEY, zSetOps.range(CACHE_KEY, 0, 0).iterator().next());
-            if (newQuote.getTimestamp().getTime() > lowestScore) {
-                zSetOps.removeRange(CACHE_KEY, 0, 0);
+            if (cacheSize < CACHE_SIZE) {
                 zSetOps.add(CACHE_KEY, serializeQuote(newQuote), newQuote.getTimestamp().getTime());
-                logger.info("Replaced oldest quote in cache with new quote");
+                logger.info("Added new quote to cache. Current cache size: {}", cacheSize + 1);
             } else {
-                logger.info("New quote is older than cached quotes, not added to cache");
+                Double lowestScore = zSetOps.score(CACHE_KEY, zSetOps.range(CACHE_KEY, 0, 0).iterator().next());
+                if (newQuote.getTimestamp().getTime() > lowestScore) {
+                    zSetOps.removeRange(CACHE_KEY, 0, 0);
+                    zSetOps.add(CACHE_KEY, serializeQuote(newQuote), newQuote.getTimestamp().getTime());
+                    logger.info("Replaced oldest quote in cache with new quote");
+                } else {
+                    logger.info("New quote is older than cached quotes, not added to cache");
+                }
             }
+        } catch (RedisConnectionFailureException e) {
+            logger.error("Failed to update cache due to Redis connection issue", e);
+        } catch (Exception e) {
+            logger.error("Unexpected error when updating cache", e);
         }
     }
 
@@ -253,22 +279,27 @@ public class QuoteService {
     }
 
     public boolean deleteQuote(Long id, String token) {
-        User user = jwtTokenUtil.getUserFromToken(token);
-        Optional<Quote> quoteOpt = quoteRepository.findById(id);
-        if (quoteOpt.isPresent()) {
-            Quote quote = quoteOpt.get();
-            if (quote.getUserId().getUserId().equals(user.getUserId())) {
-                quoteRepository.delete(quote);
+        try {
+            User user = jwtTokenUtil.getUserFromToken(token);
+            Optional<Quote> quoteOpt = quoteRepository.findById(id);
+            if (quoteOpt.isPresent()) {
+                Quote quote = quoteOpt.get();
+                if (quote.getUserId().getUserId().equals(user.getUserId())) {
+                    quoteRepository.delete(quote);
 
-                // 從緩存中刪除
-                ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
-                Long removed = zSetOps.remove(CACHE_KEY, serializeQuote(quote));
-                logger.info("Removed {} entries from cache", removed);
+                    // 從緩存中刪除
+                    ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
+                    Long removed = zSetOps.remove(CACHE_KEY, serializeQuote(quote));
+                    logger.info("Removed {} entries from cache", removed);
 
-                return true;
+                    return true;
+                }
             }
+            return false;
+        } catch (Exception e) {
+            logger.error("Error deleting quote", e);
+            return false;
         }
-        return false;
     }
 
     public boolean editQuote(Long id, String token, String updatedQuote) {

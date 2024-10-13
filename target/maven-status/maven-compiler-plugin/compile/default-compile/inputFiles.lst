@@ -1,4 +1,5 @@
 /Users/user/repo/NetToRead/src/main/java/com/personal_project/Next_to_read/NextToReadApplication.java
+/Users/user/repo/NetToRead/src/main/java/com/personal_project/Next_to_read/config/RedisConfig.java
 /Users/user/repo/NetToRead/src/main/java/com/personal_project/Next_to_read/config/SecurityConfig.java
 /Users/user/repo/NetToRead/src/main/java/com/personal_project/Next_to_read/controller/AuthController.java
 /Users/user/repo/NetToRead/src/main/java/com/personal_project/Next_to_read/controller/BookCommentSqlController.java

@@ -5,6 +5,7 @@ com/personal_project/Next_to_read/exception/auth/UserNotExistException.class
 com/personal_project/Next_to_read/validation/ValidPassword.class
 com/personal_project/Next_to_read/model/UserBookshelfSql.class
 com/personal_project/Next_to_read/repository/UserBookshelfSqlRepository.class
+com/personal_project/Next_to_read/config/RedisConfig.class
 com/personal_project/Next_to_read/validation/PasswordValidator.class
 com/personal_project/Next_to_read/service/BookCommentSqlService.class
 com/personal_project/Next_to_read/service/BookPageService.class

@@ -14,6 +14,7 @@ import com.personal_project.Next_to_read.repository.UserBookshelfSqlRepository;
 import com.personal_project.Next_to_read.util.EntityToDtoConverter.BookCommentDtoConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
@@ -55,43 +56,98 @@ public class BookCommentSqlService {
         this.bookPageService = bookPageService;
     }
 
+//    @Transactional
+//    public boolean addOrUpdateComment(Long bookId, String token, CommentForm commentForm) {
+//        logger.info("Adding new comment for book ID: {}", bookId);
+//
+//        // get user form token
+//        User user = jwtTokenUtil.getUserFromToken(token);
+//
+//        // find BookInfo
+//        BookInfo bookInfo = bookinfoRepository.findByBookId(bookId)
+//                .orElseThrow(() -> new ResourceNotFoundException("Book not found with id: " + bookId));
+//
+//        // check if user already commented to the book
+//        Optional<BookCommentSql> existingComment = bookCommentSqlRepository.findByUserId_UserIdAndBookId_BookId(user.getUserId(), bookInfo.getBookId());
+//
+//        // if already commented, return false
+//        if (existingComment.isPresent()) {
+//            return false;
+//        }
+//
+//        // if not yet comment, set bookComment
+//        BookCommentSql bookCommentSql = new BookCommentSql();
+//        bookCommentSql.setBookId(bookInfo);
+//        bookCommentSql.setUserId(user);
+//        bookCommentSql.setComment(commentForm.getComment());
+//        bookCommentSql.setTimestamp(Timestamp.from(Instant.now()));
+//        bookCommentSql.setMainCategory(bookInfo.getMainCategory());
+//        bookCommentSql.setSubCategory(bookInfo.getSubCategory());
+//
+//        // save comment
+//        bookCommentSqlRepository.save(bookCommentSql);
+//        logger.info("Comment saved to database with ID: {}", bookCommentSql.getId());
+//
+//        // update cache
+//        bookPageService.updateCache(bookCommentSql);
+//        return true;
+//    }
+
     @Transactional
     public boolean addOrUpdateComment(Long bookId, String token, CommentForm commentForm) {
-        logger.info("Adding new comment for book ID: {}", bookId);
+        try {
+            logger.info("Adding new comment for book ID: {}", bookId);
 
-        // get user form token
-        User user = jwtTokenUtil.getUserFromToken(token);
+            // get user from token
+            User user = jwtTokenUtil.getUserFromToken(token);
 
-        // find BookInfo
-        BookInfo bookInfo = bookinfoRepository.findByBookId(bookId)
-                .orElseThrow(() -> new ResourceNotFoundException("Book not found with id: " + bookId));
+            // find BookInfo
+            BookInfo bookInfo = bookinfoRepository.findByBookId(bookId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Book not found with id: " + bookId));
 
-        // check if user already commented to the book
-        Optional<BookCommentSql> existingComment = bookCommentSqlRepository.findByUserId_UserIdAndBookId_BookId(user.getUserId(), bookInfo.getBookId());
+            // check if user already commented on the book
+            Optional<BookCommentSql> existingComment = bookCommentSqlRepository.findByUserId_UserIdAndBookId_BookId(user.getUserId(), bookInfo.getBookId());
 
-        // if already commented, return false
-        if (existingComment.isPresent()) {
-            return false;
+            // if already commented, return false
+            if (existingComment.isPresent()) {
+                logger.info("User {} has already commented on book {}. Comment not added.", user.getUserId(), bookId);
+                return false;
+            }
+
+            // if not yet commented, set bookComment
+            BookCommentSql bookCommentSql = new BookCommentSql();
+            bookCommentSql.setBookId(bookInfo);
+            bookCommentSql.setUserId(user);
+            bookCommentSql.setComment(commentForm.getComment());
+            bookCommentSql.setTimestamp(Timestamp.from(Instant.now()));
+            bookCommentSql.setMainCategory(bookInfo.getMainCategory());
+            bookCommentSql.setSubCategory(bookInfo.getSubCategory());
+
+            // save comment
+            bookCommentSql = bookCommentSqlRepository.save(bookCommentSql);
+            logger.info("Comment saved to database with ID: {}", bookCommentSql.getId());
+
+            // update cache
+            try {
+                bookPageService.updateCache(bookCommentSql);
+                logger.info("Cache updated successfully for comment ID: {}", bookCommentSql.getId());
+            } catch (RedisConnectionFailureException e) {
+                logger.error("Failed to update Redis cache for comment ID: {}. Error: {}", bookCommentSql.getId(), e.getMessage());
+                // 不要因為 Redis 錯誤而回滾事務
+            } catch (Exception e) {
+                logger.error("Unexpected error when updating cache for comment ID: {}. Error: {}", bookCommentSql.getId(), e.getMessage());
+                // 不要因為緩存錯誤而回滾事務
+            }
+
+            return true;
+        } catch (ResourceNotFoundException e) {
+            logger.error("Book not found with id: {}. Error: {}", bookId, e.getMessage());
+            throw e; // 重新拋出異常，因為這是一個嚴重的錯誤
+        } catch (Exception e) {
+            logger.error("Error adding new comment for book ID: {}. Error: {}", bookId, e.getMessage());
+            throw new RuntimeException("Failed to add new comment", e);
         }
-
-        // if not yet comment, set bookComment
-        BookCommentSql bookCommentSql = new BookCommentSql();
-        bookCommentSql.setBookId(bookInfo);
-        bookCommentSql.setUserId(user);
-        bookCommentSql.setComment(commentForm.getComment());
-        bookCommentSql.setTimestamp(Timestamp.from(Instant.now()));
-        bookCommentSql.setMainCategory(bookInfo.getMainCategory());
-        bookCommentSql.setSubCategory(bookInfo.getSubCategory());
-
-        // save comment
-        bookCommentSqlRepository.save(bookCommentSql);
-        logger.info("Comment saved to database with ID: {}", bookCommentSql.getId());
-
-        // update cache
-        bookPageService.updateCache(bookCommentSql);
-        return true;
     }
-
 
     @Transactional
     public void addQuote(Long bookId, String token, QuoteForm quoteForm) {
