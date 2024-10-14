@@ -11,7 +11,7 @@
 	<groupId>com.personal-project</groupId>
 	<artifactId>Next-to-read</artifactId>
 	<!-- modify to distinguish version-->
-	<version>1011_sprint4_demo</version>
+	<version>10141701_ElastiCache_test</version>
 	<name>Next-to-read</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>
