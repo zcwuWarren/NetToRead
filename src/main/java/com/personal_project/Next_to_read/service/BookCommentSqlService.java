@@ -12,6 +12,7 @@ import com.personal_project.Next_to_read.repository.BookInfoRepository;
 import com.personal_project.Next_to_read.repository.QuoteRepository;
 import com.personal_project.Next_to_read.repository.UserBookshelfSqlRepository;
 import com.personal_project.Next_to_read.util.EntityToDtoConverter.BookCommentDtoConverter;
+import com.personal_project.Next_to_read.util.EntityToDtoConverter.BookInfoDtoConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -35,7 +36,8 @@ public class BookCommentSqlService {
 
     private static final Logger logger = LoggerFactory.getLogger(BookCommentSqlService.class);
     private static final String CACHE_KEY = "latest_comments";
-    private static final int CACHE_SIZE = 200;
+    private static final String LIKED_BOOKS_CACHE_KEY = "latest_liked_books";
+    private static final int CACHE_SIZE = 50;
 
     private final BookCommentSqlRepository bookCommentSqlRepository;
     private final UserBookshelfSqlRepository userBookshelfSqlRepository;
@@ -232,76 +234,167 @@ public class BookCommentSqlService {
         quoteService.addQuote(bookId, token, quoteForm);
     }
 
+//    // no cache
+//    @Transactional
+//    public boolean likeBook(Long bookId, String token) {
+//
+//        // get user form token
+//        User user = jwtTokenUtil.getUserFromToken(token);
+//
+//        // find BookInfo
+//        BookInfo bookInfo = bookinfoRepository.findByBookId(bookId)
+//                .orElseThrow(() -> new ResourceNotFoundException("Book not found with id: " + bookId));
+//
+//        // check if user already has a record in UserBookshelfSql
+//        Optional<UserBookshelfSql> existingRecord = userBookshelfSqlRepository.findByUserId_UserIdAndBookId_BookId(user.getUserId(), bookInfo.getBookId());
+//
+//        if (existingRecord.isPresent()) {
+//            // If record exists, check the current 'likes' status
+//            UserBookshelfSql userBookshelfSql = existingRecord.get();
+//
+//            if (Boolean.TRUE.equals(userBookshelfSql.getLikes())) {
+//                // If currently liked, cancel the like
+//                userBookshelfSql.setLikes(false);
+//                // Set timestamp_like to null when canceling the like
+//                userBookshelfSql.setTimestampLike(null);
+//
+//                // Decrease book's likes count
+//                if (bookInfo.getLikes() != null && bookInfo.getLikes() > 0) {
+//                    bookInfo.setLikes(bookInfo.getLikes() - 1);
+//                }
+//            } else {
+//                // If not liked (or previously canceled), add a like
+//                userBookshelfSql.setLikes(true);
+//                userBookshelfSql.setTimestampLike(Timestamp.from(Instant.now()));
+//
+//                // Increase book's likes count
+//                if (bookInfo.getLikes() == null) {
+//                    bookInfo.setLikes(1); // if no likes yet, set to 1
+//                } else {
+//                    bookInfo.setLikes(bookInfo.getLikes() + 1);
+//                }
+//            }
+//
+//            // Save the updated record and bookInfo
+//            userBookshelfSqlRepository.save(userBookshelfSql);
+//            bookinfoRepository.save(bookInfo);
+//
+//            return Boolean.TRUE.equals(userBookshelfSql.getLikes()); // return true if liked, false if canceled
+//        } else {
+//            // If no record exists, create a new like
+//            UserBookshelfSql userBookshelfSql = new UserBookshelfSql();
+//            userBookshelfSql.setBookId(bookInfo);
+//            userBookshelfSql.setUserId(user);
+//            userBookshelfSql.setLikes(true);
+//            userBookshelfSql.setCollect(false);
+//            userBookshelfSql.setTimestampLike(Timestamp.from(Instant.now()));// set default collect status
+//            userBookshelfSql.setMainCategory(bookInfo.getMainCategory());
+//            userBookshelfSql.setSubCategory(bookInfo.getSubCategory());
+//
+//            // Save like
+//            userBookshelfSqlRepository.save(userBookshelfSql);
+//
+//            // Increase book's likes count
+//            if (bookInfo.getLikes() == null) {
+//                bookInfo.setLikes(1); // if no likes yet, set to 1
+//            } else {
+//                bookInfo.setLikes(bookInfo.getLikes() + 1);
+//            }
+//
+//            // Save the updated bookInfo
+//            bookinfoRepository.save(bookInfo);
+//
+//            return true; // return true to indicate like was added
+//        }
+//    }
+
     @Transactional
     public boolean likeBook(Long bookId, String token) {
-
-        // get user form token
         User user = jwtTokenUtil.getUserFromToken(token);
-
-        // find BookInfo
         BookInfo bookInfo = bookinfoRepository.findByBookId(bookId)
-                .orElseThrow(() -> new ResourceNotFoundException("Book not found with id: " + bookId));
+                .orElseThrow(() -> new ResourceNotFoundException("找不到 ID 為 " + bookId + " 的書籍"));
 
-        // check if user already has a record in UserBookshelfSql
         Optional<UserBookshelfSql> existingRecord = userBookshelfSqlRepository.findByUserId_UserIdAndBookId_BookId(user.getUserId(), bookInfo.getBookId());
 
+        UserBookshelfSql userBookshelfSql;
+        boolean isLiked;
+
         if (existingRecord.isPresent()) {
-            // If record exists, check the current 'likes' status
-            UserBookshelfSql userBookshelfSql = existingRecord.get();
+            userBookshelfSql = existingRecord.get();
+            isLiked = !Boolean.TRUE.equals(userBookshelfSql.getLikes());
+            userBookshelfSql.setLikes(isLiked);
+            userBookshelfSql.setTimestampLike(isLiked ? Timestamp.from(Instant.now()) : null);
 
-            if (Boolean.TRUE.equals(userBookshelfSql.getLikes())) {
-                // If currently liked, cancel the like
-                userBookshelfSql.setLikes(false);
-                // Set timestamp_like to null when canceling the like
-                userBookshelfSql.setTimestampLike(null);
-
-                // Decrease book's likes count
-                if (bookInfo.getLikes() != null && bookInfo.getLikes() > 0) {
-                    bookInfo.setLikes(bookInfo.getLikes() - 1);
-                }
-            } else {
-                // If not liked (or previously canceled), add a like
-                userBookshelfSql.setLikes(true);
-                userBookshelfSql.setTimestampLike(Timestamp.from(Instant.now()));
-
-                // Increase book's likes count
-                if (bookInfo.getLikes() == null) {
-                    bookInfo.setLikes(1); // if no likes yet, set to 1
-                } else {
-                    bookInfo.setLikes(bookInfo.getLikes() + 1);
-                }
+            if (isLiked) {
+                bookInfo.setLikes(bookInfo.getLikes() == null ? 1 : bookInfo.getLikes() + 1);
+            } else if (bookInfo.getLikes() != null && bookInfo.getLikes() > 0) {
+                bookInfo.setLikes(bookInfo.getLikes() - 1);
             }
-
-            // Save the updated record and bookInfo
-            userBookshelfSqlRepository.save(userBookshelfSql);
-            bookinfoRepository.save(bookInfo);
-
-            return Boolean.TRUE.equals(userBookshelfSql.getLikes()); // return true if liked, false if canceled
         } else {
-            // If no record exists, create a new like
-            UserBookshelfSql userBookshelfSql = new UserBookshelfSql();
+            userBookshelfSql = new UserBookshelfSql();
             userBookshelfSql.setBookId(bookInfo);
             userBookshelfSql.setUserId(user);
             userBookshelfSql.setLikes(true);
             userBookshelfSql.setCollect(false);
-            userBookshelfSql.setTimestampLike(Timestamp.from(Instant.now()));// set default collect status
+            userBookshelfSql.setTimestampLike(Timestamp.from(Instant.now()));
             userBookshelfSql.setMainCategory(bookInfo.getMainCategory());
             userBookshelfSql.setSubCategory(bookInfo.getSubCategory());
+            isLiked = true;
 
-            // Save like
-            userBookshelfSqlRepository.save(userBookshelfSql);
+            bookInfo.setLikes(bookInfo.getLikes() == null ? 1 : bookInfo.getLikes() + 1);
+        }
 
-            // Increase book's likes count
-            if (bookInfo.getLikes() == null) {
-                bookInfo.setLikes(1); // if no likes yet, set to 1
-            } else {
-                bookInfo.setLikes(bookInfo.getLikes() + 1);
+        userBookshelfSqlRepository.save(userBookshelfSql);
+        bookinfoRepository.save(bookInfo);
+
+//        updateLikedBooksCache(bookInfo, isLiked, userBookshelfSql.getTimestampLike());
+
+        // 更新緩存
+        if (isLiked) {
+            addToLikedBooksCache(bookInfo, userBookshelfSql.getTimestampLike());
+        } else {
+            removeFromLikedBooksCache(bookInfo);
+        }
+
+        return isLiked;
+    }
+
+    public void addToLikedBooksCache(BookInfo book, Timestamp likeTimestamp) {
+        ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
+        zSetOps.add(LIKED_BOOKS_CACHE_KEY, serializeBook(book), likeTimestamp.getTime());
+        // 如果緩存大小超過限制，移除最舊的元素
+        if (zSetOps.size(LIKED_BOOKS_CACHE_KEY) > CACHE_SIZE) {
+            zSetOps.removeRange(LIKED_BOOKS_CACHE_KEY, 0, 0);
+        }
+    }
+
+    public void removeFromLikedBooksCache(BookInfo book) {
+        ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
+        zSetOps.remove(LIKED_BOOKS_CACHE_KEY, serializeBook(book));
+    }
+
+    private void updateLikedBooksCache(BookInfo book, boolean isLiked, Timestamp timestamp) {
+        ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
+        String serializedBook = serializeBook(book);
+
+        if (isLiked) {
+            zSetOps.add(LIKED_BOOKS_CACHE_KEY, serializedBook, timestamp.getTime());
+            if (zSetOps.size(LIKED_BOOKS_CACHE_KEY) > CACHE_SIZE) {
+                zSetOps.removeRange(LIKED_BOOKS_CACHE_KEY, 0, 0);
             }
+        } else {
+            zSetOps.remove(LIKED_BOOKS_CACHE_KEY, serializedBook);
+        }
 
-            // Save the updated bookInfo
-            bookinfoRepository.save(bookInfo);
+        logger.info("已更新喜歡的書籍緩存。書籍 ID: {}, 是否喜歡: {}", book.getBookId(), isLiked);
+    }
 
-            return true; // return true to indicate like was added
+    private String serializeBook(BookInfo book) {
+        try {
+            return objectMapper.writeValueAsString(BookInfoDtoConverter.convertToDto(book));
+        } catch (Exception e) {
+            logger.error("序列化書籍時發生錯誤", e);
+            throw new RuntimeException("序列化書籍失敗", e);
         }
     }
 

@@ -45,7 +45,7 @@ public class QuoteService {
 
     private static final Logger logger = LoggerFactory.getLogger(QuoteService.class);
     private static final String CACHE_KEY = "quotes_sorted_set";
-    private static final int CACHE_SIZE = 200;
+    private static final int CACHE_SIZE = 50;
 
     public QuoteService(QuoteRepository quoteRepository, JwtTokenUtil jwtTokenUtil, BookInfoRepository bookInfoRepository, RedisTemplate<String, String> redisTemplate, ObjectMapper objectMapper) {
         this.quoteRepository = quoteRepository;
