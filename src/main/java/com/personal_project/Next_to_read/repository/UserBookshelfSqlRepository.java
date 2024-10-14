@@ -2,6 +2,7 @@ package com.personal_project.Next_to_read.repository;
 
 import com.personal_project.Next_to_read.model.UserBookshelfSql;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -110,4 +111,9 @@ public interface UserBookshelfSqlRepository extends JpaRepository<UserBookshelfS
             "WHERE ubs.likes = true " +
             "ORDER BY ubs.timestampLike DESC")
     Page<UserBookshelfSql> findByLikesTrueOrderByTimestampLikeDesc(Pageable pageable);
+
+    @Query("SELECT ubs FROM UserBookshelfSql ubs " +
+            "WHERE ubs.collect = true " +
+            "ORDER BY ubs.timestampCollect DESC")
+    Page<UserBookshelfSql> findByCollectsTrueOrderByTimestampCollectDesc(Pageable pageable);
 }

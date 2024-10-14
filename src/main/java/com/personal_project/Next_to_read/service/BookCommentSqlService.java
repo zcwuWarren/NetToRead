@@ -60,24 +60,32 @@ public class BookCommentSqlService {
     }
 
     public List<BookCommentDto> getLatestComments(int offset, int limit) {
-        ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
-        long totalCached = zSetOps.size(CACHE_KEY);
+        try {
+            ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
+            long totalCached = zSetOps.size(CACHE_KEY);
 
-        logger.info("Attempting to fetch comments from cache. Offset: {}, Limit: {}, Total cached: {}", offset, limit, totalCached);
+            logger.info("Attempting to fetch comments from cache. Offset: {}, Limit: {}, Total cached: {}", offset, limit, totalCached);
 
-        if (totalCached < CACHE_SIZE || offset + limit > totalCached) {
-            logger.info("Cache miss or insufficient data. Updating cache from database.");
-            updateFullCache();
-        }
+            if (totalCached < CACHE_SIZE || offset + limit > totalCached) {
+                logger.info("Cache miss or insufficient data. Updating cache from database.");
+                updateFullCache();
+            }
 
-        // 獲取緩存中的評論
-        Set<String> cachedComments = zSetOps.reverseRange(CACHE_KEY, offset, offset + limit - 1);
+            // 獲取緩存中的評論
+            Set<String> cachedComments = zSetOps.reverseRange(CACHE_KEY, offset, offset + limit - 1);
 
-        if (cachedComments != null && cachedComments.size() == limit) {
-            logger.info("Successfully retrieved {} comments from cache", cachedComments.size());
-            return deserializeComments(new ArrayList<>(cachedComments));
-        } else {
-            logger.warn("Comment Cache retrieval failed or incomplete. Fetching from database.");
+            if (cachedComments != null && cachedComments.size() == limit) {
+                logger.info("Successfully retrieved {} comments from cache", cachedComments.size());
+                return deserializeComments(new ArrayList<>(cachedComments));
+            } else {
+                logger.warn("Comment Cache retrieval failed or incomplete. Fetching from database.");
+                return getCommentsFromDatabase(offset, limit);
+            }
+        } catch (RedisConnectionFailureException e) {
+            logger.error("Failed to connect to Redis. Falling back to database.", e);
+            return getCommentsFromDatabase(offset, limit);
+        } catch (Exception e) {
+            logger.error("Unexpected error when fetching comments from cache", e);
             return getCommentsFromDatabase(offset, limit);
         }
     }
@@ -233,80 +241,6 @@ public class BookCommentSqlService {
 
         quoteService.addQuote(bookId, token, quoteForm);
     }
-
-//    // no cache
-//    @Transactional
-//    public boolean likeBook(Long bookId, String token) {
-//
-//        // get user form token
-//        User user = jwtTokenUtil.getUserFromToken(token);
-//
-//        // find BookInfo
-//        BookInfo bookInfo = bookinfoRepository.findByBookId(bookId)
-//                .orElseThrow(() -> new ResourceNotFoundException("Book not found with id: " + bookId));
-//
-//        // check if user already has a record in UserBookshelfSql
-//        Optional<UserBookshelfSql> existingRecord = userBookshelfSqlRepository.findByUserId_UserIdAndBookId_BookId(user.getUserId(), bookInfo.getBookId());
-//
-//        if (existingRecord.isPresent()) {
-//            // If record exists, check the current 'likes' status
-//            UserBookshelfSql userBookshelfSql = existingRecord.get();
-//
-//            if (Boolean.TRUE.equals(userBookshelfSql.getLikes())) {
-//                // If currently liked, cancel the like
-//                userBookshelfSql.setLikes(false);
-//                // Set timestamp_like to null when canceling the like
-//                userBookshelfSql.setTimestampLike(null);
-//
-//                // Decrease book's likes count
-//                if (bookInfo.getLikes() != null && bookInfo.getLikes() > 0) {
-//                    bookInfo.setLikes(bookInfo.getLikes() - 1);
-//                }
-//            } else {
-//                // If not liked (or previously canceled), add a like
-//                userBookshelfSql.setLikes(true);
-//                userBookshelfSql.setTimestampLike(Timestamp.from(Instant.now()));
-//
-//                // Increase book's likes count
-//                if (bookInfo.getLikes() == null) {
-//                    bookInfo.setLikes(1); // if no likes yet, set to 1
-//                } else {
-//                    bookInfo.setLikes(bookInfo.getLikes() + 1);
-//                }
-//            }
-//
-//            // Save the updated record and bookInfo
-//            userBookshelfSqlRepository.save(userBookshelfSql);
-//            bookinfoRepository.save(bookInfo);
-//
-//            return Boolean.TRUE.equals(userBookshelfSql.getLikes()); // return true if liked, false if canceled
-//        } else {
-//            // If no record exists, create a new like
-//            UserBookshelfSql userBookshelfSql = new UserBookshelfSql();
-//            userBookshelfSql.setBookId(bookInfo);
-//            userBookshelfSql.setUserId(user);
-//            userBookshelfSql.setLikes(true);
-//            userBookshelfSql.setCollect(false);
-//            userBookshelfSql.setTimestampLike(Timestamp.from(Instant.now()));// set default collect status
-//            userBookshelfSql.setMainCategory(bookInfo.getMainCategory());
-//            userBookshelfSql.setSubCategory(bookInfo.getSubCategory());
-//
-//            // Save like
-//            userBookshelfSqlRepository.save(userBookshelfSql);
-//
-//            // Increase book's likes count
-//            if (bookInfo.getLikes() == null) {
-//                bookInfo.setLikes(1); // if no likes yet, set to 1
-//            } else {
-//                bookInfo.setLikes(bookInfo.getLikes() + 1);
-//            }
-//
-//            // Save the updated bookInfo
-//            bookinfoRepository.save(bookInfo);
-//
-//            return true; // return true to indicate like was added
-//        }
-//    }
 
     @Transactional
     public boolean likeBook(Long bookId, String token) {

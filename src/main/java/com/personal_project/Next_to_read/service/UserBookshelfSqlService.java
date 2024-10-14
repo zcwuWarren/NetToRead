@@ -28,36 +28,6 @@ public class UserBookshelfSqlService {
         this.jwtTokenUtil = jwtTokenUtil;
     }
 
-    public List<UserBookshelfDto> getCollectByUserId(String token) {
-
-        User user = jwtTokenUtil.getUserFromToken(token);
-        Long userId = user.getUserId();
-
-        List<UserBookshelfSql> collects = userBookshelfSqlRepository.findByUserId_UserIdAndCollectTrueOrderByTimestampCollectDesc(userId);
-
-        // 刪除功能還沒完成
-//        collects.forEach(userBookshelf -> {
-//            if (!userBookshelf.getLikes() && !userBookshelf.getCollect()) {
-//                // if likes and collect are both false, delete the record
-//                userBookshelfSqlRepository.delete(userBookshelf);
-//            }
-//        });
-
-        // turn result to BookCollectDto
-        return collects.stream().map(collect -> new UserBookshelfDto(collect)).collect(Collectors.toList());
-    }
-
-//    public List<UserBookshelfDto> getLikeByUserId(String token) {
-//
-//        User user = jwtTokenUtil.getUserFromToken(token);
-//        Long userId = user.getUserId();
-//
-//        List<UserBookshelfSql> likes = userBookshelfSqlRepository.findByUserId_UserIdAndLikesTrueOrderByTimestampLikeDesc(userId);
-//
-//        // turn result to BookCollectDto
-//        return likes.stream().map(like -> new UserBookshelfDto(like)).collect(Collectors.toList());
-//    }
-
     public List<UserBookshelfDto> getLikeByUserId(String token, int offset, int limit) {
 
         User user = jwtTokenUtil.getUserFromToken(token);
