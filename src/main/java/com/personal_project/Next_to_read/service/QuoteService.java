@@ -86,33 +86,69 @@ public class QuoteService {
                 .collect(Collectors.toList());
     }
 
+//    public List<QuoteDto> getQuotesWithoutCondition(int offset, int limit) {
+//        try {
+//            ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
+//            long totalCached = zSetOps.size(CACHE_KEY);
+//
+//            logger.info("Attempting to fetch quotes from cache. Offset: {}, Limit: {}, Total cached: {}", offset, limit, totalCached);
+//
+//            if (totalCached < CACHE_SIZE || offset + limit > totalCached) {
+//                logger.info("Cache miss or insufficient data. Updating cache from database.");
+//                updateFullCache();
+//            }
+//
+//            // descending order from highest to lowest (new to old)
+//            Set<String> cachedQuotes = zSetOps.reverseRange(CACHE_KEY, offset, offset + limit - 1);
+//
+//            if (cachedQuotes != null && cachedQuotes.size() == limit) {
+//                logger.info("Successfully retrieved {} quotes from cache", cachedQuotes.size());
+//                return deserializeQuotes(new ArrayList<>(cachedQuotes));
+//            } else {
+//                logger.warn("Quote Cache retrieval failed or incomplete. Fetching from database.");
+//                return getQuotesFromDatabase(offset, limit);
+//            }
+//        } catch (RedisConnectionFailureException e) {
+//            logger.error("Failed to connect to Redis. Falling back to database.", e);
+//            return getQuotesFromDatabase(offset, limit);
+//        } catch (Exception e) {
+//            logger.error("Unexpected error when fetching quotes from cache", e);
+//            return getQuotesFromDatabase(offset, limit);
+//        }
+//    }
+
     public List<QuoteDto> getQuotesWithoutCondition(int offset, int limit) {
+        assert limit == CACHE_SIZE : "Limit must be equal to CACHE_SIZE";
+
         try {
             ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
             long totalCached = zSetOps.size(CACHE_KEY);
 
-            logger.info("Attempting to fetch quotes from cache. Offset: {}, Limit: {}, Total cached: {}", offset, limit, totalCached);
+            logger.info("Attempting to fetch quotes. Offset: {}, Limit: {}, Total cached: {}", offset, limit, totalCached);
 
-            if (totalCached < CACHE_SIZE || offset + limit > totalCached) {
-                logger.info("Cache miss or insufficient data. Updating cache from database.");
+            // 如果是請求第一頁（offset == 0），且緩存不滿，則更新緩存
+            if (offset == 0 && totalCached < CACHE_SIZE) {
+                logger.info("Requesting first page and cache is not full. Updating cache from database.");
                 updateFullCache();
             }
 
-            // descending order from highest to lowest (new to old)
-            Set<String> cachedQuotes = zSetOps.reverseRange(CACHE_KEY, offset, offset + limit - 1);
-
-            if (cachedQuotes != null && cachedQuotes.size() == limit) {
-                logger.info("Successfully retrieved {} quotes from cache", cachedQuotes.size());
-                return deserializeQuotes(new ArrayList<>(cachedQuotes));
-            } else {
-                logger.warn("Quote Cache retrieval failed or incomplete. Fetching from database.");
-                return getQuotesFromDatabase(offset, limit);
+            // 如果請求的是第一頁，直接從緩存返回
+            if (offset == 0) {
+                Set<String> cachedQuotes = zSetOps.reverseRange(CACHE_KEY, 0, CACHE_SIZE - 1);
+                if (cachedQuotes != null && cachedQuotes.size() == CACHE_SIZE) {
+                    logger.info("Retrieved first page ({} quotes) from cache", cachedQuotes.size());
+                    return deserializeQuotes(new ArrayList<>(cachedQuotes));
+                }
             }
+
+            // 對於其他頁面，直接從數據庫獲取
+            logger.info("Fetching quotes from database. Offset: {}, Limit: {}", offset, limit);
+            return getQuotesFromDatabase(offset, limit);
         } catch (RedisConnectionFailureException e) {
             logger.error("Failed to connect to Redis. Falling back to database.", e);
             return getQuotesFromDatabase(offset, limit);
         } catch (Exception e) {
-            logger.error("Unexpected error when fetching quotes from cache", e);
+            logger.error("Unexpected error when fetching quotes", e);
             return getQuotesFromDatabase(offset, limit);
         }
     }
@@ -179,9 +215,35 @@ public class QuoteService {
         }
     }
 
+//    private void updateCache(Quote newQuote) {
+//        try {
+//            logger.info("Updating cache with new quote");
+//            ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
+//            long cacheSize = zSetOps.size(CACHE_KEY);
+//
+//            if (cacheSize < CACHE_SIZE) {
+//                zSetOps.add(CACHE_KEY, serializeQuote(newQuote), newQuote.getTimestamp().getTime());
+//                logger.info("Added new quote to cache. Current cache size: {}", cacheSize + 1);
+//            } else {
+//                Double lowestScore = zSetOps.score(CACHE_KEY, zSetOps.range(CACHE_KEY, 0, 0).iterator().next());
+//                if (newQuote.getTimestamp().getTime() > lowestScore) {
+//                    zSetOps.removeRange(CACHE_KEY, 0, 0);
+//                    zSetOps.add(CACHE_KEY, serializeQuote(newQuote), newQuote.getTimestamp().getTime());
+//                    logger.info("Replaced oldest quote in cache with new quote");
+//                } else {
+//                    logger.info("New quote is older than cached quotes, not added to cache");
+//                }
+//            }
+//        } catch (RedisConnectionFailureException e) {
+//            logger.error("Failed to update cache due to Redis connection issue", e);
+//        } catch (Exception e) {
+//            logger.error("Unexpected error when updating cache", e);
+//        }
+//    }
+
     private void updateCache(Quote newQuote) {
         try {
-            logger.info("Updating cache with new quote");
+            logger.info("Updating cache with new quote"); // OK
             ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
             long cacheSize = zSetOps.size(CACHE_KEY);
 
@@ -189,11 +251,11 @@ public class QuoteService {
                 zSetOps.add(CACHE_KEY, serializeQuote(newQuote), newQuote.getTimestamp().getTime());
                 logger.info("Added new quote to cache. Current cache size: {}", cacheSize + 1);
             } else {
-                Double lowestScore = zSetOps.score(CACHE_KEY, zSetOps.range(CACHE_KEY, 0, 0).iterator().next());
-                if (newQuote.getTimestamp().getTime() > lowestScore) {
+                Double oldestScore = zSetOps.score(CACHE_KEY, zSetOps.range(CACHE_KEY, 0, 0).iterator().next());
+                if (newQuote.getTimestamp().getTime() > oldestScore) {
                     zSetOps.removeRange(CACHE_KEY, 0, 0);
                     zSetOps.add(CACHE_KEY, serializeQuote(newQuote), newQuote.getTimestamp().getTime());
-                    logger.info("Replaced oldest quote in cache with new quote");
+                    logger.info("Replaced oldest quote in cache with new quote"); // OK
                 } else {
                     logger.info("New quote is older than cached quotes, not added to cache");
                 }
@@ -270,6 +332,30 @@ public class QuoteService {
         );
     }
 
+//    public boolean deleteQuote(Long id, String token) {
+//        try {
+//            User user = jwtTokenUtil.getUserFromToken(token);
+//            Optional<Quote> quoteOpt = quoteRepository.findById(id);
+//            if (quoteOpt.isPresent()) {
+//                Quote quote = quoteOpt.get();
+//                if (quote.getUserId().getUserId().equals(user.getUserId())) {
+//                    quoteRepository.delete(quote);
+//
+//                    // 從緩存中刪除
+//                    ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
+//                    Long removed = zSetOps.remove(CACHE_KEY, serializeQuote(quote));
+//                    logger.info("Removed {} entries from cache", removed);
+//
+//                    return true;
+//                }
+//            }
+//            return false;
+//        } catch (Exception e) {
+//            logger.error("Error deleting quote", e);
+//            return false;
+//        }
+//    }
+
     public boolean deleteQuote(Long id, String token) {
         try {
             User user = jwtTokenUtil.getUserFromToken(token);
@@ -284,6 +370,11 @@ public class QuoteService {
                     Long removed = zSetOps.remove(CACHE_KEY, serializeQuote(quote));
                     logger.info("Removed {} entries from cache", removed);
 
+                    // 如果刪除的 quote 在緩存中，需要補充一個新的 quote
+                    if (removed > 0) {
+                        updateCacheAfterDeletion();
+                    }
+
                     return true;
                 }
             }
@@ -291,6 +382,37 @@ public class QuoteService {
         } catch (Exception e) {
             logger.error("Error deleting quote", e);
             return false;
+        }
+    }
+
+    private void updateCacheAfterDeletion() {
+        ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
+        long cacheSize = zSetOps.size(CACHE_KEY);
+        if (cacheSize < CACHE_SIZE) {
+            // 獲取緩存中最舊的 quote 的時間戳
+            Set<String> oldestQuoteSet = zSetOps.range(CACHE_KEY, -1, -1);
+            if (oldestQuoteSet.isEmpty()) {
+                logger.warn("Cache is empty after deletion. Unable to determine oldest quote.");
+                return;
+            }
+            String oldestQuoteStr = oldestQuoteSet.iterator().next();
+            Quote oldestQuote = deserializeQuote(oldestQuoteStr);
+            Timestamp oldestTimestamp = oldestQuote.getTimestamp();
+
+            // 從數據庫中獲取下一個應該進入緩存的 quote
+            List<Quote> nextQuotes = quoteRepository.findFirstByTimestampLessThanOrderByTimestampDesc(
+                    oldestTimestamp,
+                    PageRequest.of(0, 1)
+            );
+
+            if (!nextQuotes.isEmpty()) {
+                Quote nextQuote = nextQuotes.get(0);
+                String serializedNextQuote = serializeQuote(nextQuote);
+                zSetOps.add(CACHE_KEY, serializedNextQuote, nextQuote.getTimestamp().getTime());
+                logger.info("Added next quote to cache after deletion. Cache size: {}", cacheSize + 1);
+            } else {
+                logger.info("No more quotes available to add to cache after deletion.");
+            }
         }
     }
 
@@ -306,6 +428,31 @@ public class QuoteService {
 //        }
 //        return false;
 //    }
+//    public boolean editQuote(Long id, String token, String updatedQuoteContent) {
+//        try {
+//            User user = jwtTokenUtil.getUserFromToken(token);
+//            Optional<Quote> quoteOpt = quoteRepository.findById(id);
+//
+//            if (quoteOpt.isPresent() && quoteOpt.get().getUserId().getUserId().equals(user.getUserId())) {
+//                Quote quoteToUpdate = quoteOpt.get();
+//                quoteToUpdate.setQuote(updatedQuoteContent);
+//                quoteRepository.save(quoteToUpdate);
+//
+//                // 更新緩存
+//                updateCache(quoteToUpdate);
+//
+//                logger.info("Quote updated successfully. ID: {}", id);
+//                return true;
+//            } else {
+//                logger.warn("Failed to edit quote. ID: {}. Quote not found or unauthorized.", id);
+//                return false;
+//            }
+//        } catch (Exception e) {
+//            logger.error("Error editing quote with ID: {}", id, e);
+//            return false;
+//        }
+//    }
+
     public boolean editQuote(Long id, String token, String updatedQuoteContent) {
         try {
             User user = jwtTokenUtil.getUserFromToken(token);
@@ -313,13 +460,30 @@ public class QuoteService {
 
             if (quoteOpt.isPresent() && quoteOpt.get().getUserId().getUserId().equals(user.getUserId())) {
                 Quote quoteToUpdate = quoteOpt.get();
+                ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
+
+                // 序列化舊的 quote
+                String serializedOldQuote = serializeQuote(quoteToUpdate);
+
+                // 檢查 quote 是否在緩存中
+                Double score = zSetOps.score(CACHE_KEY, serializedOldQuote);
+                boolean inCache = (score != null);
+
+                // 更新 quote 內容，但不更新時間戳
                 quoteToUpdate.setQuote(updatedQuoteContent);
                 quoteRepository.save(quoteToUpdate);
 
-                // 更新緩存
-                updateCache(quoteToUpdate);
+                if (inCache) {
+                    // 如果在緩存中，更新緩存
+                    zSetOps.remove(CACHE_KEY, serializedOldQuote);
+                    String serializedNewQuote = serializeQuote(quoteToUpdate);
+                    zSetOps.add(CACHE_KEY, serializedNewQuote, score); // 使用原來的 score 以保持順序
+                    logger.info("Updated quote in cache. ID: {}", id); // OK
+                } else {
+                    logger.info("Quote not in cache, no cache update needed. ID: {}", id); //OK
+                }
 
-                logger.info("Quote updated successfully. ID: {}", id);
+                logger.info("Quote updated successfully in database. ID: {}", id);
                 return true;
             } else {
                 logger.warn("Failed to edit quote. ID: {}. Quote not found or unauthorized.", id);

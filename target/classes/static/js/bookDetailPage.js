@@ -699,14 +699,6 @@ document.addEventListener("DOMContentLoaded", async function() {
 
         window.addEventListener('scroll', handleScroll);
 
-        // function updateUIForMode(mode) {
-        //     if (mode === 'comment') {
-        //         inputBox.placeholder = "Please login to write a Comment";
-        //     } else {
-        //         inputBox.placeholder = "Please login to write a Quote";
-        //     }
-        // }
-
         function updateUIForMode(mode) {
             const baseText = isTokenValid() ? "" : "Please login to ";
             if (mode === 'comment') {
