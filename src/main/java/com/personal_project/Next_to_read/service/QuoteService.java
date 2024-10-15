@@ -86,37 +86,6 @@ public class QuoteService {
                 .collect(Collectors.toList());
     }
 
-//    public List<QuoteDto> getQuotesWithoutCondition(int offset, int limit) {
-//        try {
-//            ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
-//            long totalCached = zSetOps.size(CACHE_KEY);
-//
-//            logger.info("Attempting to fetch quotes from cache. Offset: {}, Limit: {}, Total cached: {}", offset, limit, totalCached);
-//
-//            if (totalCached < CACHE_SIZE || offset + limit > totalCached) {
-//                logger.info("Cache miss or insufficient data. Updating cache from database.");
-//                updateFullCache();
-//            }
-//
-//            // descending order from highest to lowest (new to old)
-//            Set<String> cachedQuotes = zSetOps.reverseRange(CACHE_KEY, offset, offset + limit - 1);
-//
-//            if (cachedQuotes != null && cachedQuotes.size() == limit) {
-//                logger.info("Successfully retrieved {} quotes from cache", cachedQuotes.size());
-//                return deserializeQuotes(new ArrayList<>(cachedQuotes));
-//            } else {
-//                logger.warn("Quote Cache retrieval failed or incomplete. Fetching from database.");
-//                return getQuotesFromDatabase(offset, limit);
-//            }
-//        } catch (RedisConnectionFailureException e) {
-//            logger.error("Failed to connect to Redis. Falling back to database.", e);
-//            return getQuotesFromDatabase(offset, limit);
-//        } catch (Exception e) {
-//            logger.error("Unexpected error when fetching quotes from cache", e);
-//            return getQuotesFromDatabase(offset, limit);
-//        }
-//    }
-
     public List<QuoteDto> getQuotesWithoutCondition(int offset, int limit) {
         assert limit == CACHE_SIZE : "Limit must be equal to CACHE_SIZE";
 
@@ -215,32 +184,6 @@ public class QuoteService {
         }
     }
 
-//    private void updateCache(Quote newQuote) {
-//        try {
-//            logger.info("Updating cache with new quote");
-//            ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
-//            long cacheSize = zSetOps.size(CACHE_KEY);
-//
-//            if (cacheSize < CACHE_SIZE) {
-//                zSetOps.add(CACHE_KEY, serializeQuote(newQuote), newQuote.getTimestamp().getTime());
-//                logger.info("Added new quote to cache. Current cache size: {}", cacheSize + 1);
-//            } else {
-//                Double lowestScore = zSetOps.score(CACHE_KEY, zSetOps.range(CACHE_KEY, 0, 0).iterator().next());
-//                if (newQuote.getTimestamp().getTime() > lowestScore) {
-//                    zSetOps.removeRange(CACHE_KEY, 0, 0);
-//                    zSetOps.add(CACHE_KEY, serializeQuote(newQuote), newQuote.getTimestamp().getTime());
-//                    logger.info("Replaced oldest quote in cache with new quote");
-//                } else {
-//                    logger.info("New quote is older than cached quotes, not added to cache");
-//                }
-//            }
-//        } catch (RedisConnectionFailureException e) {
-//            logger.error("Failed to update cache due to Redis connection issue", e);
-//        } catch (Exception e) {
-//            logger.error("Unexpected error when updating cache", e);
-//        }
-//    }
-
     private void updateCache(Quote newQuote) {
         try {
             logger.info("Updating cache with new quote"); // OK
@@ -332,30 +275,6 @@ public class QuoteService {
         );
     }
 
-//    public boolean deleteQuote(Long id, String token) {
-//        try {
-//            User user = jwtTokenUtil.getUserFromToken(token);
-//            Optional<Quote> quoteOpt = quoteRepository.findById(id);
-//            if (quoteOpt.isPresent()) {
-//                Quote quote = quoteOpt.get();
-//                if (quote.getUserId().getUserId().equals(user.getUserId())) {
-//                    quoteRepository.delete(quote);
-//
-//                    // 從緩存中刪除
-//                    ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
-//                    Long removed = zSetOps.remove(CACHE_KEY, serializeQuote(quote));
-//                    logger.info("Removed {} entries from cache", removed);
-//
-//                    return true;
-//                }
-//            }
-//            return false;
-//        } catch (Exception e) {
-//            logger.error("Error deleting quote", e);
-//            return false;
-//        }
-//    }
-
     public boolean deleteQuote(Long id, String token) {
         try {
             User user = jwtTokenUtil.getUserFromToken(token);
@@ -415,43 +334,6 @@ public class QuoteService {
             }
         }
     }
-
-    //    public boolean editQuote(Long id, String token, String updatedQuote) {
-//        User user = jwtTokenUtil.getUserFromToken(token);
-//        Optional<Quote> quote = quoteRepository.findById(id);
-//
-//        if (quote.isPresent() && quote.get().getUserId().getUserId().equals(user.getUserId())) {
-//            Quote quoteToUpdate = quote.get();
-//            quoteToUpdate.setQuote(updatedQuote); // 更新引言內容
-//            quoteRepository.save(quoteToUpdate);
-//            return true;
-//        }
-//        return false;
-//    }
-//    public boolean editQuote(Long id, String token, String updatedQuoteContent) {
-//        try {
-//            User user = jwtTokenUtil.getUserFromToken(token);
-//            Optional<Quote> quoteOpt = quoteRepository.findById(id);
-//
-//            if (quoteOpt.isPresent() && quoteOpt.get().getUserId().getUserId().equals(user.getUserId())) {
-//                Quote quoteToUpdate = quoteOpt.get();
-//                quoteToUpdate.setQuote(updatedQuoteContent);
-//                quoteRepository.save(quoteToUpdate);
-//
-//                // 更新緩存
-//                updateCache(quoteToUpdate);
-//
-//                logger.info("Quote updated successfully. ID: {}", id);
-//                return true;
-//            } else {
-//                logger.warn("Failed to edit quote. ID: {}. Quote not found or unauthorized.", id);
-//                return false;
-//            }
-//        } catch (Exception e) {
-//            logger.error("Error editing quote with ID: {}", id, e);
-//            return false;
-//        }
-//    }
 
     public boolean editQuote(Long id, String token, String updatedQuoteContent) {
         try {

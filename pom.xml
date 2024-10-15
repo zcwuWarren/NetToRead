@@ -11,7 +11,7 @@
 	<groupId>com.personal-project</groupId>
 	<artifactId>Next-to-read</artifactId>
 	<!-- modify to distinguish version-->
-	<version>10151533_fix_quoteCache</version>
+	<version>10152315_fixed_quteAndCommentCache</version>
 	<name>Next-to-read</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>

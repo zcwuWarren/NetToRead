@@ -1,6 +1,7 @@
 package com.personal_project.Next_to_read.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.personal_project.Next_to_read.data.dto.BookCommentDto;
 import com.personal_project.Next_to_read.data.form.CommentForm;
 import com.personal_project.Next_to_read.data.form.QuoteForm;
@@ -11,6 +12,7 @@ import com.personal_project.Next_to_read.repository.BookCommentSqlRepository;
 import com.personal_project.Next_to_read.repository.BookInfoRepository;
 import com.personal_project.Next_to_read.repository.QuoteRepository;
 import com.personal_project.Next_to_read.repository.UserBookshelfSqlRepository;
+import com.personal_project.Next_to_read.util.DateUtil;
 import com.personal_project.Next_to_read.util.EntityToDtoConverter.BookCommentDtoConverter;
 import com.personal_project.Next_to_read.util.EntityToDtoConverter.BookInfoDtoConverter;
 import org.slf4j.Logger;
@@ -60,32 +62,37 @@ public class BookCommentSqlService {
     }
 
     public List<BookCommentDto> getLatestComments(int offset, int limit) {
+        assert limit == CACHE_SIZE : "Limit must be equal to CACHE_SIZE";
+
         try {
             ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
             long totalCached = zSetOps.size(CACHE_KEY);
 
-            logger.info("Attempting to fetch comments from cache. Offset: {}, Limit: {}, Total cached: {}", offset, limit, totalCached);
+            logger.info("Attempting to fetch comments. Offset: {}, Limit: {}, Total cached: {}", offset, limit, totalCached);
 
-            if (totalCached < CACHE_SIZE || offset + limit > totalCached) {
-                logger.info("Cache miss or insufficient data. Updating cache from database.");
+            // 如果是請求第一頁（offset == 0），且緩存不滿，則更新緩存
+            if (offset == 0 && totalCached < CACHE_SIZE) {
+                logger.info("Requesting first page and cache is not full. Updating cache from database.");
                 updateFullCache();
             }
 
-            // 獲取緩存中的評論
-            Set<String> cachedComments = zSetOps.reverseRange(CACHE_KEY, offset, offset + limit - 1);
-
-            if (cachedComments != null && cachedComments.size() == limit) {
-                logger.info("Successfully retrieved {} comments from cache", cachedComments.size());
-                return deserializeComments(new ArrayList<>(cachedComments));
-            } else {
-                logger.warn("Comment Cache retrieval failed or incomplete. Fetching from database.");
-                return getCommentsFromDatabase(offset, limit);
+             //如果請求的是第一頁，直接從緩存返回
+            if (offset == 0) {
+                Set<String> cachedComments = zSetOps.reverseRange(CACHE_KEY, 0, CACHE_SIZE - 1);
+                if (cachedComments != null && cachedComments.size() == CACHE_SIZE) {
+                    logger.info("Retrieved first page ({} comments) from cache", cachedComments.size());
+                    return deserializeComments(new ArrayList<>(cachedComments));
+                }
             }
+
+            // 對於其他頁面，直接從數據庫獲取
+            logger.info("Fetching comments from database. Offset: {}, Limit: {}", offset, limit);
+            return getCommentsFromDatabase(offset, limit);
         } catch (RedisConnectionFailureException e) {
             logger.error("Failed to connect to Redis. Falling back to database.", e);
             return getCommentsFromDatabase(offset, limit);
         } catch (Exception e) {
-            logger.error("Unexpected error when fetching comments from cache", e);
+            logger.error("Unexpected error when fetching comments", e);
             return getCommentsFromDatabase(offset, limit);
         }
     }
@@ -97,26 +104,42 @@ public class BookCommentSqlService {
     }
 
     private void updateFullCache() {
-        logger.info("Updating full cache with latest comments");
-        ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
-        List<BookCommentSql> latestComments = bookCommentSqlRepository.findAll(
-                PageRequest.of(0, CACHE_SIZE, Sort.by("timestamp").descending())
-        ).getContent();
+        try {
+            logger.info("Updating full cache with latest comments");
+            ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
+            List<BookCommentSql> latestComments = bookCommentSqlRepository.findAll(
+                    PageRequest.of(0, CACHE_SIZE, Sort.by("timestamp").descending())
+            ).getContent();
 
-        redisTemplate.delete(CACHE_KEY);
-        logger.info("Cleared existing cache");
+            redisTemplate.delete(CACHE_KEY);
+            logger.info("Cleared existing cache");
 
-        for (BookCommentSql comment : latestComments) {
-            zSetOps.add(CACHE_KEY, serializeComment(comment), comment.getTimestamp().getTime());
+            for (BookCommentSql comment : latestComments) {
+                zSetOps.add(CACHE_KEY, serializeComment(comment), comment.getTimestamp().getTime());
+            }
+            logger.info("Added {} comments to cache", latestComments.size());
+        } catch (RedisConnectionFailureException e) {
+            logger.error("Failed to update full cache due to Redis connection issue", e);
+        } catch (Exception e) {
+            logger.error("Unexpected error when updating full cache", e);
         }
-        logger.info("Added {} comments to cache", latestComments.size());
     }
 
     private String serializeComment(BookCommentSql comment) {
         try {
-            return objectMapper.writeValueAsString(BookCommentDtoConverter.convertToDto(comment));
+            ObjectNode node = objectMapper.createObjectNode()
+                    .put("id", comment.getId())
+                    .put("comment", comment.getComment())
+                    .put("timestamp", comment.getTimestamp().getTime())
+                    .put("mainCategory", comment.getMainCategory())
+                    .put("subCategory", comment.getSubCategory())
+                    .put("userId", comment.getUserId().getUserId())
+                    .put("bookId", comment.getBookId().getBookId())
+                    .put("userName", comment.getUserId().getName())
+                    .put("bookName", comment.getBookId().getBookName());
+
+            return objectMapper.writeValueAsString(node);
         } catch (Exception e) {
-            logger.error("Error serializing comment", e);
             throw new RuntimeException("Error serializing comment", e);
         }
     }
@@ -124,60 +147,132 @@ public class BookCommentSqlService {
     private List<BookCommentDto> deserializeComments(List<String> serializedComments) {
         return serializedComments.stream()
                 .map(this::deserializeComment)
+                .map(this::convertToCommentDto)
                 .collect(Collectors.toList());
     }
 
-    private BookCommentDto deserializeComment(String serialized) {
+    private BookCommentSql deserializeComment(String serialized) {
         try {
-            return objectMapper.readValue(serialized, BookCommentDto.class);
+            ObjectNode node = (ObjectNode) objectMapper.readTree(serialized);
+
+            BookCommentSql comment = new BookCommentSql();
+            comment.setId(node.get("id").asLong());
+            comment.setComment(node.get("comment").asText());
+            comment.setTimestamp(new Timestamp(node.get("timestamp").asLong()));
+            comment.setMainCategory(node.get("mainCategory").asText());
+            comment.setSubCategory(node.get("subCategory").asText());
+
+            User user = new User();
+            user.setUserId(node.get("userId").asLong());
+            user.setName(node.get("userName").asText());
+            comment.setUserId(user);
+
+            BookInfo bookInfo = new BookInfo();
+            bookInfo.setBookId(node.get("bookId").asLong());
+            bookInfo.setBookName(node.get("bookName").asText());
+            comment.setBookId(bookInfo);
+
+            return comment;
         } catch (IOException e) {
-            logger.error("Error deserializing comment", e);
             throw new RuntimeException("Error deserializing comment", e);
         }
     }
 
-    public void updateCache(BookCommentSql newComment) {
-        logger.info("Updating cache with new comment");
-        ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
-        long cacheSize = zSetOps.size(CACHE_KEY);
+    private BookCommentDto convertToCommentDto(BookCommentSql comment) {
+        return new BookCommentDto(
+                comment.getUserId().getUserId(),
+                comment.getComment(),
+                comment.getBookId().getBookName(),
+                DateUtil.formatDate(comment.getTimestamp()),
+                comment.getBookId().getBookId(),
+                comment.getUserId().getName(),
+                comment.getId()
+        );
+    }
 
-        if (cacheSize < CACHE_SIZE) { // 假設我們想要緩存最新的 200 條評論
-            zSetOps.add(CACHE_KEY, serializeComment(newComment), newComment.getTimestamp().getTime());
-            logger.info("Added new comment to cache. Current cache size: {}", cacheSize + 1);
-        } else {
-            Double lowestScore = zSetOps.score(CACHE_KEY, zSetOps.range(CACHE_KEY, 0, 0).iterator().next());
-            if (newComment.getTimestamp().getTime() > lowestScore) {
-                zSetOps.removeRange(CACHE_KEY, 0, 0);
+    private void updateCache(BookCommentSql newComment) {
+        try {
+            logger.info("Updating cache with new comment");
+            ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
+            long cacheSize = zSetOps.size(CACHE_KEY);
+
+            if (cacheSize < CACHE_SIZE) {
                 zSetOps.add(CACHE_KEY, serializeComment(newComment), newComment.getTimestamp().getTime());
-                logger.info("Replaced oldest comment in cache with new comment");
+                logger.info("Added new comment to cache. Current cache size: {}", cacheSize + 1);
+            } else {
+                Double oldestScore = zSetOps.score(CACHE_KEY, zSetOps.range(CACHE_KEY, 0, 0).iterator().next());
+                if (newComment.getTimestamp().getTime() > oldestScore) {
+                    zSetOps.removeRange(CACHE_KEY, 0, 0);
+                    zSetOps.add(CACHE_KEY, serializeComment(newComment), newComment.getTimestamp().getTime());
+                    logger.info("Replaced oldest comment in cache with new comment");
+                } else {
+                    logger.info("New comment is older than cached comments, not added to cache");
+                }
             }
-            else {
-                logger.info("New comment is older than cached comments, not added to cache");
-            }
+        } catch (RedisConnectionFailureException e) {
+            logger.error("Failed to update cache due to Redis connection issue", e);
+        } catch (Exception e) {
+            logger.error("Unexpected error when updating cache", e);
         }
     }
 
     public boolean deleteComment(Long id, String token) {
-        User user = jwtTokenUtil.getUserFromToken(token);
+        try {
+            User user = jwtTokenUtil.getUserFromToken(token);
+            Optional<BookCommentSql> commentOpt = bookCommentSqlRepository.findById(id);
+            if (commentOpt.isPresent()) {
+                BookCommentSql comment = commentOpt.get();
+                if (comment.getUserId().getUserId().equals(user.getUserId())) {
+                    bookCommentSqlRepository.delete(comment);
 
-        // 查找該評論
-        Optional<BookCommentSql> commentOpt = bookCommentSqlRepository.findById(id);
-        if (commentOpt.isPresent()) {
-            BookCommentSql comment = commentOpt.get();
+                    ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
+                    String serializedComment = serializeComment(comment);
+                    Long removed = zSetOps.remove(CACHE_KEY, serializedComment);
+                    logger.info("Removed {} entries from cache", removed);
 
-            // 驗證該評論是否屬於當前用戶
-            if (comment.getUserId().getUserId().equals(user.getUserId())) {
-                bookCommentSqlRepository.delete(comment);
+                    if (removed > 0) {
+                        updateCacheAfterDeletion();
+                    }
 
-                // 從緩存中刪除
-                ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
-                Long removed = zSetOps.remove(CACHE_KEY, serializeComment(comment));
-                logger.info("Removed {} entries from cache", removed);
+                    return true;
+                }
+            }
+            return false;
+        } catch (Exception e) {
+            logger.error("Error deleting comment", e);
+            return false;
+        }
+    }
 
-                return true;  // 刪除成功
+    private void updateCacheAfterDeletion() {
+        ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
+        long cacheSize = zSetOps.size(CACHE_KEY);
+        if (cacheSize < CACHE_SIZE) {
+            // 獲取緩存中最舊的評論的時間戳
+            Set<String> oldestCommentSet = zSetOps.range(CACHE_KEY, -1, -1);
+            if (oldestCommentSet.isEmpty()) {
+                logger.warn("Cache is empty after deletion. Unable to determine oldest comment.");
+                return;
+            }
+            String oldestCommentStr = oldestCommentSet.iterator().next();
+            BookCommentSql oldestComment = deserializeComment(oldestCommentStr);
+            Timestamp oldestTimestamp = oldestComment.getTimestamp();
+
+            // 從數據庫中獲取下一個應該進入緩存的評論
+            List<BookCommentSql> nextComments = bookCommentSqlRepository.findFirstByTimestampLessThanOrderByTimestampDesc(
+                    oldestTimestamp,
+                    PageRequest.of(0, 1)
+            );
+
+            if (!nextComments.isEmpty()) {
+                BookCommentSql nextComment = nextComments.get(0);
+                String serializedNextComment = serializeComment(nextComment);
+                zSetOps.add(CACHE_KEY, serializedNextComment, nextComment.getTimestamp().getTime());
+                logger.info("Added next comment to cache after deletion. Cache size: {}", cacheSize + 1);
+            } else {
+                logger.info("No more comments available to add to cache after deletion.");
             }
         }
-        return false;  // 刪除失敗，因為評論不存在或者權限不足
     }
 
     @Transactional
@@ -185,23 +280,23 @@ public class BookCommentSqlService {
         try {
             logger.info("Adding new comment for book ID: {}", bookId);
 
-            // get user from token
+            // 從 token 獲取用戶
             User user = jwtTokenUtil.getUserFromToken(token);
 
-            // find BookInfo
+            // 查找 BookInfo
             BookInfo bookInfo = bookinfoRepository.findByBookId(bookId)
                     .orElseThrow(() -> new ResourceNotFoundException("Book not found with id: " + bookId));
 
-            // check if user already commented on the book
+            // 檢查用戶是否已經評論過這本書
             Optional<BookCommentSql> existingComment = bookCommentSqlRepository.findByUserId_UserIdAndBookId_BookId(user.getUserId(), bookInfo.getBookId());
 
-            // if already commented, return false
+            // 如果已經評論過，返回 false
             if (existingComment.isPresent()) {
                 logger.info("User {} has already commented on book {}. Comment not added.", user.getUserId(), bookId);
                 return false;
             }
 
-            // if not yet commented, set bookComment
+            // 如果還沒有評論，設置新的評論
             BookCommentSql bookCommentSql = new BookCommentSql();
             bookCommentSql.setBookId(bookInfo);
             bookCommentSql.setUserId(user);
@@ -210,26 +305,17 @@ public class BookCommentSqlService {
             bookCommentSql.setMainCategory(bookInfo.getMainCategory());
             bookCommentSql.setSubCategory(bookInfo.getSubCategory());
 
-            // save comment
-            bookCommentSql = bookCommentSqlRepository.save(bookCommentSql);
+            // 儲存評論
+            bookCommentSqlRepository.save(bookCommentSql);
             logger.info("Comment saved to database with ID: {}", bookCommentSql.getId());
 
-            // update cache
-            try {
-                updateCache(bookCommentSql);
-                logger.info("Cache updated successfully for comment ID: {}", bookCommentSql.getId());
-            } catch (RedisConnectionFailureException e) {
-                logger.error("Failed to update Redis cache for comment ID: {}. Error: {}", bookCommentSql.getId(), e.getMessage());
-                // 不要因為 Redis 錯誤而回滾事務
-            } catch (Exception e) {
-                logger.error("Unexpected error when updating cache for comment ID: {}. Error: {}", bookCommentSql.getId(), e.getMessage());
-                // 不要因為緩存錯誤而回滾事務
-            }
+            // 更新緩存
+            updateCache(bookCommentSql);
 
             return true;
         } catch (ResourceNotFoundException e) {
             logger.error("Book not found with id: {}. Error: {}", bookId, e.getMessage());
-            throw e; // 重新拋出異常，因為這是一個嚴重的錯誤
+            throw e;
         } catch (Exception e) {
             logger.error("Error adding new comment for book ID: {}. Error: {}", bookId, e.getMessage());
             throw new RuntimeException("Failed to add new comment", e);
@@ -415,15 +501,25 @@ public class BookCommentSqlService {
 
             if (commentOpt.isPresent() && commentOpt.get().getUserId().getUserId().equals(user.getUserId())) {
                 BookCommentSql commentToUpdate = commentOpt.get();
-                commentToUpdate.setComment(updatedComment);
+                ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
 
-                // 更新資料庫
+                String serializedOldComment = serializeComment(commentToUpdate);
+                Double score = zSetOps.score(CACHE_KEY, serializedOldComment);
+                boolean inCache = (score != null);
+
+                commentToUpdate.setComment(updatedComment);
                 bookCommentSqlRepository.save(commentToUpdate);
 
-                // 更新緩存
-                updateCache(commentToUpdate);
+                if (inCache) {
+                    zSetOps.remove(CACHE_KEY, serializedOldComment);
+                    String serializedNewComment = serializeComment(commentToUpdate);
+                    zSetOps.add(CACHE_KEY, serializedNewComment, score);
+                    logger.info("Updated comment in cache. ID: {}", id);
+                } else {
+                    logger.info("Comment not in cache, no cache update needed. ID: {}", id);
+                }
 
-                logger.info("Comment updated successfully. ID: {}", id);
+                logger.info("Comment updated successfully in database. ID: {}", id);
                 return true;
             } else {
                 logger.warn("Failed to edit comment. ID: {}. Comment not found or unauthorized.", id);

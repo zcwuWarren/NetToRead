@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,12 +17,6 @@ import java.util.Optional;
 public interface BookCommentSqlRepository extends JpaRepository<BookCommentSql, Long> {
 
     Optional<BookCommentSql> findByUserId_UserIdAndBookId_BookId(Long userId, Long bookId);
-
-    List<BookCommentSql> findByBookId_BookIdOrderByTimestampDesc(Long bookId);
-
-    List<BookCommentSql> findByUserId_UserIdOrderByTimestampDesc(Long userId);
-
-//    List<BookCommentSql> findBySubCategoryOrderByTimestampDesc(String subCategory);
 
     @Query("SELECT bcs FROM BookCommentSql bcs WHERE bcs.subCategory = :subCategory ORDER BY bcs.timestamp DESC")
     Page<BookCommentSql> findBySubCategoryOrderByTimestampDesc(@Param("subCategory") String subCategory, Pageable pageable);
@@ -34,4 +29,5 @@ public interface BookCommentSqlRepository extends JpaRepository<BookCommentSql, 
     @Query("SELECT bcs FROM BookCommentSql bcs WHERE bcs.userId.userId = :userId ORDER BY bcs.timestamp DESC")
     Page<BookCommentSql> findByUserIdOrderByTimestampDesc(@Param("userId") Long userId, Pageable pageable);
 
+    List<BookCommentSql> findFirstByTimestampLessThanOrderByTimestampDesc(Timestamp timestamp, Pageable pageable);
 }
