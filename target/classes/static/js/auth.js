@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function() {
     const token = localStorage.getItem('jwtToken');
-    const loginLogoutElement = document.querySelector('.profile-box .profile-item:first-child');
+    const loginLogoutElement = document.querySelector('.profile-box .profile-item:last-child');
 
     function isTokenExpired(token) {
         if (!token) return true;

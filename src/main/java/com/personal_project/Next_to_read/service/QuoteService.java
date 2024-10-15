@@ -98,6 +98,7 @@ public class QuoteService {
                 updateFullCache();
             }
 
+            // descending order from highest to lowest (new to old)
             Set<String> cachedQuotes = zSetOps.reverseRange(CACHE_KEY, offset, offset + limit - 1);
 
             if (cachedQuotes != null && cachedQuotes.size() == limit) {

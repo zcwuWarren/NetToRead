@@ -700,11 +700,17 @@ document.addEventListener("DOMContentLoaded", async function() {
         window.addEventListener('scroll', handleScroll);
 
         function updateUIForMode(mode) {
+            const baseText = isTokenValid() ? "" : "Please login to ";
             if (mode === 'comment') {
-                inputBox.placeholder = "Please login to write a Comment";
+                inputBox.placeholder = baseText + "write a Comment";
             } else {
-                inputBox.placeholder = "Please login to write a Quote";
+                inputBox.placeholder = baseText + "write a Quote";
             }
+        }
+
+        function isTokenValid() {
+            const token = localStorage.getItem('jwtToken');
+            return token && !isTokenExpired(token);
         }
 
         // 初始化UI
