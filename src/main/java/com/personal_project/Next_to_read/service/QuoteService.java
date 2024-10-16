@@ -286,7 +286,11 @@ public class QuoteService {
 
                     // 從緩存中刪除
                     ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
-                    Long removed = zSetOps.remove(CACHE_KEY, serializeQuote(quote));
+                    Set<String> cachedQuotes = zSetOps.rangeByScore(CACHE_KEY, quote.getTimestamp().getTime(), quote.getTimestamp().getTime());
+                    Long removed = 0L;
+                    if (!cachedQuotes.isEmpty()) {
+                        removed = zSetOps.remove(CACHE_KEY, cachedQuotes.iterator().next());
+                    }
                     logger.info("Removed {} entries from cache", removed);
 
                     // 如果刪除的 quote 在緩存中，需要補充一個新的 quote
@@ -344,25 +348,23 @@ public class QuoteService {
                 Quote quoteToUpdate = quoteOpt.get();
                 ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
 
-                // 序列化舊的 quote
-                String serializedOldQuote = serializeQuote(quoteToUpdate);
+                // 查找緩存中的 Quote
+                Set<String> cachedQuotes = zSetOps.rangeByScore(CACHE_KEY, quoteToUpdate.getTimestamp().getTime(), quoteToUpdate.getTimestamp().getTime());
+                boolean inCache = !cachedQuotes.isEmpty();
 
-                // 檢查 quote 是否在緩存中
-                Double score = zSetOps.score(CACHE_KEY, serializedOldQuote);
-                boolean inCache = (score != null);
-
-                // 更新 quote 內容，但不更新時間戳
+                // 更新 Quote 內容，但不更新時間戳
                 quoteToUpdate.setQuote(updatedQuoteContent);
                 quoteRepository.save(quoteToUpdate);
 
                 if (inCache) {
                     // 如果在緩存中，更新緩存
-                    zSetOps.remove(CACHE_KEY, serializedOldQuote);
-                    String serializedNewQuote = serializeQuote(quoteToUpdate);
-                    zSetOps.add(CACHE_KEY, serializedNewQuote, score); // 使用原來的 score 以保持順序
-                    logger.info("Updated quote in cache. ID: {}", id); // OK
+                    String oldSerializedQuote = cachedQuotes.iterator().next();
+                    zSetOps.remove(CACHE_KEY, oldSerializedQuote);
+                    String newSerializedQuote = serializeQuote(quoteToUpdate);
+                    zSetOps.add(CACHE_KEY, newSerializedQuote, quoteToUpdate.getTimestamp().getTime());
+                    logger.info("Updated quote in cache. ID: {}", id);
                 } else {
-                    logger.info("Quote not in cache, no cache update needed. ID: {}", id); //OK
+                    logger.info("Quote not in cache, no cache update needed. ID: {}", id);
                 }
 
                 logger.info("Quote updated successfully in database. ID: {}", id);

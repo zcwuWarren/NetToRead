@@ -225,11 +225,16 @@ public class BookCommentSqlService {
                 if (comment.getUserId().getUserId().equals(user.getUserId())) {
                     bookCommentSqlRepository.delete(comment);
 
+                    // 從緩存中刪除
                     ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
-                    String serializedComment = serializeComment(comment);
-                    Long removed = zSetOps.remove(CACHE_KEY, serializedComment);
+                    Set<String> cachedComments = zSetOps.rangeByScore(CACHE_KEY, comment.getTimestamp().getTime(), comment.getTimestamp().getTime());
+                    Long removed = 0L;
+                    if (!cachedComments.isEmpty()) {
+                        removed = zSetOps.remove(CACHE_KEY, cachedComments.iterator().next());
+                    }
                     logger.info("Removed {} entries from cache", removed);
 
+                    // 如果刪除的 comment 在緩存中，需要補充一個新的 comment
                     if (removed > 0) {
                         updateCacheAfterDeletion();
                     }
@@ -503,17 +508,20 @@ public class BookCommentSqlService {
                 BookCommentSql commentToUpdate = commentOpt.get();
                 ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
 
-                String serializedOldComment = serializeComment(commentToUpdate);
-                Double score = zSetOps.score(CACHE_KEY, serializedOldComment);
-                boolean inCache = (score != null);
+                // 查找緩存中的 Comment
+                Set<String> cachedComments = zSetOps.rangeByScore(CACHE_KEY, commentToUpdate.getTimestamp().getTime(), commentToUpdate.getTimestamp().getTime());
+                boolean inCache = !cachedComments.isEmpty();
 
+                // 更新 Comment 內容，但不更新時間戳
                 commentToUpdate.setComment(updatedComment);
                 bookCommentSqlRepository.save(commentToUpdate);
 
                 if (inCache) {
-                    zSetOps.remove(CACHE_KEY, serializedOldComment);
-                    String serializedNewComment = serializeComment(commentToUpdate);
-                    zSetOps.add(CACHE_KEY, serializedNewComment, score);
+                    // 如果在緩存中，更新緩存
+                    String oldSerializedComment = cachedComments.iterator().next();
+                    zSetOps.remove(CACHE_KEY, oldSerializedComment);
+                    String newSerializedComment = serializeComment(commentToUpdate);
+                    zSetOps.add(CACHE_KEY, newSerializedComment, commentToUpdate.getTimestamp().getTime());
                     logger.info("Updated comment in cache. ID: {}", id);
                 } else {
                     logger.info("Comment not in cache, no cache update needed. ID: {}", id);
