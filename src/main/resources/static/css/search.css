@@ -42,6 +42,7 @@
     box-shadow: 0 6px 12px rgba(0,0,0,0.15); /* 增强阴影效果 */
     transform: scale(1.1);
     z-index: 1; /* 确保悬停的项目位于其他项目之上 */
+    cursor: pointer;
 }
 
 /* 书籍封面容器 */

@@ -9,19 +9,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface QuoteRepository extends JpaRepository<Quote, Long> {
-
-    List<Quote> findByBookId_BookIdOrderByTimestampDesc(Long bookId);
-
-    List<Quote> findByUserId_UserIdOrderByTimestampDesc(Long UserId);
-
-    List<Quote> findBySubCategory_OrderByTimestampDesc(String subCategory);
-
-    List<Quote> findTop6ByOrderByTimestampDesc();
 
     @Query("SELECT q FROM Quote q WHERE q.subCategory = :subCategory ORDER BY q.timestamp DESC")
     Page<Quote> findBySubCategoryOrderByTimestampDesc(@Param("subCategory") String subCategory, Pageable pageable);
@@ -31,4 +24,6 @@ public interface QuoteRepository extends JpaRepository<Quote, Long> {
 
     @Query("SELECT q FROM Quote q WHERE q.userId.userId = :userId ORDER BY q.timestamp DESC")
     Page<Quote> findByUserIdOrderByTimestampDesc(@Param("userId") Long userId, Pageable pageable);
+
+    List<Quote> findFirstByTimestampLessThanOrderByTimestampDesc(Timestamp timestamp, Pageable pageable);
 }
