@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const createAccountButton = document.getElementById('create-account');
     const loginSubmitButton = document.getElementById('submit-login');
     const registerSubmitButton = document.getElementById('submit-register');
+    const experienceLogin = document.getElementById('experience-account');
 
     const previousPage = document.referrer || 'index.html';
     const token = localStorage.getItem('jwtToken');
@@ -118,4 +119,10 @@ document.addEventListener("DOMContentLoaded", function() {
             alert("Registration failed. Please try again.");
         }
     });
+
+    experienceLogin.addEventListener('click', function (){
+        document.getElementById("login-email").value = "experience@example.com";
+        document.getElementById("login-password").value = "AreYouKiddingMe?123";
+        document.getElementById("submit-login").click();
+    })
 });

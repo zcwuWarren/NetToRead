@@ -80,3 +80,10 @@ button:hover {
 .secondary-button:hover {
     background-color: #36a420;
 }
+
+.experience-account {
+    margin: 0 auto;
+    cursor: pointer;
+    color: rgb(117, 117, 117);
+    text-align: center;
+}
