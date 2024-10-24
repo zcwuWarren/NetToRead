@@ -3,17 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>來 Quote 冊 - 登入/註冊</title>
+    <title>來 Quote 冊 - 搜尋結果</title>
     <link rel="preload" href="/fonts/SourceHanSerifTC-VF.otf.woff" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/account.css"> <!-- 引入新的CSS -->
+    <link rel="stylesheet" href="css/search.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+Mono+TC:wght@300;400;700&display=swap" rel="stylesheet">
 </head>
-<!-- 先隱藏 body，待確認 jwtToken 存在後再顯示 -->
-<body style="display:none;">
+<body>
 <header class="container-header">
     <div class="middle-container">
         <div id="header-1" class="header-item">
@@ -44,29 +43,19 @@
         </div>
     </div>
 </header>
-
 <main>
-    <div class="container-a" id="containerA">
-        <div id="container-a-login-1" class="login-container">
-            <input type="text" id="login-email" placeholder="電子郵件地址或手機號碼">
-            <input type="password" id="login-password" placeholder="密碼">
-            <button id="submit-login">登入</button>
-            <button id="create-account" class="secondary-button">建立新帳號</button>
-            <p class="experience-account" id="experience-account">使用體驗帳號</p>
-        </div>
-
-        <div id="container-a-login-2" class="register-container" style="display:none;">
-            <input type="text" id="register-username" placeholder="使用者名稱">
-            <input type="email" id="register-email" placeholder="電子郵件地址">
-            <input type="password" id="register-password" placeholder="密碼">
-            <button id="submit-register">建立新帳號</button>
-        </div>
+    <div class="search-result-container">
+        <h1 id="search-keyword">搜尋關鍵字： <span></span></h1>
+        <div id="books-container" class="books-grid"></div>
+        <div id="pagination" class="pagination"></div>
     </div>
 </main>
 
-<script src="js/accountPage.js"></script> <!-- 引入 JS -->
+<script src="js/style.js"></script>
 <script src="js/categoryNavBar.js"></script>
+<script src="js/search.js"></script>
 <script src="js/auth.js"></script>
+
 
 </body>
 </html>

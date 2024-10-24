@@ -1,0 +1,285 @@
+/*style.css*/
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+@font-face {
+    font-family: 'LXGW WenKai Mono TC';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url(https://fonts.gstatic.com/s/lxgwwenkaimonotc/v5/pxiVyos4iPVgyWx9WtufHnsIf5nkaB0HstKthvdli3mpgz50y8Xm4hwb0U1i1EaZnkpPt4i8OGF8UbVwW5aE5vAR.0.woff2) format('woff2');
+}
+
+.lxgw-wenkai-mono-tc-light {
+    font-family: "LXGW WenKai Mono TC", monospace;
+    font-weight: 300;
+    font-style: normal;
+}
+
+.lxgw-wenkai-mono-tc-regular {
+    font-family: "LXGW WenKai Mono TC", monospace;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.lxgw-wenkai-mono-tc-bold {
+    font-family: "LXGW WenKai Mono TC", monospace;
+    font-weight: 700;
+    font-style: normal;
+}
+
+#header-1 a {
+    font-family: 'LXGW WenKai Mono TC', monospace;
+    font-weight: 700; /* 您可以根據需要調整粗細 */
+}
+
+#header-1 a {
+    font-size: 2.5em; /* 調整大小 */
+    letter-spacing: 0.05em; /* 調整字母間距 */
+    /* 其他樣式... */
+}
+
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* 改为 min-height 以允许内容增长 */
+    background-color: rgb(249, 248, 245);
+}
+
+.container-header {
+    width: 100%;
+    /*background-color: #f1f1f1;*/
+    background-color: #E6E0DB;
+    padding: 10px 0;
+    display: flex;
+    justify-content: center;
+    position: sticky; /* 添加sticky定位 */
+    top: 0; /* 固定在顶部 */
+    z-index: 1000; /* 确保header在其他元素之上 */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* 添加阴影以区分内容 */
+    /*box-shadow: 0 2px 4px #cccccc; !* 添加阴影以区分内容 *!*/
+
+}
+
+.middle-container {
+    width: 70%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-item {
+    position: relative;
+    padding: 10px;
+    cursor: pointer;
+}
+
+
+.header-item a {
+    text-decoration: none;
+    color: black;
+    font-size: 16px;
+}
+
+.header-item:hover a {
+    color: #333;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: white;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    padding: 10px;
+    min-width: 200px;
+    border-radius: 4px;
+}
+
+.header-item:hover .dropdown-content {
+    display: block;
+}
+
+/* 搜索框樣式 */
+#header-search {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+    position: relative; /* 確保 suggestion-box 基於 header-search 定位 */
+}
+
+#search-input {
+    width: 100%;
+    padding: 8px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* 搜索框聚焦時的效果 */
+#search-input:focus {
+    outline: none;
+    border-color: #999;
+}
+
+/* 隱藏但對於屏幕閱讀器可見的樣式 */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    /*overflow: hidden;*/
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+#suggestion-box {
+    position: absolute;
+    top: 100%; /* 保證 suggestion-box 顯示在輸入框下方 */
+    left: 0;
+    background-color: white;
+    border: 1px solid #ccc;
+    max-height: 400px;
+    overflow-y: auto;
+    width: 100%;
+    z-index: 1000; /* 保證 suggestion-box 蓋在其他元素之上 */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 10px;
+}
+
+#suggestion-box .suggestion-item {
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+    font-size: 16px;
+}
+
+#suggestion-box .suggestion-item:last-child {
+    border-bottom: none;
+}
+
+#suggestion-box .suggestion-item:hover {
+    background-color: #f0f0f0;
+}
+
+.category-item {
+    padding: 10px;
+    cursor: pointer;
+    position: relative;
+    color: black;
+    transition: background-color 0.3s;
+}
+
+.sub-category-container {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 100%;
+    background-color: white;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
+    z-index: 1001;
+    padding: 10px;
+    min-width: 150px;
+    border-radius: 4px;
+}
+
+.category-item:hover .sub-category-container {
+    display: block;
+}
+
+.sub-category-item {
+    padding: 8px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.3s;
+}
+
+.category-item:hover {
+    background-color: #f0f0f0;
+}
+
+.sub-category-item:hover {
+    background-color: #f0f0f0;
+}
+
+.category-item, .sub-category-item {
+    background-color: transparent;
+    border: none;
+    margin: 0;
+}
+
+.profile-box {
+    padding: 5px 0;
+}
+
+.profile-item {
+    padding: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.profile-item a {
+    text-decoration: none;
+    color: black;
+    display: block;
+}
+
+.profile-item:hover {
+    background-color: #f0f0f0;
+}
+
+/* navigator bar svg icon*/
+.material-symbols-outlined {
+    font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24;
+    color: #041723; /* 设置图标颜色为 #041723 */
+    margin-right: 8px; /* 在图标和文字之间添加一些间距 */
+}
+
+.search-icon {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #041723; /* 与 Category 图标相同的颜色 */
+    cursor: pointer;
+}
+
+.account-icon {
+    font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24;
+    color: #041723; /* 与其他图标相同的颜色 */
+    margin-right: 8px; /* 在图标和文字之间添加一些间距 */
+    font-size: 24px; /* 或者与其他图标相同的大小 */
+}
+
+.home-icon {
+    font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24;
+    color: #041723; /* 与其他图标相同的颜色 */
+    margin-right: 8px; /* 在图标和文字之间添加一些间距 */
+    font-size: 24px; /* 或者与其他图标相同的大小 */
+}
+
+#header-1, #header-2, #header-3 {
+    display: flex;
+    align-items: center;
+}

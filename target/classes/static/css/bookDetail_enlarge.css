@@ -1,0 +1,407 @@
+/* bookDetail.css */
+/* 容器 a 的樣式 */
+.container-a {
+    width: 70%;
+    margin: 10px auto;
+    /*border: 2px solid #ccc;*/
+    border-radius: 10px;
+    padding: 20px 20px 30px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* 添加阴影以区分内容 */
+    /* loading gif */
+    min-height: 584.234px; /* 使用最小高度確保有足夠空間顯示 loading */
+    /*min-height: 1045.23px; !* 使用最小高度確保有足夠空間顯示 loading *!*/
+    overflow: visible;
+    --loading-gif-size: 150px;
+    /* flicker */
+    /* 保持原有樣式 */
+    position: relative;
+}
+
+.container-a-top {
+    display: flex;
+    flex-direction: row; /* 使 a-1 和 a-2 左右排列 */
+    justify-content: space-between;
+}
+
+.container-a-left {
+    width: 30%; /* 匹配原来 container-a-1 的宽度 */
+    display: flex;
+    flex-direction: column;
+}
+
+.container-a-1 {
+    width: 100%;
+    /*padding-right: 20px;*/
+    /* flicker */
+    position: relative;
+    background-color: #ffffff; /* 佔位符顏色 */
+    aspect-ratio: 341 / 440; /* 假設書籍封面的比例為 2:3，請根據實際情況調整 */
+}
+
+.container-a-1 img {
+    width: 100%;
+    height: auto;
+    /* flicker */
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.container-a-1 img.loaded {
+    opacity: 1;
+}
+
+.container-a-2 {
+    width: 70%; /* a-2 的寬度較大 */
+    word-wrap: break-word; /* 防止文字超出容器寬度 */
+    padding: 0 10px;
+}
+
+.container-a-2 div {
+    /*margin-bottom: 10px;*/
+    padding: 0px 10px;
+}
+
+.book-info-item {
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.book-info-item strong {
+    display: inline-block;
+    width: 100px; /* 调整标签宽度 */
+    font-weight: bold;
+    color: #666666;
+}
+
+.book-info-item span {
+    color: #000000;
+}
+
+/* 可以为特定的信息项添加自定义样式 */
+#bookName strong, #bookName span {
+    font-size: 36px;
+    color: #000;
+    font-weight: bold;
+}
+
+#author strong, #author span {
+    font-style: italic;
+    font-size: 20px;
+}
+
+#publisher, #publishDate, #isbn {
+    font-size: 14px;
+}
+
+#content {
+    font-size: 16px;
+    max-height: 278px;
+    overflow-y: auto; /* 內容超過 max-height 時顯示垂直滾動條 */
+    padding-right: 10px; /* 為滾動條預留空間 */
+}
+
+.container-a-3 {
+    width: 100%; /* a-3 寬度與 a-1, a-2 的總和一致 */
+    /*margin-top: 10px;*/
+    padding-top: 10px;
+    border-top: 1px solid #ddd;
+    word-wrap: break-word; /* 防止文字超出容器寬度 */
+}
+
+.container-a-3-long-content {
+    max-height: 400px; /* 可選：最大高度，超過此高度後可滾動 */
+    overflow-y: auto;
+    font-size: 16px;
+    /*margin: 0px 5px;*/
+    padding: 18px;
+}
+
+/* 書封下面按鈕 */
+.container-a-1-buttons {
+    width: 91%;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    margin: 10px auto 28px; /* 使用 auto 左右边距实现水平居中 */
+}
+
+.top-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px; /* 調整兩個按鈕之間的間距 */
+    margin-bottom: 10px; /* 與下方 library-dropdown 的間距 */
+}
+
+.action-button {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    flex: 1; /* 讓上方兩個按鈕平均分配寬度 */
+}
+
+.action-button .btn-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+}
+
+.btn-icon {
+    width: 24px;
+    height: 24px;
+    position: relative; /* 為 count-display 提供定位參考 */
+}
+
+.action-button span {
+    white-space: nowrap;
+}
+
+.action-button.active {
+    background-color: #DFCB8E; /* 選中時的背景色 */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* 輕微陰影效果 */
+    /*color: #041723; !* 可以設置一個對比色,使文字更清晰 *!*/
+}
+
+/*.count-display {*/
+/*    position: absolute;*/
+/*    right: 10px;*/
+/*    background-color: #da1c1c;*/
+/*    padding: 2px 6px;*/
+/*    border-radius: 10px;*/
+/*    font-size: 14px;*/
+/*    color: #e3dbdb;*/
+/*}*/
+
+.count-display {
+    position: absolute;
+    top: -5px; /* 調整此值以上下移動 */
+    right: -10px; /* 調整此值以左右移動 */
+    background-color: #F2E9CF;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 14px; /* 稍微減小字體大小 */
+    color: #000000;
+    min-width: 40px; /* 確保單個數字也能保持圓形 */
+    height: 20px; /* 設置固定高度 */
+    display: flex;
+    /*display: none; !* 初始狀態隱藏 *!*/
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2); /* 添加輕微陰影以提高可讀性 */
+}
+
+.action-button .material-symbols-outlined {
+    font-size: 24px; /* 調整大小以匹配原SVG */
+    width: 20px;
+    height: auto;
+    fill: currentColor; /* 使用當前文字顏色 */
+}
+
+.library-dropdown .action-button {
+    width: 100%; /* 保持 library-dropdown 按鈕全寬 */
+    justify-content: center;
+    margin-bottom: 5px;
+}
+
+.library-dropdown-content {
+    width: 100%; /* 使下拉内容与按钮等宽 */
+    box-sizing: border-box; /* 确保内边距不会增加总宽度 */
+}
+
+.library-dropdown:hover .library-dropdown-content {
+    display: block;
+}
+
+#library-select {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+/* b 大容器樣式 */
+.container-b {
+    width: 70%;
+    margin: 10px auto 30px;
+    display: flex;
+    flex-direction: column;
+    min-height: 174px; /* 設置最小高度 */
+    max-height: 600px; /* 設置最大高度，超過此高度時出現滾動條 */
+    overflow-y: auto; /* 允許垂直滾動 */
+    padding: 10px 20px;
+    border-radius: 10px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: relative; /* 為絕對定位的子元素提供參考 */
+}
+
+.loading-container-b {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.8);
+    z-index: 10;
+}
+
+/* 新增用於控制內容可見性的樣式 */
+.container-b-content {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.container-b-content.loaded {
+    opacity: 1;
+}
+
+.comment-container, .quote-container {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+    padding: 10px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* 添加過渡效果 */
+    cursor: pointer; /* 改變鼠標樣式，表示可點擊 */
+    position: relative; /* 為絕對定位的按鈕容器提供參考 */
+}
+
+/* 懸停效果 */
+.comment-container:hover, .quote-container:hover {
+    transform: scale(1.03); /* 放大效果 */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* 添加陰影效果 */
+    z-index: 1; /* 確保懸停的元素在其他元素之上 */
+}
+
+.comment-container:hover .button-container,
+.quote-container:hover .button-container {
+    display: flex; /* 懸停時顯示按鈕 */
+}
+
+/* 左側 comment 部分 */
+.comment-text, .quote-text {
+    /*width: 80%;*/
+    word-wrap: break-word;
+    font-size: 20px;
+    margin-bottom: 5px; /* Add some space between comment and book name */
+}
+
+/* 左側 bookName, userName 部分 */
+.comment-user-id, .quote-user-id, .comment-book-name, .quote-book-name, .comment-user-name, .quote-user-name {
+    /*width: 20%;*/
+    /*text-align: right;*/
+    text-align: left; /* Align the book name to the left */
+    font-size: 16px;
+    color: #666;
+    font-style: italic;
+}
+
+.comment-content, .quote-content {
+    flex-grow: 1;
+}
+
+/* comment, quote 在 container 內直接編輯*/
+[contenteditable="true"] {
+    border: 1px solid #007bff;
+    padding: 5px;
+    border-radius: 4px;
+}
+
+[contenteditable="true"]:focus {
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+}
+
+/* 固定 button-container 在右下角*/
+.button-container {
+    position: absolute;
+    /*top: 10px;*/
+    bottom: 6px;
+    right: 10px;
+    display: none; /* 默認隱藏按鈕 */
+    gap: 10px;
+}
+
+.icon-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+.icon-button svg {
+    width: 20px;
+    height: 20px;
+    fill: #666;
+    transition: fill 0.3s ease;
+}
+
+.icon-button:hover svg {
+    fill: #041723; /* 或者你想要的任何顏色 */
+}
+
+.delete-edit-button {
+    margin: 0 5px;
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    background-color: #f0f0f0;
+    cursor: pointer;
+}
+
+.delete-edit-button:hover {
+    background-color: #ddd;
+}
+
+
+.container-b-controls {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+/* 容器 C 的樣式 */
+#containerC {
+    width: 60%;
+    margin: 20px auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+#input-box {
+    width: 100%;
+    height: 100px;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    font-size: 16px;
+}
+
+#submit-button {
+    padding: 10px 0;
+    background-color: #E1F5F4;
+    color: #000000;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 120px;
+}
+
+
+
+
