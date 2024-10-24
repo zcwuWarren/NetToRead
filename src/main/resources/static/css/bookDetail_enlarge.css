@@ -173,16 +173,6 @@
     /*color: #041723; !* 可以設置一個對比色,使文字更清晰 *!*/
 }
 
-/*.count-display {*/
-/*    position: absolute;*/
-/*    right: 10px;*/
-/*    background-color: #da1c1c;*/
-/*    padding: 2px 6px;*/
-/*    border-radius: 10px;*/
-/*    font-size: 14px;*/
-/*    color: #e3dbdb;*/
-/*}*/
-
 .count-display {
     position: absolute;
     top: -5px; /* 調整此值以上下移動 */

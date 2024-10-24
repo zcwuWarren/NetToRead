@@ -12,11 +12,11 @@ public class RegisterForm {
     @NotBlank
     private String userName;
 
-    @Email(message = "請輸入有效的電子郵件地址") // 1. 使用 @Email 註解來檢查 email 格式
-    @NotBlank(message = "電子郵件地址不能為空") // 2. 使用 @NotBlank 確保這個欄位不為空
+    @Email(message = "請輸入有效的電子郵件地址") // @Email for validating email format
+    @NotBlank(message = "電子郵件地址不能為空") // @NotBlank for validating no blank
     private String email;
 
-    @NotBlank(message = "密碼不能為空") // 3. 確保密碼不為空
-    @ValidPassword // 4. 使用自訂的密碼驗證註解
+    @NotBlank(message = "密碼不能為空")
+    @ValidPassword // for custom password rule
     private String password;
 }

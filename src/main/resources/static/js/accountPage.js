@@ -19,14 +19,14 @@ document.addEventListener("DOMContentLoaded", function() {
     function isTokenExpired(token) {
         const tokenParts = token.split('.');
         if (tokenParts.length !== 3) {
-            return true;  // 無效的 token
+            return true;  // invalid token
         }
 
         const decodedPayload = JSON.parse(atob(tokenParts[1]));
-        const expirationDate = new Date(decodedPayload.exp * 1000);  // exp 是以秒計算的
+        const expirationDate = new Date(decodedPayload.exp * 1000);
         const now = new Date();
 
-        return expirationDate < now;  // 如果當前時間大於過期時間，token 已過期
+        return expirationDate < now;
     }
 
     function switchToLogin() {
@@ -39,7 +39,6 @@ document.addEventListener("DOMContentLoaded", function() {
         registerContainer.style.display = 'block';
     }
 
-    // 添加事件监听器
     createAccountButton.addEventListener('click', switchToRegister);
 
     loginSubmitButton.addEventListener('click', async () => {
@@ -110,7 +109,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
             if (response.ok) {
                 alert(result.message);
-                switchToLogin(); // 注册成功后切换到登录界面
+                switchToLogin();
             } else {
                 alert(result.message);
             }

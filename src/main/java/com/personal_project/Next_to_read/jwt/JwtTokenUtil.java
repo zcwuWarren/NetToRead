@@ -33,11 +33,6 @@ public class JwtTokenUtil {
         Claims claims = getAllClaimsFromToken(token);
         Long userId = claims.get("userId", Long.class);
         String username = claims.get("username", String.class);
-//        List<String> rolesList = claims.get("roles", List.class);
-//        Set<String> roles = new HashSet<>(rolesList);
-
-        //username field stores email
-//        User user = User.builder().id(userId).email(username).roles(roles).build();
         User user = User.builder().userId(userId).email(username).build();
 
 

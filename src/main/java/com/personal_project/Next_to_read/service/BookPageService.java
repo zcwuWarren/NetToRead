@@ -59,12 +59,6 @@ public class BookPageService {
         return bookInfoRepository.findDistinctCategories();
     }
 
-    public List<BookInfoDto> getTop6BooksByLikesByCategory(String subCategory) {
-        List<BookInfo> books = bookInfoRepository.findTop6BySubCategoryOrderByLikesDesc(subCategory);
-        // turn to BookInfoDto
-        return BookInfoDtoConverter.convertToDtoList(books);
-    }
-
     public List<BookCommentDto> getCommentsByBookId(Long bookId, int offset, int limit) {
         Pageable pageable = PageRequest.of(offset / limit, limit);
         Page<BookCommentSql> commentPage = bookCommentSqlRepository.findByBookIdOrderByTimestampDesc(bookId, pageable);
@@ -155,33 +149,29 @@ public class BookPageService {
             ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
             long totalCached = zSetOps.size(LIKED_BOOKS_CACHE_KEY);
 
-            logger.info("嘗試從緩存中獲取最新點讚書籍。Offset: {}, Limit: {}, 緩存總數: {}", offset, limit, totalCached);
+            logger.info("get latest liked book from cache. Offset: {}, Limit: {}, total cached size: {}", offset, limit, totalCached);
 
             if (totalCached < CACHE_SIZE || offset + limit > totalCached) {
-                logger.info("緩存未命中或數據不足。從資料庫更新緩存。");
-                long startTime = System.currentTimeMillis();
+                logger.info("cache miss or insufficient data, updating cache from database");
                 updateFullCacheOfLatestLikes();
-                logger.info("更新緩存耗時: {} ms", System.currentTimeMillis() - startTime);
             }
 
+            // get liked book from cache
             long startTime = System.currentTimeMillis();
             Set<String> cachedBooks = zSetOps.reverseRange(LIKED_BOOKS_CACHE_KEY, offset, offset + limit - 1);
-            logger.info("從緩存獲取數據耗時: {} ms", System.currentTimeMillis() - startTime);
 
             if (cachedBooks != null && cachedBooks.size() == limit) {
-                logger.info("成功從緩存中檢索到 {} 本書", cachedBooks.size());
-                startTime = System.currentTimeMillis();
-                logger.info("反序列化耗時: {} ms", System.currentTimeMillis() - startTime);
+                logger.info("get {} books from cache", cachedBooks.size());
                 return deserializeBooks(new ArrayList<>(cachedBooks));
             } else {
-                logger.warn("緩存檢索失敗或不完整。從資料庫獲取。");
+                logger.warn("get cache failed, get data form database");
                 return getLatestLikedBooksFromDatabase(offset, limit);
             }
         } catch (RedisConnectionFailureException e) {
-            logger.error("連接 Redis 失敗。回退到資料庫。", e);
+            logger.error("connect redis failed, get data from database", e);
             return getLatestLikedBooksFromDatabase(offset, limit);
         } catch (Exception e) {
-            logger.error("獲取緩存中的最新點讚書籍時發生意外錯誤", e);
+            logger.error("error in getting latest liked from cache", e);
             return getLatestLikedBooksFromDatabase(offset, limit);
         }
     }
@@ -210,8 +200,8 @@ public class BookPageService {
         try {
             return objectMapper.writeValueAsString(BookInfoDtoConverter.convertToDto(book));
         } catch (Exception e) {
-            logger.error("序列化書籍時發生錯誤", e);
-            throw new RuntimeException("序列化書籍失敗", e);
+            logger.error("error in serializing book error", e);
+            throw new RuntimeException("serialized failed", e);
         }
     }
 
@@ -225,31 +215,30 @@ public class BookPageService {
         try {
             return objectMapper.readValue(serialized, BookInfoDto.class);
         } catch (IOException e) {
-            logger.error("反序列化書籍時發生錯誤", e);
-            throw new RuntimeException("反序列化書籍失敗", e);
+            logger.error("error in deserializing book error", e);
+            throw new RuntimeException("deserialized failed", e);
         }
     }
 
     private void updateFullCacheOfLatestLikes() {
         try {
-            logger.info("使用最新點讚的書籍更新完整緩存");
+            logger.info("update latest liked book to fully update cache");
             ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
 
             Page<UserBookshelfSql> latestLikes = userBookshelfSqlRepository.findByLikesTrueOrderByTimestampLikeDesc(PageRequest.of(0, CACHE_SIZE));
-            logger.info("種共有幾本書" + latestLikes.getContent().size());
 
             redisTemplate.delete(LIKED_BOOKS_CACHE_KEY);
-            logger.info("清除現有緩存");
+            logger.info("delete current cache");
 
             for (UserBookshelfSql like : latestLikes) {
                 BookInfo book = like.getBookId();
                 zSetOps.add(LIKED_BOOKS_CACHE_KEY, serializeBook(book), like.getTimestampLike().getTime());
             }
-            logger.info("新增 {} 本書到緩存", latestLikes.getNumberOfElements());
+            logger.info("add {} books to cache", latestLikes.getNumberOfElements());
         } catch (RedisConnectionFailureException e) {
-            logger.error("由於 Redis 連接問題，無法更新完整緩存", e);
+            logger.error("redis connect error, update full cache of latest like failed", e);
         } catch (Exception e) {
-            logger.error("更新完整緩存時發生意外錯誤", e);
+            logger.error("error in fully updated cache", e);
         }
     }
 
@@ -258,33 +247,27 @@ public class BookPageService {
             ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
             long totalCached = zSetOps.size(COLLECTED_BOOKS_CACHE_KEY);
 
-            logger.info("嘗試從緩存中獲取最新收藏書籍。Offset: {}, Limit: {}, 緩存總數: {}", offset, limit, totalCached);
+            logger.info("get latest collected book from cache. Offset: {}, Limit: {}, total cached size: {}", offset, limit, totalCached);
 
             if (totalCached < CACHE_SIZE || offset + limit > totalCached) {
-                logger.info("緩存未命中或數據不足。從資料庫更新緩存。");
-                long startTime = System.currentTimeMillis();
+                logger.info("cache miss or insufficient data, updating cache from database");
                 updateFullCacheOfLatestCollects();
-                logger.info("更新緩存耗時: {} ms", System.currentTimeMillis() - startTime);
             }
 
-            long startTime = System.currentTimeMillis();
             Set<String> cachedBooks = zSetOps.reverseRange(COLLECTED_BOOKS_CACHE_KEY, offset, offset + limit - 1);
-            logger.info("從緩存獲取數據耗時: {} ms", System.currentTimeMillis() - startTime);
 
             if (cachedBooks != null && cachedBooks.size() == limit) {
-                logger.info("成功從緩存中檢索到 {} 本書", cachedBooks.size());
-                startTime = System.currentTimeMillis();
-                logger.info("反序列化耗時: {} ms", System.currentTimeMillis() - startTime);
+                logger.info("get {} books from cache", cachedBooks.size());
                 return deserializeBooks(new ArrayList<>(cachedBooks));
             } else {
-                logger.warn("緩存檢索失敗或不完整。從資料庫獲取。");
+                logger.warn("get cache failed, get data form database");
                 return getLatestCollectedBooksFromDatabase(offset, limit);
             }
         } catch (RedisConnectionFailureException e) {
-            logger.error("連接 Redis 失敗。回退到資料庫。", e);
+            logger.error("connect redis failed, get data from database", e);
             return getLatestCollectedBooksFromDatabase(offset, limit);
         } catch (Exception e) {
-            logger.error("獲取緩存中的最新點讚書籍時發生意外錯誤", e);
+            logger.error("error in getting latest liked from cache", e);
             return getLatestCollectedBooksFromDatabase(offset, limit);
         }
     }
@@ -317,24 +300,23 @@ public class BookPageService {
 
     private void updateFullCacheOfLatestCollects() {
         try {
-            logger.info("使用最新收藏的書籍更新完整緩存");
+            logger.info("update latest collected book to fully update cache");
             ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
 
             Page<UserBookshelfSql> latestCollects = userBookshelfSqlRepository.findByCollectsTrueOrderByTimestampCollectDesc(PageRequest.of(0, CACHE_SIZE));
-            logger.info("種共有幾本書" + latestCollects.getContent().size());
 
             redisTemplate.delete(COLLECTED_BOOKS_CACHE_KEY);
-            logger.info("清除現有緩存");
+            logger.info("delete current cache");
 
             for (UserBookshelfSql collect : latestCollects) {
                 BookInfo book = collect.getBookId();
                 zSetOps.add(COLLECTED_BOOKS_CACHE_KEY, serializeBook(book), collect.getTimestampCollect().getTime());
             }
-            logger.info("新增 {} 本書到緩存", latestCollects.getNumberOfElements());
+            logger.info("add {} books to cache", latestCollects.getNumberOfElements());
         } catch (RedisConnectionFailureException e) {
-            logger.error("由於 Redis 連接問題，無法更新完整緩存", e);
+            logger.error("redis connect error, update full cache of latest like failed", e);
         } catch (Exception e) {
-            logger.error("更新完整緩存時發生意外錯誤", e);
+            logger.error("error in fully updated cache", e);
         }
     }
 
