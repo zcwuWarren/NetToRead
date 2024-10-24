@@ -22,5 +22,5 @@ ___
 [![來 Quote 冊 Demo](https://dy16yxlrc5irl.cloudfront.net/personal_project/comeQuoteBook/ComeQuoteBook_demo.png)](https://www.youtube.com/watch?v=JIFo0jYvCas)
 
 ## Contact
-[![Gmail](https://img.shields.io/badge/Gmail-EA4335.svg?style=for-the-badge&logo=Gmail&logoColor=white)](z.c.wu32@gmail.com) [![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2.svg?style=for-the-badge&logo=LinkedIn&logoColor=white)](Linkedin.com/in/zcwu)
+[![Gmail](https://img.shields.io/badge/Gmail-EA4335.svg?style=for-the-badge&logo=Gmail&logoColor=white)](https://sz.c.wu32@gmail.com) [![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2.svg?style=for-the-badge&logo=LinkedIn&logoColor=white)](https://Linkedin.com/in/zcwu)
 
