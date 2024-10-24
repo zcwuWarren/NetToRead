@@ -17,9 +17,6 @@ public class DateUtil {
 
         ZonedDateTime zonedDateTime = timestamp.toInstant().atZone(ZoneId.systemDefault());
 
-//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-//        return sdf.format(timestamp);
-
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         return zonedDateTime.format(formatter);
     }

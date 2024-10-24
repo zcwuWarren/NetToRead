@@ -17,12 +17,12 @@ public class RedisConfig {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
 
-        // 使用 Jackson2JsonRedisSerializer 来序列化和反序列化 redis 的 value 值
+        // Jackson2JsonRedisSerializer for serializer and deserializer value of redis
         Jackson2JsonRedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer<>(Object.class);
 
         template.setValueSerializer(serializer);
         template.setHashValueSerializer(serializer);
-        // 使用 StringRedisSerializer 来序列化和反序列化 redis 的 key 值
+        // StringRedisSerializer for serializer and deserializer key of redis
         template.setKeySerializer(new StringRedisSerializer());
         template.setHashKeySerializer(new StringRedisSerializer());
 
@@ -31,16 +31,3 @@ public class RedisConfig {
         return template;
     }
 }
-//
-//    @Bean
-//    public RedisConnectionFactory redisConnectionFactory() {
-//        RedisStandaloneConfiguration redisConfig = new RedisStandaloneConfiguration();
-//        redisConfig.setHostName("warren.gbvbyb.ng.0001.apne1.cache.amazonaws.com");
-//        redisConfig.setPort(6379);
-////        redisConfig.setPassword("your-auth-token"); // 如果設置了密碼
-//
-//        LettuceConnectionFactory lettuceConnectionFactory = new LettuceConnectionFactory(redisConfig);
-//        lettuceConnectionFactory.setUseSsl(false);
-//
-//        return lettuceConnectionFactory;
-//    }

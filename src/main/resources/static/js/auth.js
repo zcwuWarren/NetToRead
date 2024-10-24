@@ -6,14 +6,14 @@ document.addEventListener("DOMContentLoaded", function() {
         if (!token) return true;
         const tokenParts = token.split('.');
         if (tokenParts.length !== 3) {
-            return true;  // 無效的 token
+            return true;  // invalid token
         }
 
         const decodedPayload = JSON.parse(atob(tokenParts[1]));
-        const expirationDate = new Date(decodedPayload.exp * 1000);  // exp 是以秒計算的
+        const expirationDate = new Date(decodedPayload.exp * 1000);
         const now = new Date();
 
-        return expirationDate < now;  // 如果當前時間大於過期時間，token 已過期
+        return expirationDate < now;
     }
 
     function updateLoginLogoutButton() {
@@ -22,17 +22,17 @@ document.addEventListener("DOMContentLoaded", function() {
             document.getElementById('logoutButton').addEventListener('click', function(e) {
                 e.preventDefault();
                 localStorage.removeItem('jwtToken');
-                window.location.reload(); // 重新加載當前頁面
+                window.location.reload();
             });
         } else {
             loginLogoutElement.innerHTML = '<a href="account.html">登入 / 註冊</a>';
         }
     }
 
-    // 初始化按鈕狀態
+    // initial button status
     updateLoginLogoutButton();
 
-    // 檢查並處理 token
+    // check and handle token
     if (token) {
         if (isTokenExpired(token)) {
             console.error("JWT Token has expired.");

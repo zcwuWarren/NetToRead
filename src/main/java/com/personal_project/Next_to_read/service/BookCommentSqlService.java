@@ -70,13 +70,11 @@ public class BookCommentSqlService {
 
             logger.info("Attempting to fetch comments. Offset: {}, Limit: {}, Total cached: {}", offset, limit, totalCached);
 
-            // 如果是請求第一頁（offset == 0），且緩存不滿，則更新緩存
             if (offset == 0 && totalCached < CACHE_SIZE) {
                 logger.info("Requesting first page and cache is not full. Updating cache from database.");
                 updateFullCache();
             }
 
-             //如果請求的是第一頁，直接從緩存返回
             if (offset == 0) {
                 Set<String> cachedComments = zSetOps.reverseRange(CACHE_KEY, 0, CACHE_SIZE - 1);
                 if (cachedComments != null && cachedComments.size() == CACHE_SIZE) {
@@ -85,7 +83,6 @@ public class BookCommentSqlService {
                 }
             }
 
-            // 對於其他頁面，直接從數據庫獲取
             logger.info("Fetching comments from database. Offset: {}, Limit: {}", offset, limit);
             return getCommentsFromDatabase(offset, limit);
         } catch (RedisConnectionFailureException e) {
@@ -225,7 +222,7 @@ public class BookCommentSqlService {
                 if (comment.getUserId().getUserId().equals(user.getUserId())) {
                     bookCommentSqlRepository.delete(comment);
 
-                    // 從緩存中刪除
+                    // delete form cache
                     ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
                     Set<String> cachedComments = zSetOps.rangeByScore(CACHE_KEY, comment.getTimestamp().getTime(), comment.getTimestamp().getTime());
                     Long removed = 0L;
@@ -234,7 +231,7 @@ public class BookCommentSqlService {
                     }
                     logger.info("Removed {} entries from cache", removed);
 
-                    // 如果刪除的 comment 在緩存中，需要補充一個新的 comment
+                    // if deleted comment in cache, getting new comment into cache
                     if (removed > 0) {
                         updateCacheAfterDeletion();
                     }
@@ -253,7 +250,7 @@ public class BookCommentSqlService {
         ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
         long cacheSize = zSetOps.size(CACHE_KEY);
         if (cacheSize < CACHE_SIZE) {
-            // 獲取緩存中最舊的評論的時間戳
+            // get timestamp of oldest comment in cache
             Set<String> oldestCommentSet = zSetOps.range(CACHE_KEY, -1, -1);
             if (oldestCommentSet.isEmpty()) {
                 logger.warn("Cache is empty after deletion. Unable to determine oldest comment.");
@@ -263,7 +260,7 @@ public class BookCommentSqlService {
             BookCommentSql oldestComment = deserializeComment(oldestCommentStr);
             Timestamp oldestTimestamp = oldestComment.getTimestamp();
 
-            // 從數據庫中獲取下一個應該進入緩存的評論
+            // get next older comment by timestamp from database into cache
             List<BookCommentSql> nextComments = bookCommentSqlRepository.findFirstByTimestampLessThanOrderByTimestampDesc(
                     oldestTimestamp,
                     PageRequest.of(0, 1)
@@ -285,23 +282,22 @@ public class BookCommentSqlService {
         try {
             logger.info("Adding new comment for book ID: {}", bookId);
 
-            // 從 token 獲取用戶
+            // get user for JWTtoken
             User user = jwtTokenUtil.getUserFromToken(token);
 
-            // 查找 BookInfo
+            // find BookInfo
             BookInfo bookInfo = bookinfoRepository.findByBookId(bookId)
                     .orElseThrow(() -> new ResourceNotFoundException("Book not found with id: " + bookId));
 
-            // 檢查用戶是否已經評論過這本書
+            // check if user has already commented the book
             Optional<BookCommentSql> existingComment = bookCommentSqlRepository.findByUserId_UserIdAndBookId_BookId(user.getUserId(), bookInfo.getBookId());
 
-            // 如果已經評論過，返回 false
             if (existingComment.isPresent()) {
                 logger.info("User {} has already commented on book {}. Comment not added.", user.getUserId(), bookId);
                 return false;
             }
 
-            // 如果還沒有評論，設置新的評論
+            // if not yet comment, add new comment
             BookCommentSql bookCommentSql = new BookCommentSql();
             bookCommentSql.setBookId(bookInfo);
             bookCommentSql.setUserId(user);
@@ -310,11 +306,10 @@ public class BookCommentSqlService {
             bookCommentSql.setMainCategory(bookInfo.getMainCategory());
             bookCommentSql.setSubCategory(bookInfo.getSubCategory());
 
-            // 儲存評論
             bookCommentSqlRepository.save(bookCommentSql);
             logger.info("Comment saved to database with ID: {}", bookCommentSql.getId());
 
-            // 更新緩存
+            // update cache
             updateCache(bookCommentSql);
 
             return true;
@@ -372,9 +367,7 @@ public class BookCommentSqlService {
         userBookshelfSqlRepository.save(userBookshelfSql);
         bookinfoRepository.save(bookInfo);
 
-//        updateLikedBooksCache(bookInfo, isLiked, userBookshelfSql.getTimestampLike());
-
-        // 更新緩存
+        // update cache
         if (isLiked) {
             addToLikedBooksCache(bookInfo, userBookshelfSql.getTimestampLike());
         } else {
@@ -387,7 +380,7 @@ public class BookCommentSqlService {
     public void addToLikedBooksCache(BookInfo book, Timestamp likeTimestamp) {
         ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
         zSetOps.add(LIKED_BOOKS_CACHE_KEY, serializeBook(book), likeTimestamp.getTime());
-        // 如果緩存大小超過限制，移除最舊的元素
+        // if cache liked book > cache size, removing the oldest member
         if (zSetOps.size(LIKED_BOOKS_CACHE_KEY) > CACHE_SIZE) {
             zSetOps.removeRange(LIKED_BOOKS_CACHE_KEY, 0, 0);
         }
@@ -398,28 +391,28 @@ public class BookCommentSqlService {
         zSetOps.remove(LIKED_BOOKS_CACHE_KEY, serializeBook(book));
     }
 
-    private void updateLikedBooksCache(BookInfo book, boolean isLiked, Timestamp timestamp) {
-        ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
-        String serializedBook = serializeBook(book);
-
-        if (isLiked) {
-            zSetOps.add(LIKED_BOOKS_CACHE_KEY, serializedBook, timestamp.getTime());
-            if (zSetOps.size(LIKED_BOOKS_CACHE_KEY) > CACHE_SIZE) {
-                zSetOps.removeRange(LIKED_BOOKS_CACHE_KEY, 0, 0);
-            }
-        } else {
-            zSetOps.remove(LIKED_BOOKS_CACHE_KEY, serializedBook);
-        }
-
-        logger.info("已更新喜歡的書籍緩存。書籍 ID: {}, 是否喜歡: {}", book.getBookId(), isLiked);
-    }
+//    private void updateLikedBooksCache(BookInfo book, boolean isLiked, Timestamp timestamp) {
+//        ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
+//        String serializedBook = serializeBook(book);
+//
+//        if (isLiked) {
+//            zSetOps.add(LIKED_BOOKS_CACHE_KEY, serializedBook, timestamp.getTime());
+//            if (zSetOps.size(LIKED_BOOKS_CACHE_KEY) > CACHE_SIZE) {
+//                zSetOps.removeRange(LIKED_BOOKS_CACHE_KEY, 0, 0);
+//            }
+//        } else {
+//            zSetOps.remove(LIKED_BOOKS_CACHE_KEY, serializedBook);
+//        }
+//
+//        logger.info("已更新喜歡的書籍緩存。書籍 ID: {}, 是否喜歡: {}", book.getBookId(), isLiked);
+//    }
 
     private String serializeBook(BookInfo book) {
         try {
             return objectMapper.writeValueAsString(BookInfoDtoConverter.convertToDto(book));
         } catch (Exception e) {
-            logger.error("序列化書籍時發生錯誤", e);
-            throw new RuntimeException("序列化書籍失敗", e);
+            logger.error("serializing error", e);
+            throw new RuntimeException("serialized failed", e);
         }
     }
 
@@ -508,16 +501,16 @@ public class BookCommentSqlService {
                 BookCommentSql commentToUpdate = commentOpt.get();
                 ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
 
-                // 查找緩存中的 Comment
+                // find Comment in cache
                 Set<String> cachedComments = zSetOps.rangeByScore(CACHE_KEY, commentToUpdate.getTimestamp().getTime(), commentToUpdate.getTimestamp().getTime());
                 boolean inCache = !cachedComments.isEmpty();
 
-                // 更新 Comment 內容，但不更新時間戳
+                // update comment content, without updating timestamp
                 commentToUpdate.setComment(updatedComment);
                 bookCommentSqlRepository.save(commentToUpdate);
 
                 if (inCache) {
-                    // 如果在緩存中，更新緩存
+                    // if edited comment already in cache, update cache
                     String oldSerializedComment = cachedComments.iterator().next();
                     zSetOps.remove(CACHE_KEY, oldSerializedComment);
                     String newSerializedComment = serializeComment(commentToUpdate);

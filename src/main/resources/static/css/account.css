@@ -30,15 +30,6 @@
     color: #fff;
 }
 
-/*input {*/
-/*    width: 100%;*/
-/*    padding: 12px;*/
-/*    margin-bottom: 12px;*/
-/*    border: 1px solid #dddfe2;*/
-/*    border-radius: 4px;*/
-/*    font-size: 16px;*/
-/*}*/
-
 #login-email, #login-password, #register-username, #register-email, #register-password {
     width: 100%;
     padding: 12px;

@@ -4,17 +4,17 @@ document.addEventListener("DOMContentLoaded", async function() {
     const loadingContainer = document.querySelector('.loading-container');
     const containerA1 = document.getElementById('containerA1');
 
-    // 顯示 loading
+    // show loading
     function showLoading() {
         loadingContainer.style.display = 'flex';
     }
 
-    // 隱藏 loading
+    // hide loading
     function hideLoading() {
         loadingContainer.style.display = 'none';
     }
 
-    // 從 URL 中提取 bookId
+    // get bookId from URL
     const urlParams = new URLSearchParams(window.location.search);
     const bookId = urlParams.get('bookId');
     const token = localStorage.getItem('jwtToken');
@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", async function() {
 
     if (bookId) {
         try {
-            showLoading(); // 顯示 loading
+            showLoading(); // show loading
 
             const response = await fetch(`/api/bookPage/getBookInfo?bookId=${bookId}`);
             book = await response.json();
@@ -37,16 +37,15 @@ document.addEventListener("DOMContentLoaded", async function() {
             const likeButton = document.getElementById('like-button');
             const collectButton = document.getElementById('collect-button');
 
-            // 預加載圖片
+            // loading image
             const img = new Image();
             img.onload = function() {
-                // 圖片加載完成後，將其添加到 DOM 並淡入
-                containerA1.innerHTML = ''; // 清空可能存在的佔位符
+                containerA1.innerHTML = '';
                 containerA1.appendChild(img);
                 setTimeout(() => {
                     img.classList.add('loaded');
                     hideLoading();
-                }, 100); // 短暫延遲以確保過渡效果順滑
+                }, 100);
             };
             img.onerror = function() {
                 console.error('無法加載圖片');
@@ -55,29 +54,27 @@ document.addEventListener("DOMContentLoaded", async function() {
             img.src = book.bookCover;
             img.alt = book.bookName;
 
-            // 更新点赞和收藏按钮的裡面的数字
+            // update count of like, collect button
             document.getElementById('like-count').textContent = book.like;
             document.getElementById('collect-count').textContent = book.collect;
 
-            // 更新點讚和收藏按鈕裡面的數字，並根據數值決定是否顯示
+            // update count of like, collect button, and displaying depended on the count
             updateCountDisplay('like-count', book.like);
             updateCountDisplay('collect-count', book.collect);
 
-            // 渲染书籍信息
+            // render book info
             document.getElementById('bookName').innerHTML = `<span>${book.bookName}</span>`;
             document.getElementById('author').innerHTML = `<span>${book.author}</span>`;
             document.getElementById('publisher').innerHTML = `<strong>出版社：</strong> <span>${book.publisher}</span>`;
             document.getElementById('publishDate').innerHTML = `<strong>出版日期：</strong> <span>${book.publishDate}</span>`;
             document.getElementById('isbn').innerHTML = `<strong>ISBN：</strong> <span>${book.isbn}</span>`;
-            // document.getElementById('likes').innerHTML = `<strong>點讚數：</strong> <span>${book.like}</span>`;
-            // document.getElementById('collects').innerHTML = `<strong>收藏數：</strong> <span>${book.collect}</span>`;
             document.getElementById('content').innerHTML = `<span>${book.content}</span>`;
 
-            // 渲染書籍描述
+            // render book description
             const bookDescription = `<div class="container-a-3-long-content">${book.description}</div>`;
             containerA3.innerHTML = bookDescription;
 
-            // 圖書館主容器下拉選單查詢功能
+            // find book in library
             const librarySelect = document.getElementById('library-select');
             if (librarySelect) {
                 librarySelect.addEventListener('change', function() {
@@ -99,7 +96,7 @@ document.addEventListener("DOMContentLoaded", async function() {
                 console.error("Library select element not found");
             }
 
-            // 按讚功能
+            // like
             likeButton.addEventListener('click', async () => {
                 const token = localStorage.getItem('jwtToken');
                 if (!token) {
@@ -119,24 +116,23 @@ document.addEventListener("DOMContentLoaded", async function() {
                     const result = await response.json();
                     if (response.ok) {
                         alert(result.message);
-                        // 切換按鈕狀態
+                        // switch button status
                         likeButton.classList.toggle('active');
                     } else {
                         alert(result.message);
-                        // 切換按鈕狀態
+                        // switch button status
                         likeButton.classList.remove('active');
                     }
 
-                    // 無論是點讚還是取消點讚，都重新獲取書籍信息
+                    // rerender book info
                     const bookInfoResponse = await fetch(`/api/bookPage/getBookInfo?bookId=${bookId}`);
                     const updatedBook = await bookInfoResponse.json();
 
-                    // 更新點讚數
+                    // update count of like
                     const likeCountElement = document.getElementById('like-count');
                     likeCountElement.textContent = updatedBook.like;
                     updateCountDisplay('like-count', updatedBook.like);
 
-                    // 更新全局的 book 對象
                     book = updatedBook;
 
                 } catch (error) {
@@ -144,7 +140,7 @@ document.addEventListener("DOMContentLoaded", async function() {
                 }
             });
 
-            // 收藏功能
+            // collect
             collectButton.addEventListener('click', async () => {
                 const token = localStorage.getItem('jwtToken');
                 if (!token) {
@@ -318,17 +314,17 @@ document.addEventListener("DOMContentLoaded", async function() {
             if (!token) return true;
             const tokenParts = token.split('.');
             if (tokenParts.length !== 3) {
-                return true;  // 無效的 token
+                return true;
             }
 
             const decodedPayload = JSON.parse(atob(tokenParts[1]));
-            const expirationDate = new Date(decodedPayload.exp * 1000);  // exp 是以秒計算的
+            const expirationDate = new Date(decodedPayload.exp * 1000);
             const now = new Date();
 
-            return expirationDate < now;  // 如果當前時間大於過期時間，token 已過期
+            return expirationDate < now;
         }
 
-        // 检查并处理 token
+        // 檢查處理 token
         if (token) {
             if (isTokenExpired(token)) {
                 console.error("JWT Token has expired.");
@@ -339,7 +335,7 @@ document.addEventListener("DOMContentLoaded", async function() {
             }
         }
 
-        // 加载评论
+        // 加載評論
         async function loadComments() {
             if (isLoading || !hasMoreComments) return;
             isLoading = true;
@@ -366,7 +362,7 @@ document.addEventListener("DOMContentLoaded", async function() {
             }
         }
 
-        // 加载引用
+        // 加載引用
         async function loadQuotes() {
             if (isLoading || !hasMoreQuotes) return;
             isLoading = true;
@@ -393,7 +389,6 @@ document.addEventListener("DOMContentLoaded", async function() {
             }
         }
 
-        // toggleEdit, saveEdit, saveEditedComment, deleteComment, saveEditedQuote, deleteQuote 函数保持不变
         // 新增 toggleEdit
         function toggleEdit(textElement, editButton, id, type) {
             const isEditing = textElement.getAttribute('contenteditable') === 'true';
@@ -568,7 +563,7 @@ document.addEventListener("DOMContentLoaded", async function() {
                 });
         }
 
-        // 渲染评论
+        // render comment
         function renderComments(comments) {
             comments.forEach(comment => {
                 const commentDiv = document.createElement('div');
@@ -628,7 +623,7 @@ document.addEventListener("DOMContentLoaded", async function() {
             });
         }
 
-        // 渲染引用
+        // render quote
         function renderQuotes(quotes) {
             quotes.forEach(quote => {
                 const quoteDiv = document.createElement('div');
@@ -716,7 +711,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         // 初始化UI
         updateUIForMode(currentMode);
 
-        // 切换到评论
+        // 切換到評論
         bLeftButton.addEventListener('click', () => {
             currentMode = 'comment';
             updateUIForMode(currentMode);
@@ -730,7 +725,7 @@ document.addEventListener("DOMContentLoaded", async function() {
             loadComments();
         });
 
-        // 切换到引用
+        // 切換到引用
         bRightButton.addEventListener('click', () => {
             currentMode = 'quote';
             updateUIForMode(currentMode);
@@ -800,9 +795,9 @@ document.addEventListener("DOMContentLoaded", async function() {
                 const result = await response.json();
 
                 if (response.ok) {
-                    inputBox.value = ""; // 清空输入框
+                    inputBox.value = ""; // 清空輸入框
 
-                    // 重新加载评论或引用
+                    // 重新加載評論或飲用
                     commentsContainer.innerHTML = ''; // 清空容器
                     if (currentMode === 'comment') {
                         commentOffset = 0;
@@ -824,7 +819,7 @@ document.addEventListener("DOMContentLoaded", async function() {
             } finally {
                 isSubmitting = false;
             }
-        }, 300); // 300毫秒的延遲
+        }, 300);
 
         inputBox.addEventListener('compositionstart', () => {
             isComposing = true;
@@ -846,7 +841,7 @@ document.addEventListener("DOMContentLoaded", async function() {
             debouncedHandleSubmit();
         });
 
-        // 初始加载评论
+        // 初始加載評論
         loadComments();
 
         // 設置 active 狀態
