@@ -1,5 +1,4 @@
 # 來 Quote 冊
-___
 
 [來 Quote 冊](https://zcwu.site) is a book recommendation platform designed to share reading experiences through user interactions. It tackles the issue where traditional online bookstores focus on sales-driven recommendations, while social media-based book clubs often struggle with fragmented attention.
 
