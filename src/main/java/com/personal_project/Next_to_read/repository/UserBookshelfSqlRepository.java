@@ -17,22 +17,6 @@ public interface UserBookshelfSqlRepository extends JpaRepository<UserBookshelfS
 
     Optional<UserBookshelfSql> findByUserId_UserIdAndBookId_BookId(Long userId, Long bookId);
 
-    List<UserBookshelfSql> findByUserId_UserIdAndCollectTrueOrderByTimestampCollectDesc(Long userId);
-
-    List<UserBookshelfSql> findByUserId_UserIdAndLikesTrueOrderByTimestampLikeDesc(Long userId);
-    // find book by subcategory sort by like timestamp descending
-    @Query("SELECT u.bookId.bookId FROM UserBookshelfSql u WHERE u.subCategory = :subCategory ORDER BY u.timestampLike DESC")
-    List<Long> findTop6BookIdsBySubCategoryOrderByTimestampLikeDesc(String subCategory);
-
-    @Query("SELECT u.bookId.bookId FROM UserBookshelfSql u WHERE u.subCategory = :subCategory ORDER BY u.timestampCollect DESC")
-    List<Long> findTop6BookIdsBySubCategoryOrderByTimestampCollectDesc(String subCategory);
-
-    @Query("SELECT u.bookId.bookId FROM UserBookshelfSql u ORDER BY u.timestampLike DESC")
-    List<Long> findTop6BookIdsByOrderByTimestampLikeDesc();
-
-    @Query("SELECT u.bookId.bookId FROM UserBookshelfSql u ORDER BY u.timestampCollect DESC")
-    List<Long> findTop6BookIdsOrderByTimestampCollectDesc();
-
     @Query(value = "SELECT ubs.book_id " +
             "FROM user_bookshelf ubs " +
             "WHERE ubs.likes = true " +

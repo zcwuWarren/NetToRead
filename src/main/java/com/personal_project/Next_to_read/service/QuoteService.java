@@ -101,7 +101,6 @@ public class QuoteService {
                 updateFullCache();
             }
 
-            // 如果請求的是第一頁，直接從緩存返回
             if (offset == 0) {
                 Set<String> cachedQuotes = zSetOps.reverseRange(CACHE_KEY, 0, CACHE_SIZE - 1);
                 if (cachedQuotes != null && cachedQuotes.size() == CACHE_SIZE) {
@@ -110,7 +109,6 @@ public class QuoteService {
                 }
             }
 
-            // 對於其他頁面，直接從數據庫獲取
             logger.info("Fetching quotes from database. Offset: {}, Limit: {}", offset, limit);
             return getQuotesFromDatabase(offset, limit);
         } catch (RedisConnectionFailureException e) {
@@ -284,7 +282,7 @@ public class QuoteService {
                 if (quote.getUserId().getUserId().equals(user.getUserId())) {
                     quoteRepository.delete(quote);
 
-                    // 從緩存中刪除
+                    // delete from cache
                     ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
                     Set<String> cachedQuotes = zSetOps.rangeByScore(CACHE_KEY, quote.getTimestamp().getTime(), quote.getTimestamp().getTime());
                     Long removed = 0L;
@@ -293,7 +291,7 @@ public class QuoteService {
                     }
                     logger.info("Removed {} entries from cache", removed);
 
-                    // 如果刪除的 quote 在緩存中，需要補充一個新的 quote
+                    // if deleted quote in cache, getting new quote into cache
                     if (removed > 0) {
                         updateCacheAfterDeletion();
                     }
@@ -312,7 +310,7 @@ public class QuoteService {
         ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
         long cacheSize = zSetOps.size(CACHE_KEY);
         if (cacheSize < CACHE_SIZE) {
-            // 獲取緩存中最舊的 quote 的時間戳
+            // get timestamp of oldest quote in cache
             Set<String> oldestQuoteSet = zSetOps.range(CACHE_KEY, -1, -1);
             if (oldestQuoteSet.isEmpty()) {
                 logger.warn("Cache is empty after deletion. Unable to determine oldest quote.");
@@ -322,7 +320,7 @@ public class QuoteService {
             Quote oldestQuote = deserializeQuote(oldestQuoteStr);
             Timestamp oldestTimestamp = oldestQuote.getTimestamp();
 
-            // 從數據庫中獲取下一個應該進入緩存的 quote
+            // get next older quote by timestamp from database into cache
             List<Quote> nextQuotes = quoteRepository.findFirstByTimestampLessThanOrderByTimestampDesc(
                     oldestTimestamp,
                     PageRequest.of(0, 1)
@@ -348,16 +346,16 @@ public class QuoteService {
                 Quote quoteToUpdate = quoteOpt.get();
                 ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
 
-                // 查找緩存中的 Quote
+                // find quote in cache
                 Set<String> cachedQuotes = zSetOps.rangeByScore(CACHE_KEY, quoteToUpdate.getTimestamp().getTime(), quoteToUpdate.getTimestamp().getTime());
                 boolean inCache = !cachedQuotes.isEmpty();
 
-                // 更新 Quote 內容，但不更新時間戳
+                // update Quote content without updating timestamp
                 quoteToUpdate.setQuote(updatedQuoteContent);
                 quoteRepository.save(quoteToUpdate);
 
                 if (inCache) {
-                    // 如果在緩存中，更新緩存
+                    // if quote in cache, updating ，updating cache
                     String oldSerializedQuote = cachedQuotes.iterator().next();
                     zSetOps.remove(CACHE_KEY, oldSerializedQuote);
                     String newSerializedQuote = serializeQuote(quoteToUpdate);

@@ -149,24 +149,6 @@ document.addEventListener("DOMContentLoaded", function() {
             });
     }
 
-    // // 渲染書籍
-    // function renderBooks(books) {
-    //     books.forEach(book => {
-    //         const bookDiv = document.createElement('div');
-    //         bookDiv.classList.add('book-container');
-    //
-    //         bookDiv.addEventListener('click', function() {
-    //             window.location.href = `/bookDetail.html?bookId=${book.bookId}`;
-    //         });
-    //
-    //         bookDiv.innerHTML = `
-    //             <img src="${book.bookCover}" alt="${book.bookName}" class="book-cover">
-    //             <div class="book-name">${book.bookName}</div>
-    //         `;
-    //         containerCategory.appendChild(bookDiv);
-    //     });
-    // }
-
     // 渲染書籍 enlarge
     function renderBooks(books) {
         books.forEach(book => {

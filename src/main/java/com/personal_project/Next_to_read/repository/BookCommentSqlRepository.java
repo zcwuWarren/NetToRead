@@ -24,8 +24,6 @@ public interface BookCommentSqlRepository extends JpaRepository<BookCommentSql, 
     @Query("SELECT bcs FROM BookCommentSql bcs WHERE bcs.bookId.bookId = :bookId ORDER BY bcs.timestamp DESC")
     Page<BookCommentSql> findByBookIdOrderByTimestampDesc(@Param("bookId") Long bookId, Pageable pageable);
 
-    List<BookCommentSql> findTop6ByOrderByTimestampDesc();
-
     @Query("SELECT bcs FROM BookCommentSql bcs WHERE bcs.userId.userId = :userId ORDER BY bcs.timestamp DESC")
     Page<BookCommentSql> findByUserIdOrderByTimestampDesc(@Param("userId") Long userId, Pageable pageable);
 

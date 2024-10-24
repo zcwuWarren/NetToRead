@@ -18,7 +18,4 @@ public class LoginDto {
 
     @JsonProperty("expired")
     private long accessExpired;
-
-//    @JsonProperty("user")
-//    private User user;
 }
